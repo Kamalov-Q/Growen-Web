@@ -215,7 +215,7 @@ export function HomeViews({
         <div className="relative left-1/2 w-screen -translate-x-1/2 px-3 sm:px-4 lg:px-6">
           <BrowseMap
             lang={lang}
-            purpose={query.purpose}
+            query={query}
             onOpen={(id) => router.push(`/${lang}/listing/${id}`)}
           />
         </div>

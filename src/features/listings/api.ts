@@ -63,11 +63,24 @@ export interface BBox {
   north: number;
 }
 
-/** The map's own endpoint: points when zoomed out, polygons when zoomed in. */
+/**
+ * The map's own endpoint: points when zoomed out, polygons when zoomed in.
+ *
+ * Takes the WHOLE feed query, not just the purpose.
+ *
+ * It used to take `purpose` alone, while the endpoint has always accepted
+ * category, price bounds and an address substring (see the server's
+ * MapViewportQueryDto). So picking "Kvartira" in map view navigated,
+ * re-queried the viewport and came back with exactly the same pins — the
+ * filter looked broken because it was: the chip changed the URL and the map
+ * ignored it.
+ *
+ * `q` maps to `address`, which is what the feed's search box means here.
+ */
 export async function fetchViewport(
   bbox: BBox,
   zoom: number,
-  purpose: OfferPurpose,
+  query: FeedQuery,
   signal?: AbortSignal,
 ): Promise<ViewportResponse> {
   const p = new URLSearchParams({
@@ -76,8 +89,14 @@ export async function fetchViewport(
     south: String(bbox.south),
     north: String(bbox.north),
     zoom: String(Math.round(zoom)),
-    purpose,
+    purpose: query.purpose,
   });
+  if (query.category) p.set("category", query.category);
+  if (query.priceMin !== undefined) p.set("priceMin", String(query.priceMin));
+  if (query.priceMax !== undefined) p.set("priceMax", String(query.priceMax));
+  // Trimmed-empty is "not filtering" on the server too, but sending a blank
+  // param just to have it discarded busts the cache key for nothing.
+  if (query.q?.trim()) p.set("address", query.q.trim());
   const res = await fetch(`${API_URL}/listings/map?${p}`, { signal });
   if (!res.ok) throw new Error(`Viewport failed: ${res.status}`);
   return (await res.json()) as ViewportResponse;

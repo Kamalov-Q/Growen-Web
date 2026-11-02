@@ -14,7 +14,7 @@ import { ensureMapWorker } from "@/src/lib/maplibre";
 /** See the `moveend` handler — a flick settles several times. */
 const VIEWPORT_DEBOUNCE_MS = 300;
 import type { Lang } from "@/src/i18n/config";
-import { fetchViewport, type OfferPurpose } from "./api";
+import { fetchViewport, type FeedQuery } from "./api";
 import type { MapPointFeature, MapPolygonFeature } from "@/src/lib/listing-types";
 import { MapControls } from "./MapControls";
 import { MapPreview } from "./MapPreview";
@@ -63,13 +63,23 @@ const money = (price: string, currency: string) => {
 
 export function BrowseMap({
   lang,
-  purpose,
+  query,
   onOpen,
 }: {
   lang: Lang;
-  purpose: OfferPurpose;
+  /** The whole feed query — the map honours every filter the chips set. */
+  query: FeedQuery;
   onOpen: (listingId: string) => void;
 }) {
+  // See the viewport effect's dependency list.
+  const queryKey = JSON.stringify([
+    query.purpose,
+    query.category ?? null,
+    query.priceMin ?? null,
+    query.priceMax ?? null,
+    query.q?.trim() || null,
+  ]);
+
   const holder = useRef<HTMLDivElement>(null);
   const map = useRef<MapLibreMap | null>(null);
   const markers = useRef<Marker[]>([]);
@@ -314,7 +324,7 @@ export function BrowseMap({
           north: b.getNorth(),
         },
         instance.getZoom(),
-        purpose,
+        query,
         abort.signal,
       )
         .then((res) => {
@@ -362,7 +372,12 @@ export function BrowseMap({
       abort?.abort();
       instance.off("moveend", schedule);
     };
-  }, [purpose, draw]);
+    // `queryKey`, not `query`: the object is rebuilt on every parent render,
+    // so depending on it directly would tear down and re-add the `moveend`
+    // listener (and fire a fetch) on renders where no filter actually
+    // changed. The serialised value only changes when a filter does.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryKey, draw]);
 
   const toggle = () => {
     const next: Layer = layer === "street" ? "satellite" : "street";

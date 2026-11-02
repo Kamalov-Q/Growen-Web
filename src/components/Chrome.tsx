@@ -63,8 +63,22 @@ export function Header({
    */
   minimal?: boolean;
 }) {
+  /**
+   * Translucent, not opaque.
+   *
+   * The map now runs the full width of the window underneath this bar, and
+   * a solid strip across the top of it reads as a lid on the page. At 65%
+   * with a heavy blur the colour behind comes through enough to feel like
+   * one surface, while the blur keeps the search box and the buttons
+   * legible over whatever happens to be there — which plain transparency
+   * would not.
+   *
+   * `supports-[backdrop-filter]` steps the background back up to 92% where
+   * the blur is unavailable, because 65% with nothing behind it is
+   * unreadable text over a satellite photograph.
+   */
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-surface/85 shadow-bar backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-line/70 bg-surface/92 shadow-bar backdrop-blur-xl supports-[backdrop-filter]:bg-surface/65">
       <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-3 px-4">
         <Link
           href={`/${lang}`}
