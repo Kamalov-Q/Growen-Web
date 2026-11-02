@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import type { Lang } from "@/src/i18n/config";
@@ -18,15 +19,29 @@ import { HeaderSearch } from "@/src/features/listings/HeaderSearch";
  * JavaScript to do a job an anchor already does.
  */
 
-/** The emblem, as a mark rather than an image — one less request, scales. */
+/**
+ * The real emblem — the same gold leaf and buildings the app ships as its
+ * launcher icon (mobile/assets/icon.png), resized into public/logo.png.
+ *
+ * It was a brand-coloured tile with a "G" in it, which is what you draw
+ * before anyone sends you the artwork. Somebody who installed the app and
+ * then found the site had no way to tell it was the same company.
+ *
+ * `unoptimized`: the file is already a 96px PNG cut for this 32px slot, so
+ * Next's optimizer would spend a transform and a cache entry producing
+ * something the same size.
+ */
 function Mark() {
   return (
-    <span
-      aria-hidden
-      className="grid size-8 shrink-0 place-items-center rounded-[0.6rem] bg-brand text-[15px] font-bold text-brand-ink"
-    >
-      G
-    </span>
+    <Image
+      src="/logo.png"
+      alt=""
+      width={32}
+      height={32}
+      unoptimized
+      priority
+      className="size-8 shrink-0 rounded-[0.6rem]"
+    />
   );
 }
 

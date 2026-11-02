@@ -203,11 +203,22 @@ export function HomeViews({
       {filters}
 
       {view === "map" ? (
-        <BrowseMap
-          lang={lang}
-          purpose={query.purpose}
-          onOpen={(id) => router.push(`/${lang}/listing/${id}`)}
-        />
+        /* Out of the 1400px measure and across the window.
+           A grid of cards wants a measure; a map wants the screen. On a
+           1920px monitor the container left 260px of page background down
+           each side of the one view where every pixel is content — which is
+           what every mapping site figured out years ago.
+
+           left-1/2 + -translate-x-1/2 is the standard break-out: the
+           element is still in flow, so nothing below it moves. body has
+           `overflow-x: clip` so the 100vw does not add a scrollbar. */
+        <div className="relative left-1/2 w-screen -translate-x-1/2 px-3 sm:px-4 lg:px-6">
+          <BrowseMap
+            lang={lang}
+            purpose={query.purpose}
+            onOpen={(id) => router.push(`/${lang}/listing/${id}`)}
+          />
+        </div>
       ) : (
         <>
           {shelf}

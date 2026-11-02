@@ -186,7 +186,11 @@ export function MapControls({
 
   return (
     <>
-      <div className="pointer-events-none absolute inset-x-3 top-3 flex flex-wrap items-start gap-2">
+      {/* On a phone the search box takes the full row and the two buttons
+          drop beneath it as icons. Before this they shared one line with
+          their labels, so at 459px "Butun ekran" was sliced off the right
+          edge and the search input had about forty pixels to itself. */}
+      <div className="pointer-events-none absolute inset-x-3 top-3 flex flex-col items-stretch gap-2 sm:flex-row sm:items-start">
         {/* A <div>, NOT a <form>.
             ShapePicker drops this map inside CreateListingForm's own
             <form>, and HTML forbids a form inside a form: the parser throws
@@ -197,7 +201,7 @@ export function MapControls({
             below. */}
         <div
           role="search"
-          className="pointer-events-auto flex h-9 min-w-0 flex-1 items-center gap-1 rounded-control bg-surface/95 px-2.5 shadow-card ring-1 ring-line backdrop-blur-sm sm:max-w-xs"
+          className="pointer-events-auto flex h-9 w-full min-w-0 items-center gap-1 rounded-control bg-surface/95 px-2.5 shadow-card ring-1 ring-line backdrop-blur-sm sm:w-auto sm:max-w-xs sm:flex-1"
         >
           <input
             value={query}
@@ -232,17 +236,38 @@ export function MapControls({
             aria-label={t(lang, "home.searchAction")}
             className="shrink-0 rounded-[0.5rem] bg-brand px-2.5 py-1 text-[12px] font-bold text-brand-ink disabled:opacity-50"
           >
-            {searching ? "…" : t(lang, "home.searchAction")}
+            {searching ? "…" : (
+              <>
+                <span aria-hidden className="sm:hidden">⌕</span>
+                <span className="hidden sm:inline">
+                  {t(lang, "home.searchAction")}
+                </span>
+              </>
+            )}
           </button>
         </div>
 
-        <div className="pointer-events-auto flex flex-wrap gap-2">
-          <button type="button" onClick={locate} disabled={locating} className={btn}>
-            {locating ? "…" : "◎"} {t(lang, "map.locate")}
+        <div className="pointer-events-auto flex gap-2 self-start">
+          <button
+            type="button"
+            onClick={locate}
+            disabled={locating}
+            aria-label={t(lang, "map.locate")}
+            className={btn}
+          >
+            {locating ? "…" : "◎"}
+            <span className="hidden sm:inline">{t(lang, "map.locate")}</span>
           </button>
-          <button type="button" onClick={toggleFull} className={btn}>
-            {full ? "✕" : "⤢"}{" "}
-            {t(lang, full ? "map.exitFull" : "map.full")}
+          <button
+            type="button"
+            onClick={toggleFull}
+            aria-label={t(lang, full ? "map.exitFull" : "map.full")}
+            className={btn}
+          >
+            {full ? "✕" : "⤢"}
+            <span className="hidden sm:inline">
+              {t(lang, full ? "map.exitFull" : "map.full")}
+            </span>
           </button>
         </div>
       </div>

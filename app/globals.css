@@ -155,6 +155,14 @@ html {
 body {
   background: var(--color-page);
   color: var(--color-ink);
+  /* `clip`, NOT `hidden`.
+     The map view breaks out of the page container to the full width of the
+     window, and `100vw` includes the scrollbar — so without this there is a
+     few-pixel horizontal scrollbar on every page that has a vertical one.
+     `overflow: hidden` would also stop that and would ALSO turn body into a
+     scroll container, which silently kills `position: sticky` on the
+     header. `clip` trims the overflow without becoming one. */
+  overflow-x: clip;
   /* Tabular figures off by default but on for prices — see .nums. */
   font-feature-settings: "cv05" 1;
 }

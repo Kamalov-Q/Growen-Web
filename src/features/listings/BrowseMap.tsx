@@ -10,6 +10,9 @@ import {
 import "maplibre-gl/dist/maplibre-gl.css";
 import { SATELLITE_STYLE, STREET_STYLE, TASHKENT } from "@/src/lib/mapStyles";
 import { ensureMapWorker } from "@/src/lib/maplibre";
+
+/** See the `moveend` handler — a flick settles several times. */
+const VIEWPORT_DEBOUNCE_MS = 300;
 import type { Lang } from "@/src/i18n/config";
 import { fetchViewport, type OfferPurpose } from "./api";
 import type { MapPointFeature, MapPolygonFeature } from "@/src/lib/listing-types";
@@ -329,15 +332,35 @@ export function BrowseMap({
         });
     };
 
-    // `moveend`, not `move`: the viewport endpoint is a spatial query and
-    // firing it on every animation frame is how a map takes a database down.
-    instance.on("moveend", load);
+    /**
+     * `moveend`, then DEBOUNCED on top of it.
+     *
+     * `moveend` instead of `move` was always right — the viewport endpoint
+     * is a spatial query and firing it per animation frame is how a map
+     * takes a database down. It is not enough on its own, though: a kinetic
+     * flick settles several times, and every `fitBounds` and `easeTo` fires
+     * it again, so one pan across the city produced thirty-odd queries. The
+     * only one whose answer anybody sees is the last.
+     *
+     * 300ms is below the threshold where a pause feels like lag and well
+     * above the gap between settles in a flick.
+     */
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const schedule = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(load, VIEWPORT_DEBOUNCE_MS);
+    };
+
+    instance.on("moveend", schedule);
+    // The FIRST load is immediate. Debouncing the opening query would leave
+    // the map empty for 300ms on a page whose whole point is the pins.
     if (instance.loaded()) load();
     else instance.once("load", load);
 
     return () => {
+      if (timer) clearTimeout(timer);
       abort?.abort();
-      instance.off("moveend", load);
+      instance.off("moveend", schedule);
     };
   }, [purpose, draw]);
 
@@ -356,7 +379,14 @@ export function BrowseMap({
   };
 
   return (
-    <div className="relative h-[70vh] w-full overflow-hidden rounded-card shadow-card ring-1 ring-line">
+    /* Taller on a phone than `70vh` allowed, and taller still on a desktop.
+       A map is the one view where the screen IS the content: at 459px the
+       old height left a letterbox under a stack of controls, and on a
+       1440px monitor it wasted the bottom third of the window.
+
+       `min-h` rather than a plain height so the controls across the top
+       always have somewhere to sit. */
+    <div className="relative h-[calc(100dvh-13rem)] min-h-[26rem] w-full overflow-hidden rounded-card shadow-card ring-1 ring-line sm:h-[calc(100dvh-15rem)] lg:h-[calc(100dvh-13rem)]">
       <div ref={holder} className="size-full" />
 
       <MapControls lang={lang} map={instanceForControls} ready={ready} />
