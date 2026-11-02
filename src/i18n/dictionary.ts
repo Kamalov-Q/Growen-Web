@@ -224,6 +224,21 @@ const UI = {
   "settings.verification": { uz: "Tasdiqlash", ru: "Верификация" },
   "settings.activity": { uz: "Faollik", ru: "Активность" },
   "settings.places": { uz: "Saqlangan joylar", ru: "Сохранённые места" },
+  "deletion.howTitle": {
+    uz: "Hisobni o'chirishning ikki yo'li",
+    ru: "Два способа удалить аккаунт",
+  },
+  "deletion.inApp": { uz: "Ilovadan", ru: "В приложении" },
+  "deletion.inAppHint": {
+    uz: "Profil → Sozlamalar → Hisobni o'chirish. Darhol bajariladi.",
+    ru: "Профиль → Настройки → Удалить аккаунт. Выполняется сразу.",
+  },
+  "deletion.byMail": { uz: "Yozma so'rov", ru: "Письменный запрос" },
+  "deletion.byMailHint": {
+    uz: "Ilovaga kira olmasangiz. 30 kun ichida bajaramiz.",
+    ru: "Если нет доступа к приложению. Выполним в течение 30 дней.",
+  },
+  "legal.contents": { uz: "Bo'limlar", ru: "Содержание" },
   "nav.legal": { uz: "Hujjatlar", ru: "Документы" },
   "nav.privacy": { uz: "Maxfiylik siyosati", ru: "Конфиденциальность" },
   "nav.terms": { uz: "Foydalanish shartlari", ru: "Условия использования" },

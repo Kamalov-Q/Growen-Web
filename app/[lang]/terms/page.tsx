@@ -42,8 +42,11 @@ export default async function LegalPage({
   const doc = getLegalDocument(SLUG, lang);
 
   return (
-    <Page lang={lang} path={PATH} title={doc.title} lead={doc.summary}>
-      <LegalBody doc={doc} />
+    /* `wide`, so the contents list has a column of its own beside the
+       text. The ARTICLE keeps a prose measure — see LegalBody's grid — so
+       the lines do not stretch with the container. */
+    <Page lang={lang} path={PATH} title={doc.title} lead={doc.summary} width="wide">
+      <LegalBody doc={doc} lang={lang} />
     </Page>
   );
 }
