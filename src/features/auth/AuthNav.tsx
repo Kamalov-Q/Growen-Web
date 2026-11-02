@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
+import { Icon, type IconName } from "@/src/components/ui/Icon";
 import { useSession } from "./session";
 import { ConfirmDialog } from "@/src/components/ui/ConfirmDialog";
 
@@ -98,32 +99,48 @@ export function AuthNav({ lang }: { lang: Lang }) {
             {display}
           </p>
 
-          <Link
+          <MenuLink
             href={`/${lang}/profile`}
-            role="menuitem"
-            onClick={() => setOpen(false)}
-            className="block px-3.5 py-2.5 text-[14px] text-ink transition hover:bg-muted-bg"
-          >
-            {t(lang, "profile.title")}
-          </Link>
+            icon="person"
+            label={t(lang, "profile.title")}
+            onNavigate={() => setOpen(false)}
+          />
 
-          <Link
+          <MenuLink
+            href={`/${lang}/listings/mine`}
+            icon="listings"
+            label={t(lang, "mine.title")}
+            onNavigate={() => setOpen(false)}
+          />
+
+          <MenuLink
+            href={`/${lang}/saved`}
+            icon="heart"
+            label={t(lang, "saved.title")}
+            onNavigate={() => setOpen(false)}
+          />
+
+          <MenuLink
+            href={`/${lang}/wallet`}
+            icon="wallet"
+            label={t(lang, "profile.linkWallet")}
+            onNavigate={() => setOpen(false)}
+          />
+
+          <MenuLink
             href={`/${lang}/settings`}
-            role="menuitem"
-            onClick={() => setOpen(false)}
-            className="block px-3.5 py-2.5 text-[14px] text-ink transition hover:bg-muted-bg"
-          >
-            {t(lang, "nav.settings")}
-          </Link>
+            icon="settings"
+            label={t(lang, "nav.settings")}
+            onNavigate={() => setOpen(false)}
+          />
 
-          <Link
+          <MenuLink
             href={`/${lang}/account/sessions`}
-            role="menuitem"
-            onClick={() => setOpen(false)}
-            className="block border-b border-line px-3.5 py-2.5 text-[14px] text-ink transition hover:bg-muted-bg"
-          >
-            {t(lang, "sessions.title")}
-          </Link>
+            icon="sessions"
+            label={t(lang, "sessions.title")}
+            onNavigate={() => setOpen(false)}
+            last
+          />
 
           <button
             type="button"
@@ -132,8 +149,9 @@ export function AuthNav({ lang }: { lang: Lang }) {
               setOpen(false);
               setConfirming(true);
             }}
-            className="block w-full px-3.5 py-2.5 text-start text-[14px] text-danger transition hover:bg-muted-bg"
+            className="flex w-full items-center gap-3 px-3.5 py-2.5 text-start text-[14px] text-danger transition hover:bg-muted-bg"
           >
+            <Icon name="logout" className="size-[18px]" />
             {t(lang, "auth.signOut")}
           </button>
         </div>
@@ -153,5 +171,42 @@ export function AuthNav({ lang }: { lang: Lang }) {
         onCancel={() => setConfirming(false)}
       />
     </div>
+  );
+}
+
+/**
+ * One row of the avatar menu.
+ *
+ * Icons because the menu grew: with two items the words were enough, with
+ * six they are a wall, and the glyph is what the eye lands on. They are the
+ * SAME glyphs the settings page uses for the same destinations — two icons
+ * for one place is worse than none.
+ */
+function MenuLink({
+  href,
+  icon,
+  label,
+  onNavigate,
+  last = false,
+}: {
+  href: string;
+  icon: IconName;
+  label: string;
+  onNavigate: () => void;
+  /** Draws the divider above the sign-out button. */
+  last?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      role="menuitem"
+      onClick={onNavigate}
+      className={`flex items-center gap-3 px-3.5 py-2.5 text-[14px] text-ink transition hover:bg-muted-bg ${
+        last ? "border-b border-line" : ""
+      }`}
+    >
+      <Icon name={icon} className="size-[18px] text-muted" />
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+    </Link>
   );
 }

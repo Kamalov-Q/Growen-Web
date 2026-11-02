@@ -25,8 +25,8 @@ const UI = {
     ru: "Каждое объявление показывается в валюте продавца.",
   },
   "settings.rateLine": {
-    uz: "Kurs: 1 $ = {rate} so'm · {date}",
-    ru: "Курс: 1 $ = {rate} сум · {date}",
+    uz: "Kurs: 1 $ = {{rate}} so'm · {{date}}",
+    ru: "Курс: 1 $ = {{rate}} сум · {{date}}",
   },
   "settings.language": { uz: "Til", ru: "Язык" },
   "settings.account": { uz: "Hisob", ru: "Аккаунт" },
@@ -110,10 +110,10 @@ const UI = {
     uz: "Chegarani chizish uchun xaritaga kamida 3 marta bosing",
     ru: "Нажмите на карту минимум 3 раза, чтобы обвести контур",
   },
-  "create.drawDone": { uz: "{n} nuqta — surib tuzating", ru: "{n} точек — перетащите, чтобы поправить" },
+  "create.drawDone": { uz: "{{n}} nuqta — surib tuzating", ru: "{{n}} точек — перетащите, чтобы поправить" },
   "create.undo": { uz: "Oxirgisi", ru: "Отменить" },
   "create.clear": { uz: "Tozalash", ru: "Очистить" },
-  "create.measured": { uz: "Taxminan {n} m²", ru: "Примерно {n} м²" },
+  "create.measured": { uz: "Taxminan {{n}} m²", ru: "Примерно {{n}} м²" },
   "create.needShape": {
     uz: "Xaritada joyni belgilang",
     ru: "Отметьте расположение на карте",
@@ -216,6 +216,14 @@ const UI = {
   "map.street": { uz: "Xarita", ru: "Карта" },
   "map.recenter": { uz: "Markazga", ru: "К центру" },
   "map.openIn": { uz: "Xaritada ochish:", ru: "Открыть на карте:" },
+
+  /* Rows the app has and the web has not built. Wording taken from the
+     app's own screen (mobile/app/settings.tsx) so the two agree. */
+  "settings.inAppSection": { uz: "Mobil ilovada", ru: "В приложении" },
+  "settings.inApp": { uz: "Ilovada", ru: "В приложении" },
+  "settings.verification": { uz: "Tasdiqlash", ru: "Верификация" },
+  "settings.activity": { uz: "Faollik", ru: "Активность" },
+  "settings.places": { uz: "Saqlangan joylar", ru: "Сохранённые места" },
   "nav.legal": { uz: "Hujjatlar", ru: "Документы" },
   "nav.privacy": { uz: "Maxfiylik siyosati", ru: "Конфиденциальность" },
   "nav.terms": { uz: "Foydalanish shartlari", ru: "Условия использования" },
