@@ -1,9 +1,11 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useSyncExternalStore,
 } from "react";
 
@@ -54,14 +56,48 @@ const emit = () => {
 
 function subscribeChoice(notify: () => void): () => void {
   listeners.add(notify);
+  // Cross-tab, as prefs.tsx does for currency: two tabs open and a theme
+  // changed in one of them should not leave the other disagreeing until it
+  // is reloaded.
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === KEY || e.key === null) notify();
+  };
+  window.addEventListener("storage", onStorage);
   return () => {
     listeners.delete(notify);
+    window.removeEventListener("storage", onStorage);
   };
 }
 
+/**
+ * STORAGE is the truth, the attribute only a projection of it.
+ *
+ * This read the `data-theme` attribute and nothing else, with a comment
+ * saying the attribute was the truth. It is not: the attribute belongs to
+ * <html>, and <html> is the one element the app does not own. Switching
+ * language re-renders the root layout — the only layout that renders <html>
+ * — and the attribute, which React never knew about and therefore cannot
+ * restore, went with it. The theme silently fell back to "system", so a
+ * reader who had chosen light and whose machine is set to dark watched the
+ * site go dark for changing language.
+ *
+ * localStorage survives all of that. The attribute is read only as a
+ * fallback, for the case where storage is unavailable (a private window)
+ * and the pre-paint script put something there for this page's lifetime.
+ */
 function readChoice(): ThemeChoice {
-  const attr = document.documentElement.getAttribute("data-theme");
-  return attr === "light" || attr === "dark" ? attr : "system";
+  try {
+    const stored = localStorage.getItem(KEY);
+    if (stored === "light" || stored === "dark") return stored;
+    if (stored === null) {
+      const attr = document.documentElement.getAttribute("data-theme");
+      return attr === "light" || attr === "dark" ? attr : "system";
+    }
+  } catch {
+    const attr = document.documentElement.getAttribute("data-theme");
+    return attr === "light" || attr === "dark" ? attr : "system";
+  }
+  return "system";
 }
 
 /** The server cannot read a browser's storage, and "system" is the default. */
@@ -79,9 +115,6 @@ const readSystemDark = () => window.matchMedia(DARK_QUERY).matches;
 const serverSystemDark = () => false;
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Read from the DOM, which the pre-paint script has already written. The
-  // attribute is the truth; reading storage again could disagree with what
-  // is on screen.
   const choice = useSyncExternalStore(
     subscribeChoice,
     readChoice,
@@ -106,10 +139,36 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // Private window: the theme still applies for this page's lifetime.
     }
-    // The DOM attribute IS the store, so nothing re-renders until the
-    // subscribers are told it changed.
+    // Storage is the store, and it fires no event in the tab that wrote it,
+    // so nothing re-renders until the subscribers are told.
     emit();
   }, []);
+
+  /**
+   * Put the attribute back if anything has taken it off.
+   *
+   * This is the other half of reading from storage. Whatever happens to
+   * <html> — a re-render on a language change, a remount, a stray script —
+   * the provider restores what the person actually chose.
+   *
+   * It only ever WRITES, and only for an explicit choice. Removing it here
+   * would be a hazard: during the hydration render `choice` is "system" by
+   * design, and an effect that removed the attribute on that value would
+   * strip the theme from the page for a frame before putting it back.
+   * Clearing is `setChoice`'s job, where it is unambiguous.
+   *
+   * `pathname` is in the dependency list and that is the point of it, not an
+   * oversight. The attribute goes missing on a NAVIGATION, while `choice`
+   * stays exactly what it was — so an effect keyed on `choice` alone would
+   * never run again and the theme would stay lost. Keyed on the path, it
+   * re-asserts after every navigation, and setting an attribute to the value
+   * it already holds costs nothing.
+   */
+  const pathname = usePathname();
+  useEffect(() => {
+    if (choice === "system") return;
+    document.documentElement.setAttribute("data-theme", choice);
+  }, [choice, pathname]);
 
   const resolved = choice === "system" ? (systemDark ? "dark" : "light") : choice;
 
