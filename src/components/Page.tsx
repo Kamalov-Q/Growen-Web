@@ -1,5 +1,6 @@
 import type { Lang } from "@/src/i18n/config";
 import { Footer, Header } from "./Chrome";
+import { MobileTabBar } from "./MobileTabBar";
 
 /**
  * The shell every page shares.
@@ -49,6 +50,16 @@ export function Page({
       </main>
 
       <Footer lang={lang} />
+
+      {/* The bar is `fixed`, so it is out of flow and would otherwise sit on
+          top of the last of the footer. This reserves exactly its height
+          plus the home-indicator inset, and only while the bar is on
+          screen. */}
+      <div
+        aria-hidden
+        className="h-[calc(58px+env(safe-area-inset-bottom))] md:hidden"
+      />
+      <MobileTabBar lang={lang} />
     </div>
   );
 }

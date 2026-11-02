@@ -32,7 +32,10 @@ export function PostCta({ lang }: { lang: Lang }) {
   return (
     <Link
       href={href}
-      className="hidden shrink-0 rounded-control bg-brand px-4 py-2.5 text-sm font-bold text-brand-ink transition hover:bg-brand-hover sm:block"
+      // `md`, not `sm`: below 768px this action lives in MobileTabBar as the
+      // raised centre button, and showing both would be two primary buttons
+      // on one screen. Above it there is no bar, so the header carries it.
+      className="hidden shrink-0 rounded-control bg-brand px-4 py-2.5 text-sm font-bold text-brand-ink transition hover:bg-brand-hover md:block"
     >
       {t(lang, "nav.post")}
     </Link>

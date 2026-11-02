@@ -48,23 +48,23 @@ export function Toolbar({
   return (
     <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
       <div className="flex flex-col">
-        <p className="nums text-[1.6rem] font-bold leading-none tracking-tight text-ink">
+        <p className="nums text-[1.35rem] font-bold leading-none tracking-tight text-ink sm:text-[1.6rem]">
           {groupDigits(count)}
         </p>
         <p className="text-[13px] text-muted">{t(lang, "home.foundLabel")}</p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="no-scrollbar -my-1.5 flex max-w-full items-center gap-2 overflow-x-auto py-1.5">
         {/* Links, so each ordering is its own URL. The canonical drops
             `sort`, because the same listings in a different order are a
             duplicate — see pageMetadata. */}
-        <div className="flex gap-1 rounded-control bg-muted-bg p-1">
+        <div className="flex shrink-0 gap-1 rounded-control bg-muted-bg p-1">
           {sorts.map((s) => (
             <Link
               key={s.id}
               href={href(s.id)}
               aria-current={active === s.id ? "page" : undefined}
-              className={`rounded-[0.5rem] px-3 py-1.5 text-[13px] font-semibold transition ${
+              className={`whitespace-nowrap rounded-[0.5rem] px-3 py-1.5 text-[13px] font-semibold transition ${
                 active === s.id
                   ? "bg-surface text-ink shadow-card"
                   : "text-muted hover:text-ink"

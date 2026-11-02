@@ -200,6 +200,16 @@ const UI = {
     ru: "Размещение объявлений пока доступно в мобильном приложении: фотографии, контур на карте и ценовые предложения работают там полностью.",
   },
   "nav.post": { uz: "E'lon joylash", ru: "Разместить" },
+
+  /* The bottom bar on a phone. Labels are taken verbatim from the app's own
+     dictionary (mobile/src/i18n/locales/*.ts, `tabs`) rather than retranslated,
+     so somebody who uses both does not meet two words for one place. */
+  "tabs.home": { uz: "Asosiy", ru: "Главная" },
+  "tabs.saved": { uz: "Saqlangan", ru: "Избранное" },
+  "tabs.add": { uz: "Qo'shish", ru: "Добавить" },
+  "tabs.myListings": { uz: "E'lonlarim", ru: "Мои объявления" },
+  "tabs.profile": { uz: "Profil", ru: "Профиль" },
+  "tabs.nav": { uz: "Asosiy menyu", ru: "Основная навигация" },
   "nav.legal": { uz: "Hujjatlar", ru: "Документы" },
   "nav.privacy": { uz: "Maxfiylik siyosati", ru: "Конфиденциальность" },
   "nav.terms": { uz: "Foydalanish shartlari", ru: "Условия использования" },
