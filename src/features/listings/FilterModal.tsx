@@ -5,6 +5,8 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
 import { categoryName, type Category, type FeedQuery, type OfferPurpose } from "./api";
+import { usePrefs } from "@/src/features/settings/prefs";
+import { PriceRange } from "./PriceRange";
 
 const PURPOSES: { id: OfferPurpose; key: Parameters<typeof t>[1] }[] = [
   { id: "SALE", key: "home.purposeSale" },
@@ -53,6 +55,9 @@ export function FilterModal({
   onClose: () => void;
 }) {
   const router = useRouter();
+  // Only to pick the track's scale — the API filters in the offer's own
+  // currency either way.
+  const { currency } = usePrefs();
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
@@ -203,27 +208,19 @@ export function FilterModal({
           </Section>
 
           <Section label={t(lang, "filters.price")}>
-            <div className="flex items-center gap-3">
-              <input
-                inputMode="numeric"
-                value={min}
-                onChange={(e) => setMin(e.target.value)}
-                placeholder={t(lang, "filters.priceMin")}
-                aria-label={t(lang, "filters.priceMin")}
-                className={`${field} nums`}
-              />
-              <span aria-hidden className="text-muted">
-                —
-              </span>
-              <input
-                inputMode="numeric"
-                value={max}
-                onChange={(e) => setMax(e.target.value)}
-                placeholder={t(lang, "filters.priceMax")}
-                aria-label={t(lang, "filters.priceMax")}
-                className={`${field} nums`}
-              />
-            </div>
+            {/* The track's range follows the PURPOSE, as it does in the app:
+                $500k tops out a sale, $5k a monthly rent, $500 a night. One
+                track for all three would put every nightly rate in its
+                first pixel. */}
+            <PriceRange
+              lang={lang}
+              purpose={purpose}
+              currency={currency === "UZS" ? "UZS" : "USD"}
+              min={min}
+              max={max}
+              onChangeMin={setMin}
+              onChangeMax={setMax}
+            />
           </Section>
 
           <Section label={t(lang, "filters.sortBy")}>
