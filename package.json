@@ -1,0 +1,33 @@
+{
+  "name": "growencity-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "analyze": "ANALYZE=true next build",
+    "gen:theme": "node scripts/gen-theme-init.mjs",
+    "prebuild": "node scripts/gen-theme-init.mjs",
+    "predev": "node scripts/gen-theme-init.mjs"
+  },
+  "dependencies": {
+    "maplibre-gl": "^6.16.0",
+    "next": "16.4.3",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.1.14",
+    "@types/node": "22.18.8",
+    "@types/react": "19.1.17",
+    "@types/react-dom": "19.1.11",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.3",
+    "tailwindcss": "4.1.14",
+    "typescript": "5.9.3"
+  }
+}

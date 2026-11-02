@@ -1,0 +1,264 @@
+@import "tailwindcss";
+
+/**
+ * The design tokens.
+ *
+ * NEUTRAL surfaces, ONE loud accent. That is the correction, and it is the
+ * whole difference between this and the two versions before it.
+ *
+ * Those tinted everything with the brand teal — the page, the cards, the
+ * chips, the borders, all the same hue at different lightnesses. The result
+ * had no contrast between surface and accent, so nothing could stand out:
+ * a teal button on a teal card on a teal page is three shades of one colour,
+ * and the eye reads it as a single murky plane however it is spaced. The
+ * dark theme was the worst of it.
+ *
+ * Surfaces are now neutral grey. Teal is reserved for interactive things and
+ * amber for the one call to action that should shout. An accent only works
+ * if it is the only saturated thing on the screen.
+ */
+@theme {
+  /**
+   * Every colour states its light and its dark value on ONE line.
+   *
+   * `light-dark()` picks between them from the `color-scheme` in effect, so
+   * the palette has a single source of truth. The previous shape — light
+   * values here and a whole second copy of the palette inside a dark media
+   * query — meant every colour change had to be made twice, and a change
+   * made once was a theme bug nobody would notice until they looked at the
+   * site in the other mode.
+   *
+   * `color-scheme` is set on :root below, which is also where the toggle
+   * reaches: an explicit choice overrides the system, and no choice follows
+   * it. That is why this is `light-dark()` and not a media query — a media
+   * query cannot be overridden by a person clicking a button.
+   *
+   * ── These values come from the MOBILE app, verbatim ──────────────────
+   *
+   * `mobile/src/theme/tokens.ts`. This is the same product, so a visitor
+   * moving between the app and the site should not feel the brand change
+   * under them. Two consequences worth stating, because both were wrong
+   * here before and both are deliberate there:
+   *
+   * The surfaces are TEAL-TINTED, not neutral grey. The app's own note:
+   * "Cards are white and the page behind them is faintly teal-tinted — a
+   * white-on-white version of this UI loses every card edge." The neutral
+   * light palette this replaces had exactly that problem.
+   *
+   * And gold is SCARCE. In the app it means promoted, the brand mark, and
+   * premium marks — nothing else. It is not a general accent colour, so
+   * ordinary interactive things are teal.
+   */
+  /* --- surfaces, light to dark in the stack -------------------------- */
+  --color-page: light-dark(#F4F7F7, #07191D);
+  --color-surface: light-dark(#FFFFFF, #0E2A30);
+  --color-raised: light-dark(#EDF3F2, #15383F);
+  --color-muted-bg: light-dark(#E6EDEC, #15383F);
+
+  /* --- text ---------------------------------------------------------- */
+  --color-ink: light-dark(#072226, #EEF5F4);
+  --color-ink-soft: light-dark(#2B4448, #C9DBDA);
+  --color-muted: light-dark(#52696B, #A3BABB);
+  --color-faint: light-dark(#6F8384, #74908F);
+
+  /* --- lines --------------------------------------------------------- */
+  --color-line: light-dark(#DCE6E5, #1C4249);
+  --color-line-strong: light-dark(#BFCFCE, #2B5C65);
+
+  /* --- brand --------------------------------------------------------- */
+  --color-brand: light-dark(#0A7569, #2FB8A8);
+  --color-brand-hover: light-dark(#07564E, #26998C);
+  --color-brand-ink: light-dark(#FFFFFF, #04221F);
+  --color-brand-soft: light-dark(#E6F5F2, #0C2F31);
+  --color-brand-line: light-dark(#A7DCD4, #1C5F58);
+
+  /* --- accents ------------------------------------------------------- */
+  --color-gold: light-dark(#806224, #DCC083);
+  /* Gold is a dark bronze in light mode and a pale sand in dark mode, so
+     what sits on it has to invert too. `text-white` on #DCC083 is a 1.5:1
+     smear. The app's rule: a light accent carries the page colour. */
+  --color-on-gold: light-dark(#FFFFFF, #07191D);
+  --color-sold: light-dark(#8A5A06, #F5C84B);
+  --color-sold-soft: light-dark(#FBF4E4, #2E2309);
+  --color-on-sold: light-dark(#FFFFFF, #07191D);
+  --color-danger: light-dark(#D32F2F, #FF8A8A);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Softer and larger than the default ladder: a card at 8px reads as a
+     dialog box, at 16px as a tile. */
+  --radius-card: 1rem;
+  --radius-control: 0.75rem;
+
+  /**
+   * Shadows point at `--sh-*` rather than being written inline, because
+   * Tailwind COMPILES a shadow value into the utility at build time while
+   * it leaves a colour as `var(--color-x)`. An inline shadow therefore
+   * could not change with the theme at all.
+   *
+   * They are also the one thing `light-dark()` cannot express: the dark
+   * shadows are not merely darker, they have FEWER layers. On a dark
+   * background a wide ambient shadow does nothing — the lift comes from the
+   * surface colour instead — so the two-layer light shadow collapses to a
+   * hairline. Different structure, not a different colour.
+   */
+  --shadow-card: var(--sh-card);
+  --shadow-lift: var(--sh-lift);
+  --shadow-bar: var(--sh-bar);
+}
+
+/**
+ * How the theme is chosen.
+ *
+ * No attribute: follow the system, which is what most visitors want and
+ * what they get before any JavaScript runs.
+ * `data-theme`: an explicit choice, set by the toggle and persisted; it
+ * wins over the system because the person said so.
+ */
+:root {
+  color-scheme: light dark;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+:root,
+:root[data-theme="light"] {
+  --sh-card: 0 1px 2px rgb(11 31 36 / 0.04), 0 4px 16px rgb(11 31 36 / 0.06);
+  --sh-lift: 0 2px 4px rgb(11 31 36 / 0.06), 0 12px 28px rgb(11 31 36 / 0.12);
+  --sh-bar: 0 1px 0 rgb(11 31 36 / 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sh-card: 0 1px 2px rgb(0 0 0 / 0.4);
+    --sh-lift: 0 10px 30px rgb(0 0 0 / 0.5);
+    --sh-bar: 0 1px 0 rgb(255 255 255 / 0.05);
+  }
+}
+
+:root[data-theme="dark"] {
+  --sh-card: 0 1px 2px rgb(0 0 0 / 0.4);
+  --sh-lift: 0 10px 30px rgb(0 0 0 / 0.5);
+  --sh-bar: 0 1px 0 rgb(255 255 255 / 0.05);
+}
+
+html {
+  /* Anchors land under the sticky header rather than behind it. */
+  scroll-padding-top: 5.5rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+  /* Tabular figures off by default but on for prices — see .nums. */
+  font-feature-settings: "cv05" 1;
+}
+
+/* Prices and areas line up in a grid only if the digits are the same width. */
+.nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Clamp helpers; Tailwind's line-clamp needs the plugin in some setups and
+   this is two lines of CSS. */
+.clamp-1,
+.clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.clamp-1 {
+  -webkit-line-clamp: 1;
+}
+.clamp-2 {
+  -webkit-line-clamp: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/**
+ * Form controls never draw their own focus ring.
+ *
+ * Every text control on this site sits inside a wrapper that shows focus
+ * for the whole field — the box that also holds the "+998" prefix and the
+ * search icon. Letting the control draw a ring as well produces two nested
+ * boxes, which is exactly what the phone field looked like.
+ *
+ * Targeted by ELEMENT, not by a `[data-field]` descendant selector, which
+ * is what the first attempt used. Element + pseudo-class is (0,1,1) and
+ * beats the bare `:focus-visible` above at (0,1,0) on specificity alone, so
+ * it cannot be defeated by source order, by a wrapper that forgets the
+ * attribute, or by a control that is not nested the way the selector
+ * expected.
+ *
+ * Keyboard focus is still obvious: the WRAPPER lights up, and it is bigger
+ * and easier to see than a ring on the input alone. Links and buttons keep
+ * the outline from the rule above.
+ */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+}
+
+/* A scroll strip without a scrollbar eating 12px of every photo. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/**
+ * Which theme icon is visible, decided by CSS rather than by React.
+ *
+ * The toggle cannot compute this during render without producing different
+ * markup on the server and the client — there is no `window` on the server,
+ * so it always resolved "light" and mismatched every dark-mode visitor.
+ * These variables follow exactly the same `color-scheme` cascade as the
+ * palette, so the right icon is correct on the first paint and React never
+ * has to know.
+ */
+:root,
+:root[data-theme="light"] {
+  --icon-light: 1;
+  --icon-dark: 0;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --icon-light: 0;
+    --icon-dark: 1;
+  }
+}
+:root[data-theme="dark"] {
+  --icon-light: 0;
+  --icon-dark: 1;
+}
+
+.theme-icon-light {
+  opacity: var(--icon-light);
+  scale: calc(0.9 + 0.1 * var(--icon-light));
+}
+.theme-icon-dark {
+  opacity: var(--icon-dark);
+  scale: calc(0.9 + 0.1 * var(--icon-dark));
+}
