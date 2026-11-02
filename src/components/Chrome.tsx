@@ -143,8 +143,15 @@ export function Footer({ lang }: { lang: Lang }) {
   return (
     <footer className="mt-20 border-t border-line bg-surface">
       <div className="mx-auto flex max-w-[1400px] flex-col gap-8 px-4 py-12">
-        <div className="flex flex-col gap-8 sm:flex-row sm:justify-between">
-          <div className="flex max-w-xs flex-col gap-3">
+        {/* Centred on a phone, left-aligned from `sm` up.
+            Ranged left in a single narrow column, the brand block, the two
+            store buttons and the five links all started at the same x and
+            ended at five different ones — a ragged edge down the whole
+            footer with empty space beside it. Centring gives the column an
+            axis to hang from. Above `sm` the two blocks sit side by side
+            and left-alignment is right again. */}
+        <div className="flex flex-col items-center gap-8 text-center sm:flex-row sm:items-start sm:justify-between sm:text-start">
+          <div className="flex max-w-xs flex-col items-center gap-3 sm:items-start">
             <Link
               href={`/${lang}`}
               className="flex items-center gap-2.5 text-[17px] font-bold tracking-tight text-ink"
@@ -177,7 +184,7 @@ export function Footer({ lang }: { lang: Lang }) {
 
           <nav
             aria-label={t(lang, "nav.legal")}
-            className="flex flex-col gap-2.5 text-sm"
+            className="flex flex-col items-center gap-2.5 text-sm sm:items-start"
           >
             {legal.map((l) => (
               <Link
@@ -197,7 +204,7 @@ export function Footer({ lang }: { lang: Lang }) {
           </nav>
         </div>
 
-        <p className="border-t border-line pt-6 text-[13px] text-faint">
+        <p className="border-t border-line pt-6 text-center text-[13px] text-faint sm:text-start">
           © {new Date().getFullYear()} {SITE_NAME} · {t(lang, "footer.updated")}{" "}
           <time dateTime={LEGAL_UPDATED}>{LEGAL_UPDATED}</time>
         </p>
