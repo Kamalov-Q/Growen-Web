@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { LANGS, type Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
@@ -15,9 +14,11 @@ const LABEL: Record<Lang, string> = { uz: "O'zbekcha", ru: "Русский" };
  * language is added and gives no room for the language's own name. A menu
  * shows "O'zbekcha" and "Русский" rather than two ambiguous letter pairs.
  *
- * The options stay real <Link>s to `/uz…` and `/ru…`, so switching language
+ * The options are real anchors to `/uz…` and `/ru…`, so switching language
  * is a navigation a crawler can follow and a person can open in a new tab —
  * the hreflang pairs on each page depend on those URLs existing.
+ *
+ * Deliberately NOT next/link; see the note on the anchor below.
  */
 export function LangMenu({ lang, path }: { lang: Lang; path: string }) {
   const [open, setOpen] = useState(false);
@@ -89,7 +90,23 @@ export function LangMenu({ lang, path }: { lang: Lang; path: string }) {
           {LANGS.map((code) => {
             const active = code === lang;
             return (
-              <Link
+              /* A plain anchor, NOT next/link.
+                 `[lang]` is a segment of the ROOT layout — the only layout
+                 that renders <html>. A client navigation across it tears the
+                 whole tree down and rebuilds it, and in that gap the
+                 `data-theme` attribute, which React never knew about and so
+                 cannot restore, disappeared: the page flashed the system
+                 theme and then corrected itself.
+
+                 A document load has none of that. theme-init.js runs in
+                 <head> before the first paint, so the theme is right in the
+                 first frame rather than fixed in the second.
+
+                 Nothing the links were for is lost — still real anchors with
+                 real hrefs, crawlable, openable in a new tab, hreflang pairs
+                 intact. The only thing given up is a client transition, on
+                 an action somebody performs about once. */
+              <a
                 key={code}
                 href={`/${code}${path}`}
                 hrefLang={code}
@@ -117,7 +134,7 @@ export function LangMenu({ lang, path }: { lang: Lang; path: string }) {
                     <path d="m5 13 4 4L19 7" />
                   </svg>
                 ) : null}
-              </Link>
+              </a>
             );
           })}
         </div>

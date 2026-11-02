@@ -6,6 +6,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useSyncExternalStore,
 } from "react";
 
@@ -103,6 +104,22 @@ function readChoice(): ThemeChoice {
 /** The server cannot read a browser's storage, and "system" is the default. */
 const serverChoice = (): ThemeChoice => "system";
 
+/**
+ * `useLayoutEffect` in the browser, `useEffect` on the server.
+ *
+ * Restoring the theme attribute has to happen BEFORE the browser paints,
+ * and a passive effect runs after. That one frame is visible: the page
+ * flashed the system theme on every language change and then corrected
+ * itself, which is the bug this is half of.
+ *
+ * React warns about useLayoutEffect during server rendering, correctly —
+ * there is no layout to measure. It never runs there, so the hook is chosen
+ * per environment. Assigned once at module scope, so the hook call itself is
+ * unconditional and the rules of hooks are satisfied.
+ */
+const useIsomorphicLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
+
 const DARK_QUERY = "(prefers-color-scheme: dark)";
 
 function subscribeSystem(notify: () => void): () => void {
@@ -165,7 +182,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
    * it already holds costs nothing.
    */
   const pathname = usePathname();
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (choice === "system") return;
     document.documentElement.setAttribute("data-theme", choice);
   }, [choice, pathname]);

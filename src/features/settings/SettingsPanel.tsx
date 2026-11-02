@@ -104,7 +104,11 @@ export function SettingsPanel({ lang }: { lang: Lang }) {
       <Card title={t(lang, "settings.language")}>
         <div className="grid grid-cols-2 gap-1 rounded-control bg-muted-bg p-1">
           {LANGS.map((code) => (
-            <Link
+            /* A plain <a>, like LangMenu's — `[lang]` belongs to the root
+               layout, and a client navigation across it drops the theme
+               attribute off <html> and repaints mid-rebuild. A document
+               load runs theme-init.js before the first paint instead. */
+            <a
               key={code}
               href={`/${code}${rest}`}
               hrefLang={code}
@@ -116,7 +120,7 @@ export function SettingsPanel({ lang }: { lang: Lang }) {
               }`}
             >
               {LANG_LABEL[code]}
-            </Link>
+            </a>
           ))}
         </div>
       </Card>
