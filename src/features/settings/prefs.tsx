@@ -8,6 +8,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import { API_URL } from "@/src/lib/site";
 
 export type Currency = "AUTO" | "USD" | "UZS";
 
@@ -89,7 +90,7 @@ export function PrefsProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let alive = true;
-    fetch(`${process.env.NEXT_PUBLIC_API_URL ?? ""}/rates`)
+    fetch(`${API_URL}/rates`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d: { usdToUzs?: number; updatedAt?: string } | null) => {
         if (!alive || !d?.usdToUzs) return;

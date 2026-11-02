@@ -5,6 +5,7 @@ import type { GeoJSONSource, Map as MapLibreMap, Marker as MapMarker } from "map
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
 import { GEOSEARCH_CREDIT, searchPlace, type Place, type UzRegion } from "@/src/lib/geosearch";
+import { API_URL } from "@/src/lib/site";
 
 const SEARCH_SOURCE = "map-search";
 const SEARCH_COLOR = "#3b82f6";
@@ -47,7 +48,7 @@ export function MapControls({
   // still works, it is just worse at bare district names.
   useEffect(() => {
     let alive = true;
-    fetch(`${process.env.NEXT_PUBLIC_API_URL ?? ""}/regions`)
+    fetch(`${API_URL}/regions`)
       .then((r) => (r.ok ? r.json() : []))
       .then((d: UzRegion[]) => alive && setRegions(d))
       .catch(() => {});
