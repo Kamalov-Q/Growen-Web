@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/src/components/ui/Button";
+import { ConfirmDialog } from "@/src/components/ui/ConfirmDialog";
+import { Icon } from "@/src/components/ui/Icon";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
 import { api } from "@/src/lib/api";
@@ -15,12 +17,48 @@ interface SessionRow {
 }
 
 /**
+ * Dates WITHOUT Intl, for the same reason prices are grouped by hand.
+ *
+ * `toLocaleString("uz-UZ", { dateStyle: "medium" })` gives "2-noy, 2026" in
+ * Node and "2026 M11 2" in the browser — "M11" being CLDR's fallback when a
+ * locale has no month names for that skeleton. One of those is readable and
+ * which one you get depends on whose device you are holding, which is not a
+ * thing to leave to chance on a security screen.
+ *
+ * dd.MM.yyyy is how both Uzbek and Russian write a date anyway.
+ */
+const pad = (n: number) => String(n).padStart(2, "0");
+
+function absolute(date: Date): string {
+  return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+/**
+ * "5 daqiqa oldin" beats "02.11.2026 23:45" for the question this screen
+ * answers — is somebody on my account RIGHT NOW — and the exact timestamp
+ * stays one hover away in `title`.
+ */
+function relative(iso: string, lang: Lang): string {
+  const then = new Date(iso);
+  const minutes = Math.floor((Date.now() - then.getTime()) / 60000);
+
+  if (minutes < 1) return t(lang, "time.now");
+  if (minutes < 60) return t(lang, "time.minutes", { n: minutes });
+  if (minutes < 60 * 24) {
+    return t(lang, "time.hours", { n: Math.floor(minutes / 60) });
+  }
+  if (minutes < 60 * 48) return t(lang, "time.yesterday");
+  return absolute(then);
+}
+
+/**
  * The signed-in devices, and the ability to end them.
  *
  * This matters more on the web than on a phone: a browser session can be
- * left open on a shared or public computer, and until now there was no way
- * to end it from anywhere else. The data has always existed — refresh_tokens
- * carries family_id and created_at — it simply had nothing reading it.
+ * left open on a shared or public computer, and until this existed there was
+ * no way to end it from anywhere else. The data was always there —
+ * refresh_tokens carries family_id and created_at — it simply had nothing
+ * reading it.
  *
  * One row per FAMILY, because a family is a sign-in: rotation replaces the
  * token and keeps the family, so a device open for a month is one row here
@@ -30,6 +68,7 @@ export function SessionsList({ lang }: { lang: Lang }) {
   const [rows, setRows] = useState<SessionRow[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
 
   /**
    * A counter, not a callback.
@@ -80,6 +119,7 @@ export function SessionsList({ lang }: { lang: Lang }) {
     setError(null);
     try {
       await api<void>("/auth/sessions/revoke-others", { method: "POST" });
+      setConfirming(false);
       reload();
     } catch {
       setError(t(lang, "auth.genericError"));
@@ -87,12 +127,6 @@ export function SessionsList({ lang }: { lang: Lang }) {
       setBusy(null);
     }
   };
-
-  const fmt = (iso: string) =>
-    new Date(iso).toLocaleString(lang === "ru" ? "ru-RU" : "uz-UZ", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    });
 
   /**
    * The error comes FIRST.
@@ -105,17 +139,13 @@ export function SessionsList({ lang }: { lang: Lang }) {
    */
   if (error && rows === null) {
     return (
-      <div className="flex flex-col items-start gap-3">
+      <div className="flex flex-col items-start gap-4 rounded-card bg-surface p-6 shadow-card ring-1 ring-line">
         <p role="alert" className="text-[15px] text-danger">
           {error}
         </p>
-        <button
-          type="button"
-          onClick={reload}
-          className="h-10 rounded-control px-4 text-[14px] font-semibold text-ink ring-1 ring-line transition hover:bg-muted-bg"
-        >
+        <Button variant="ghost" onClick={reload}>
           {t(lang, "common.retry")}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -123,16 +153,33 @@ export function SessionsList({ lang }: { lang: Lang }) {
   if (rows === null) {
     return (
       <div className="flex flex-col gap-3" aria-busy="true">
-        <div className="h-20 animate-pulse rounded-card bg-muted-bg" />
-        <div className="h-20 animate-pulse rounded-card bg-muted-bg" />
+        <div className="h-[4.75rem] animate-pulse rounded-card bg-muted-bg" />
+        <div className="h-[4.75rem] animate-pulse rounded-card bg-muted-bg" />
       </div>
     );
   }
 
+  if (rows.length === 0) {
+    return (
+      <p className="rounded-card bg-surface p-6 text-[15px] text-muted shadow-card ring-1 ring-line">
+        {t(lang, "sessions.empty")}
+      </p>
+    );
+  }
+
+  const others = rows.filter((r) => !r.current);
+
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
+      <p className="nums text-[13px] font-medium uppercase tracking-wide text-faint">
+        {t(lang, "sessions.active", { n: rows.length })}
+      </p>
+
       {error ? (
-        <p role="alert" className="text-sm text-red-500">
+        <p
+          role="alert"
+          className="rounded-control bg-danger/10 px-4 py-3 text-[14px] text-danger"
+        >
           {error}
         </p>
       ) : null}
@@ -141,16 +188,47 @@ export function SessionsList({ lang }: { lang: Lang }) {
         {rows.map((row) => (
           <li
             key={row.familyId}
-            className="flex items-center gap-4 rounded-control border border-line bg-muted-bg p-4"
+            className={`flex items-center gap-4 rounded-card bg-surface p-4 shadow-card ring-1 transition ${
+              row.current ? "ring-brand/40" : "ring-line hover:ring-line-strong"
+            }`}
           >
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <span className="text-[15px] font-medium text-ink">
+            <span
+              className={`grid size-11 shrink-0 place-items-center rounded-control ${
+                row.current
+                  ? "bg-brand-soft text-brand"
+                  : "bg-muted-bg text-muted"
+              }`}
+            >
+              <Icon name="sessions" className="size-5" />
+            </span>
+
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <span className="flex flex-wrap items-center gap-2 text-[15px] font-semibold text-ink">
                 {row.current
                   ? t(lang, "sessions.thisDevice")
                   : t(lang, "sessions.otherDevice")}
+                {row.current ? (
+                  <span className="rounded-full bg-brand px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-brand-ink">
+                    {t(lang, "sessions.current")}
+                  </span>
+                ) : null}
               </span>
-              <span className="text-sm text-muted">
-                {t(lang, "sessions.lastSeen", { when: fmt(row.lastSeenAt) })}
+
+              {/* The exact timestamp stays available on hover — a relative
+                  one answers "is someone on my account now?", an absolute
+                  one answers "was that me on Tuesday?". */}
+              <span
+                className="text-[13px] text-muted"
+                title={absolute(new Date(row.lastSeenAt))}
+              >
+                {t(lang, "sessions.lastSeen", {
+                  when: relative(row.lastSeenAt, lang),
+                })}
+              </span>
+              <span className="nums text-[12px] text-faint">
+                {t(lang, "sessions.started", {
+                  when: absolute(new Date(row.startedAt)),
+                })}
               </span>
             </div>
 
@@ -164,24 +242,36 @@ export function SessionsList({ lang }: { lang: Lang }) {
                 type="button"
                 onClick={() => void endOne(row.familyId)}
                 disabled={busy !== null}
-                className="shrink-0 rounded-lg border border-line px-3 py-1.5 text-sm text-ink hover:bg-muted-bg disabled:opacity-50"
+                className="shrink-0 rounded-control px-3 py-2 text-[13px] font-semibold text-danger ring-1 ring-danger/30 transition hover:bg-danger/10 disabled:opacity-50"
               >
-                {t(lang, "sessions.end")}
+                {busy === row.familyId ? "…" : t(lang, "sessions.end")}
               </button>
             )}
           </li>
         ))}
       </ul>
 
-      {rows.filter((r) => !r.current).length > 0 ? (
-        <Button
-          variant="ghost"
-          loading={busy === "others"}
-          onClick={() => void endOthers()}
-        >
-          {t(lang, "sessions.endOthers")}
-        </Button>
+      {others.length > 0 ? (
+        <div className="flex">
+          <Button variant="ghost" onClick={() => setConfirming(true)}>
+            {t(lang, "sessions.endOthers")}
+          </Button>
+        </div>
       ) : null}
+
+      {/* Confirmed, because it is irreversible and it signs other people's
+          devices out — including, quite possibly, your own phone. */}
+      <ConfirmDialog
+        open={confirming}
+        title={t(lang, "sessions.endOthersTitle")}
+        body={t(lang, "sessions.endOthersBody")}
+        confirmLabel={t(lang, "sessions.endOthers")}
+        cancelLabel={t(lang, "common.cancel")}
+        danger
+        busy={busy === "others"}
+        onConfirm={() => void endOthers()}
+        onCancel={() => setConfirming(false)}
+      />
     </div>
   );
 }

@@ -336,6 +336,22 @@ const UI = {
   "sessions.otherDevice": { uz: "Boshqa qurilma", ru: "Другое устройство" },
   "sessions.lastSeen": { uz: "Oxirgi faollik: {{when}}", ru: "Последняя активность: {{when}}" },
   "sessions.end": { uz: "Yakunlash", ru: "Завершить" },
+  "sessions.current": { uz: "Shu qurilma", ru: "Это устройство" },
+  "sessions.started": { uz: "Kirilgan: {{when}}", ru: "Вход: {{when}}" },
+  "sessions.active": { uz: "{{n}} ta faol seans", ru: "Активных сеансов: {{n}}" },
+  "sessions.empty": { uz: "Faol seanslar yo'q", ru: "Нет активных сеансов" },
+  "sessions.endOthersTitle": {
+    uz: "Boshqa qurilmalardan chiqilsinmi?",
+    ru: "Выйти на других устройствах?",
+  },
+  "sessions.endOthersBody": {
+    uz: "Shu qurilmadan tashqari barcha seanslar yakunlanadi. Qaytadan kirish uchun SMS kod kerak bo'ladi.",
+    ru: "Все сеансы, кроме текущего, будут завершены. Для входа снова понадобится SMS-код.",
+  },
+  "time.now": { uz: "hozir", ru: "только что" },
+  "time.minutes": { uz: "{{n}} daqiqa oldin", ru: "{{n}} мин назад" },
+  "time.hours": { uz: "{{n}} soat oldin", ru: "{{n}} ч назад" },
+  "time.yesterday": { uz: "kecha", ru: "вчера" },
   "sessions.endOthers": {
     uz: "Boshqa barcha qurilmalardan chiqish",
     ru: "Выйти на всех других устройствах",
