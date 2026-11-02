@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
 import type { FeedQuery } from "./api";
+import { groupDigits } from "./format";
 
 /**
  * Result count, sort, and the view switch — one row, above the grid.
@@ -48,7 +49,7 @@ export function Toolbar({
     <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
       <div className="flex flex-col">
         <p className="nums text-[1.6rem] font-bold leading-none tracking-tight text-ink">
-          {count.toLocaleString(lang === "ru" ? "ru-RU" : "uz-UZ")}
+          {groupDigits(count)}
         </p>
         <p className="text-[13px] text-muted">{t(lang, "home.foundLabel")}</p>
       </div>
