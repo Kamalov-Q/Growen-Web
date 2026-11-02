@@ -165,123 +165,158 @@ export default async function ListingPage({
           </p>
         ) : null}
 
-        <Gallery images={listing.images} alt={listing.title ?? ""} />
+        {/* ── the two-column measure ───────────────────────────────────
+            One column was right when the page was only ever read on a
+            phone. On a 1400px desktop it stretched the description to the
+            full width of the screen, which is unreadable past about 70
+            characters a line, and left the price and the seller a full
+            scroll apart from the photographs.
 
-        <header className="flex flex-col gap-3">
-          {price ? (
-            <p className="nums text-[2.25rem] font-bold leading-none tracking-tight text-ink sm:text-[2.75rem]">
-              {price}
-            </p>
-          ) : null}
-          <h1 className="text-[1.25rem] font-semibold leading-snug text-ink-soft sm:text-[1.4rem]">
-            {listing.title ?? t(lang, "listing.untitled")}
-          </h1>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[15px] text-muted">
-            {specs ? <span className="nums">{specs}</span> : null}
-            {listing.address ? (
-              <>
-                <span aria-hidden className="text-faint">·</span>
-                <span>{listing.address}</span>
-              </>
-            ) : null}
+            So: photographs and prose on the left at a readable measure, and
+            the things a buyer keeps glancing back at — price, address,
+            who is selling, how to reach them — in a column that follows
+            them down the page.
+
+            The DOM order is the phone order, and `lg:col/row-start` moves
+            the pieces without reordering them, so the reading order a
+            screen reader gets is the one the markup has. */}
+        <div className="grid items-start gap-x-8 gap-y-7 lg:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)]">
+          <div className="min-w-0 lg:col-start-1 lg:row-start-1">
+          <Gallery
+            images={listing.images}
+            alt={listing.title ?? ""}
+            lang={lang}
+          />
           </div>
-          <p className="nums text-[13px] text-faint">
-            {t(lang, "detail.views", { n: listing.viewCount })}
-          </p>
-        </header>
 
-        {listing.descriptionText?.trim() ? (
-          <section className="flex flex-col gap-2">
-            <h2 className="text-[1.05rem] font-semibold tracking-tight text-ink">
-              {t(lang, "detail.about")}
-            </h2>
-            {/* The plain-text copy, NOT descriptionHtml. The HTML is pasted
-                by sellers out of Telegram and rendering it would be an
-                injection hole on a page anybody can publish to. The server
-                keeps a stripped version for exactly this. */}
-            <p className="whitespace-pre-line rounded-card bg-surface p-5 text-[15px] leading-7 text-ink-soft shadow-card ring-1 ring-line">
-              {listing.descriptionText}
-            </p>
-          </section>
-        ) : null}
-
-        {rows.length ? (
-          <section className="flex flex-col gap-2">
-            <h2 className="text-[1.05rem] font-semibold tracking-tight text-ink">
-              {t(lang, "detail.specs")}
-            </h2>
-            {/* A grid of small facts rather than a long two-column table:
-                six rows of label/value is a form, and nobody reads a form.
-                As tiles they are scannable at a glance. */}
-            <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {rows.map((row) => (
-                <div
-                  key={row.label}
-                  className="flex flex-col gap-1 rounded-control bg-surface px-4 py-3 shadow-card ring-1 ring-line"
-                >
-                  <dt className="text-[12px] uppercase tracking-wide text-faint">
-                    {row.label}
-                  </dt>
-                  <dd className="nums text-[15px] font-medium text-ink">
-                    {row.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-        ) : null}
-
-        {listing.centroid || ring ? (
-          <section className="flex flex-col gap-2">
-            <h2 className="text-[1.05rem] font-semibold tracking-tight text-ink">
-              {t(lang, "detail.location")}
-            </h2>
-            <LocationMapLoader
-              centroid={listing.centroid?.coordinates ?? null}
-              ring={ring}
-            />
-          </section>
-        ) : null}
-
-        {seller ? (
-          <section className="flex flex-col gap-2">
-            <h2 className="text-[1.05rem] font-semibold tracking-tight text-ink">
-              {t(lang, "detail.seller")}
-            </h2>
-            <div className="flex items-center gap-4 rounded-card bg-surface p-4 shadow-card ring-1 ring-line">
-              <span
-                aria-hidden
-                className="grid size-12 shrink-0 place-items-center rounded-full bg-brand-soft text-[17px] font-bold text-brand"
-              >
-                {(sellerName ?? "?").charAt(0).toUpperCase()}
-              </span>
-              <div className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-[15px] font-semibold text-ink">
-                  {sellerName ?? "—"}
-                </span>
-                {seller.isVerifiedRealtor ? (
-                  <span className="flex items-center gap-1 text-[13px] font-medium text-brand">
-                    <svg aria-hidden viewBox="0 0 24 24" className="size-4" fill="currentColor">
-                      <path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Zm-1 13-3-3 1.4-1.4L11 12.2l4.6-4.6L17 9l-6 6Z" />
-                    </svg>
-                    {t(lang, "detail.verified")}
-                  </span>
+          <aside className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+            {/* `top-20` clears the 4rem sticky header. The sticky lives on
+                this inner box rather than the grid item, because a grid
+                item is stretched to its row and has nothing to slide
+                within. */}
+            <div className="flex flex-col gap-5 lg:sticky lg:top-20">
+            <header className="flex flex-col gap-3">
+              {price ? (
+                <p className="nums text-[2.25rem] font-bold leading-none tracking-tight text-ink sm:text-[2.75rem]">
+                  {price}
+                </p>
+              ) : null}
+              <h1 className="text-[1.25rem] font-semibold leading-snug text-ink-soft sm:text-[1.4rem]">
+                {listing.title ?? t(lang, "listing.untitled")}
+              </h1>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[15px] text-muted">
+                {specs ? <span className="nums">{specs}</span> : null}
+                {listing.address ? (
+                  <>
+                    <span aria-hidden className="text-faint">·</span>
+                    <span>{listing.address}</span>
+                  </>
                 ) : null}
               </div>
+              <p className="nums text-[13px] text-faint">
+                {t(lang, "detail.views", { n: listing.viewCount })}
+              </p>
+            </header>
 
-              {/* Only when the listing is live. Putting a phone number on a
-                  sold advert invites calls the seller does not want.
+            {seller ? (
+              <section className="flex flex-col gap-2">
+                <h2 className="text-[1.05rem] font-semibold tracking-tight text-ink">
+                  {t(lang, "detail.seller")}
+                </h2>
+                <div className="flex items-center gap-4 rounded-card bg-surface p-4 shadow-card ring-1 ring-line">
+                  <span
+                    aria-hidden
+                    className="grid size-12 shrink-0 place-items-center rounded-full bg-brand-soft text-[17px] font-bold text-brand"
+                  >
+                    {(sellerName ?? "?").charAt(0).toUpperCase()}
+                  </span>
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <span className="truncate text-[15px] font-semibold text-ink">
+                      {sellerName ?? "—"}
+                    </span>
+                    {seller.isVerifiedRealtor ? (
+                      <span className="flex items-center gap-1 text-[13px] font-medium text-brand">
+                        <svg aria-hidden viewBox="0 0 24 24" className="size-4" fill="currentColor">
+                          <path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Zm-1 13-3-3 1.4-1.4L11 12.2l4.6-4.6L17 9l-6 6Z" />
+                        </svg>
+                        {t(lang, "detail.verified")}
+                      </span>
+                    ) : null}
+                  </div>
 
-                  The NUMBER is deliberately not passed down — see
-                  ContactButton. This page is statically rendered, so a
-                  number handed to a client component would still ship in
-                  the HTML and the RSC payload for every crawler to read. */}
-              {listing.contactPhone && listing.status === "ACTIVE" ? (
-                <ContactButton lang={lang} listingId={listing.id} />
-              ) : null}
+                  {/* Only when the listing is live. Putting a phone number on a
+                      sold advert invites calls the seller does not want.
+
+                      The NUMBER is deliberately not passed down — see
+                      ContactButton. This page is statically rendered, so a
+                      number handed to a client component would still ship in
+                      the HTML and the RSC payload for every crawler to read. */}
+                  {listing.contactPhone && listing.status === "ACTIVE" ? (
+                    <ContactButton lang={lang} listingId={listing.id} />
+                  ) : null}
+                </div>
+              </section>
+            ) : null}
             </div>
-          </section>
-        ) : null}
+          </aside>
+
+          <div className="flex min-w-0 flex-col gap-7 lg:col-start-1 lg:row-start-2">
+          {listing.descriptionText?.trim() ? (
+            <section className="flex flex-col gap-2">
+              <h2 className="text-[1.05rem] font-semibold tracking-tight text-ink">
+                {t(lang, "detail.about")}
+              </h2>
+              {/* The plain-text copy, NOT descriptionHtml. The HTML is pasted
+                  by sellers out of Telegram and rendering it would be an
+                  injection hole on a page anybody can publish to. The server
+                  keeps a stripped version for exactly this. */}
+              <p className="whitespace-pre-line rounded-card bg-surface p-5 text-[15px] leading-7 text-ink-soft shadow-card ring-1 ring-line">
+                {listing.descriptionText}
+              </p>
+            </section>
+          ) : null}
+
+          {rows.length ? (
+            <section className="flex flex-col gap-2">
+              <h2 className="text-[1.05rem] font-semibold tracking-tight text-ink">
+                {t(lang, "detail.specs")}
+              </h2>
+              {/* A grid of small facts rather than a long two-column table:
+                  six rows of label/value is a form, and nobody reads a form.
+                  As tiles they are scannable at a glance. */}
+              <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {rows.map((row) => (
+                  <div
+                    key={row.label}
+                    className="flex flex-col gap-1 rounded-control bg-surface px-4 py-3 shadow-card ring-1 ring-line"
+                  >
+                    <dt className="text-[12px] uppercase tracking-wide text-faint">
+                      {row.label}
+                    </dt>
+                    <dd className="nums text-[15px] font-medium text-ink">
+                      {row.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          ) : null}
+
+          {listing.centroid || ring ? (
+            <section className="flex flex-col gap-2">
+              <h2 className="text-[1.05rem] font-semibold tracking-tight text-ink">
+                {t(lang, "detail.location")}
+              </h2>
+              <LocationMapLoader
+                centroid={listing.centroid?.coordinates ?? null}
+                ring={ring}
+                lang={lang}
+              />
+            </section>
+          ) : null}
+          </div>
+        </div>
+
         {similar.length ? (
           <section className="flex flex-col gap-3 border-t border-line pt-8">
             <h2 className="text-[1.05rem] font-semibold tracking-tight text-ink">

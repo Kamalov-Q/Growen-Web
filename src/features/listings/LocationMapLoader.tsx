@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import type { Lang } from "@/src/i18n/config";
 
 /**
  * A client boundary whose only job is to hold the `ssr: false` import.
@@ -26,6 +27,7 @@ const LocationMap = dynamic(
 export function LocationMapLoader(props: {
   centroid: [number, number] | null;
   ring: [number, number][] | null;
+  lang: Lang;
   satellite?: boolean;
 }) {
   return <LocationMap {...props} />;
