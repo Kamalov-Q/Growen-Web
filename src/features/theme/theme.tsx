@@ -1,6 +1,11 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useSyncExternalStore,
+} from "react";
 
 export type ThemeChoice = "system" | "light" | "dark";
 
@@ -24,44 +29,74 @@ type Ctx = {
 };
 const ThemeCtx = createContext<Ctx | null>(null);
 
-function systemIsDark() {
-  return (
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-  );
+/**
+ * Both pieces of theme state are EXTERNAL STORES, and that is the whole fix
+ * for a hydration mismatch that showed up on the settings page.
+ *
+ * `choice` used to be `useState` with a lazy initialiser that read
+ * `document.documentElement`. On the server there is no document, so it
+ * returned "system"; on the client the pre-paint script had already written
+ * `data-theme="light"`, so the initialiser returned "light". The settings
+ * page renders the active choice as a pressed button, so the server marked
+ * "Система" and the client marked "Светлая", and React threw the tree away.
+ *
+ * `useSyncExternalStore` uses `getServerSnapshot` for the server render AND
+ * for the hydration render, then switches to `getSnapshot` once mounted.
+ * That is exactly the shape this needs: both sides agree on "system" while
+ * hydrating, and the real value lands a tick later without a mismatch.
+ *
+ * Same store shape as `prefs.tsx`, for the same reason.
+ */
+const listeners = new Set<() => void>();
+const emit = () => {
+  for (const notify of listeners) notify();
+};
+
+function subscribeChoice(notify: () => void): () => void {
+  listeners.add(notify);
+  return () => {
+    listeners.delete(notify);
+  };
 }
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  /**
-   * Initialised from the DOM, not from localStorage.
-   *
-   * The script above has already run by the time this mounts, so the
-   * attribute is the truth and reading it avoids a second storage access
-   * that could disagree with what is on screen.
-   *
-   * A lazy initialiser rather than an effect: setting state in an effect to
-   * match something already rendered is a second render for no reason, and
-   * the React Compiler lint flags it.
-   */
-  const [choice, setChoiceState] = useState<ThemeChoice>(() => {
-    if (typeof document === "undefined") return "system";
-    const attr = document.documentElement.getAttribute("data-theme");
-    return attr === "light" || attr === "dark" ? attr : "system";
-  });
+function readChoice(): ThemeChoice {
+  const attr = document.documentElement.getAttribute("data-theme");
+  return attr === "light" || attr === "dark" ? attr : "system";
+}
 
-  const [systemDark, setSystemDark] = useState(systemIsDark);
+/** The server cannot read a browser's storage, and "system" is the default. */
+const serverChoice = (): ThemeChoice => "system";
+
+const DARK_QUERY = "(prefers-color-scheme: dark)";
+
+function subscribeSystem(notify: () => void): () => void {
+  const mq = window.matchMedia(DARK_QUERY);
+  mq.addEventListener("change", notify);
+  return () => mq.removeEventListener("change", notify);
+}
+
+const readSystemDark = () => window.matchMedia(DARK_QUERY).matches;
+const serverSystemDark = () => false;
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  // Read from the DOM, which the pre-paint script has already written. The
+  // attribute is the truth; reading storage again could disagree with what
+  // is on screen.
+  const choice = useSyncExternalStore(
+    subscribeChoice,
+    readChoice,
+    serverChoice,
+  );
 
   // Someone switching their OS to dark while the page is open should see it,
   // but only if they have not made a choice of their own.
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => setSystemDark(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
+  const systemDark = useSyncExternalStore(
+    subscribeSystem,
+    readSystemDark,
+    serverSystemDark,
+  );
 
   const setChoice = useCallback((next: ThemeChoice) => {
-    setChoiceState(next);
     const root = document.documentElement;
     if (next === "system") root.removeAttribute("data-theme");
     else root.setAttribute("data-theme", next);
@@ -71,6 +106,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // Private window: the theme still applies for this page's lifetime.
     }
+    // The DOM attribute IS the store, so nothing re-renders until the
+    // subscribers are told it changed.
+    emit();
   }, []);
 
   const resolved = choice === "system" ? (systemDark ? "dark" : "light") : choice;

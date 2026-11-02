@@ -84,12 +84,36 @@ export default async function LangLayout({
         {/* Runs before the first paint so a visitor who chose dark never
             sees a white flash.
 
-            An EXTERNAL file, not an inline tag. React 19 does not execute an
-            inline script it renders on the client and logs an error saying
-            so; a `src` script is a resource it hoists and runs properly.
-            It is not `async` or `defer` on purpose — it must execute before
-            the first paint, which is the whole point, and it is ~150 bytes
-            served from the same origin.
+            ── On the console warning this produces in dev ─────────────────
+
+            React 19 logs "Encountered a script tag while rendering React
+            component" for this line. The warning is right in general and
+            wrong about this case, and both of the obvious ways to silence
+            it have now been measured:
+
+              inline (dangerouslySetInnerHTML)
+                React 19 never executes an inline script it renders, so the
+                tag was dead weight after the first server render. Already
+                tried; that is why this is an external file.
+
+              next/script strategy="beforeInteractive"
+                Emits ONLY `<link rel="preload" href="/theme-init.js"
+                as="script">` into the HTML — checked in the built output.
+                The script then runs when the framework gets to it, which is
+                after the first paint. That trades a dev-only warning for
+                the exact flash this exists to prevent.
+
+              async
+                React hoists an async script and stops warning, but async
+                means "whenever", and whenever is sometimes after paint.
+
+            What React is actually warning about is a client NAVIGATION: a
+            script tag rendered then would not execute. This one only has to
+            run once, while the browser parses the first document, and it
+            does. The warning does not appear in a production build.
+
+            So it stays blocking, and this comment is here so the next
+            person does not spend the afternoon rediscovering the above.
 
             `public/theme-init.js` is GENERATED from the theme module by
             `scripts/gen-theme-init.mjs` so the storage key cannot drift. */}

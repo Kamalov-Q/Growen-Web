@@ -90,8 +90,7 @@ export function MapControls({
     draw();
   }, [map, ready, found]);
 
-  const runSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const runSearch = async () => {
     if (!map || !query.trim()) return;
     setSearching(true);
     setError(null);
@@ -188,8 +187,16 @@ export function MapControls({
   return (
     <>
       <div className="pointer-events-none absolute inset-x-3 top-3 flex flex-wrap items-start gap-2">
-        <form
-          onSubmit={runSearch}
+        {/* A <div>, NOT a <form>.
+            ShapePicker drops this map inside CreateListingForm's own
+            <form>, and HTML forbids a form inside a form: the parser throws
+            the inner one away, so the server's HTML and React's tree
+            disagree and hydration fails on the whole add-listing page.
+            Nothing here submits to a server, so the element was only ever
+            buying Enter-to-search — which the input does for itself
+            below. */}
+        <div
+          role="search"
           className="pointer-events-auto flex h-9 min-w-0 flex-1 items-center gap-1 rounded-control bg-surface/95 px-2.5 shadow-card ring-1 ring-line backdrop-blur-sm sm:max-w-xs"
         >
           <input
@@ -198,6 +205,14 @@ export function MapControls({
             placeholder={t(lang, "map.searchPlaceholder")}
             aria-label={t(lang, "map.searchPlaceholder")}
             enterKeyHint="search"
+            onKeyDown={(e) => {
+              if (e.key !== "Enter") return;
+              // Without this the Enter lands on the ANCESTOR form — the
+              // add-listing form — and submits a half-filled listing.
+              e.preventDefault();
+              e.stopPropagation();
+              void runSearch();
+            }}
             className="h-full w-full min-w-0 bg-transparent text-[13px] text-ink outline-none placeholder:text-faint"
           />
           {query || found ? (
@@ -211,14 +226,15 @@ export function MapControls({
             </button>
           ) : null}
           <button
-            type="submit"
+            type="button"
+            onClick={() => void runSearch()}
             disabled={searching || !query.trim()}
             aria-label={t(lang, "home.searchAction")}
             className="shrink-0 rounded-[0.5rem] bg-brand px-2.5 py-1 text-[12px] font-bold text-brand-ink disabled:opacity-50"
           >
             {searching ? "…" : t(lang, "home.searchAction")}
           </button>
-        </form>
+        </div>
 
         <div className="pointer-events-auto flex flex-wrap gap-2">
           <button type="button" onClick={locate} disabled={locating} className={btn}>
