@@ -87,6 +87,20 @@ export default async function LegalPage({
             </span>
           </a>
         </div>
+
+        {/* The number as well as the address. Somebody who has lost access to
+            their phone number cannot necessarily receive mail on it either,
+            and a deletion request that cannot be made is the failure mode
+            this whole page exists to prevent. */}
+        <p className="nums text-[14px] text-muted">
+          {t(lang, "support.phone")}:{" "}
+          <a
+            href={CONTACT.phoneHref}
+            className="font-semibold text-brand underline-offset-4 hover:underline"
+          >
+            {CONTACT.phone}
+          </a>
+        </p>
       </div>
 
       <LegalBody doc={doc} lang={lang} />

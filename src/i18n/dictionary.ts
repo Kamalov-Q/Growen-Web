@@ -258,6 +258,11 @@ const UI = {
   },
   "support.email": { uz: "Elektron pochta", ru: "Электронная почта" },
   "support.telegram": { uz: "Telegram orqali", ru: "Через Telegram" },
+  "support.phone": { uz: "Telefon", ru: "Телефон" },
+  "support.phoneHint": {
+    uz: "Ish kunlari, 9:00 — 18:00",
+    ru: "В рабочие дни, 9:00 — 18:00",
+  },
   "support.inApp": { uz: "Ilova orqali", ru: "Через приложение" },
   "support.inAppHint": {
     uz: "Ilovadagi Profil → Yordam bo'limi eng tez yo'l: suhbat hisobingizga bog'langan bo'ladi.",

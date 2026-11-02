@@ -201,6 +201,14 @@ export function Footer({ lang }: { lang: Lang }) {
             >
               {CONTACT.email}
             </a>
+            {/* `nums`, so the groups in a phone number line up rather than
+                drifting with proportional digits. */}
+            <a
+              href={CONTACT.phoneHref}
+              className="nums text-muted transition hover:text-ink"
+            >
+              {CONTACT.phone}
+            </a>
           </nav>
         </div>
 

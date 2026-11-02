@@ -42,6 +42,15 @@ export default async function SupportPage({
       value: t(lang, "support.inAppHint"),
       href: null,
     },
+    // The phone goes ABOVE the written channels: somebody on a support page
+    // usually wants an answer now, and a number is the only one of these
+    // that gives them one.
+    {
+      label: t(lang, "support.phone"),
+      value: CONTACT.phone,
+      hint: t(lang, "support.phoneHint"),
+      href: CONTACT.phoneHref,
+    },
     { label: t(lang, "support.email"), value: CONTACT.email, href: `mailto:${CONTACT.email}` },
     { label: t(lang, "support.telegram"), value: "@growencity", href: CONTACT.telegram },
     {
@@ -79,6 +88,9 @@ export default async function SupportPage({
               ) : (
                 row.value
               )}
+              {"hint" in row && row.hint ? (
+                <span className="block text-[13px] text-muted">{row.hint}</span>
+              ) : null}
             </dd>
           </div>
         ))}

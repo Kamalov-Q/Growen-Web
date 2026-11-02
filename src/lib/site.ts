@@ -34,11 +34,26 @@ export const API_ORIGIN =
  */
 export const API_URL = `${API_ORIGIN}/api`;
 
-/** Reachable addresses. Used by the support page and the legal pages. */
+/**
+ * Reachable addresses. Used by the support page, the footer and the legal
+ * pages — nothing hardcodes a contact anywhere else, which is why changing
+ * one is a change to this object and nothing more.
+ *
+ * `privacyEmail` is the SAME address as `email` on purpose. It is the one
+ * the account-deletion page tells people to write to, and Google Play
+ * requires that route to work — a deletion request bouncing off an address
+ * nobody reads is a rejected submission, and worse, somebody who wanted
+ * their data gone and believes it is being handled. Two separate inboxes is
+ * a thing to split when there is somebody to read the second one.
+ */
 export const CONTACT = {
-  email: "support@growencity.uz",
-  privacyEmail: "privacy@growencity.uz",
+  email: "agromind5229@gmail.com",
+  privacyEmail: "agromind5229@gmail.com",
   telegram: "https://t.me/growencity",
+  /** As written for a person to read. */
+  phone: "+998 95 555 52 29",
+  /** The same number for a `tel:` link — no spaces, which some diallers choke on. */
+  phoneHref: "tel:+998955555229",
 } as const;
 
 /** Store listings, for the landing page and the install prompts. */
