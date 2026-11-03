@@ -152,6 +152,19 @@ const UI = {
     uz: "Bo'sh qoldirsangiz, turi va manzilidan tuziladi.",
     ru: "Если оставить пустым, составим из типа и адреса.",
   },
+  "create.cost": { uz: "Narxi", ru: "Стоимость" },
+  "create.free": { uz: "Bepul", ru: "Бесплатно" },
+  "create.firstFreeHint": {
+    uz: "Birinchi e'loningiz bepul — balansdan hech narsa yechilmaydi",
+    ru: "Первое объявление бесплатно — с баланса ничего не спишется",
+  },
+  "create.balance": { uz: "Balansingiz", ru: "Ваш баланс" },
+  // Veb'da to'ldirish yo'q (WalletPanel'ga qarang), shuning uchun bu yerda
+  // tugma emas — qayerda to'ldirish mumkinligi aytiladi.
+  "create.notEnough": {
+    uz: "Balans yetarli emas — mobil ilovada to'ldiring",
+    ru: "Недостаточно средств — пополните в мобильном приложении",
+  },
   "create.title": { uz: "Yangi e'lon", ru: "Новое объявление" },
   "create.lead": {
     uz: "Asosiy ma'lumotlarni to'ldiring — keyin tahrirlashingiz mumkin.",

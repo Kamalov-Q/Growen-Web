@@ -18,6 +18,7 @@ import {
   type CreateListingInput,
   type UploadedImage,
 } from "./create-api";
+import { PostPriceNotice } from "./PostPriceNotice";
 
 // MapLibre touches `window` at import time, so it cannot server-render, and
 // it is the heaviest dependency here. Loaded when the form is.
@@ -570,6 +571,11 @@ export function CreateListingForm({
           className="nums"
         />
       </Section>
+
+      {/* What this will cost, above the button that costs it. Silent when
+          nothing is priced, and it never blocks submitting — the server is
+          what charges. */}
+      <PostPriceNotice lang={lang} />
 
       {error ? (
         <p role="alert" className="text-[14px] font-medium text-danger">
