@@ -6,6 +6,27 @@ export const termsUz: LegalDocument = {
     "Growen City ilovasidan foydalanish qoidalari: kim e'lon joylashi mumkin, nima taqiqlanadi va javobgarlik qanday taqsimlanadi.",
   sections: [
     {
+      id: "operator",
+      heading: "Oferta kimdan",
+      blocks: [
+        {
+          kind: "p",
+          text: "Ushbu ommaviy oferta quyidagi yuridik shaxs nomidan taqdim etiladi. Ilovadan foydalanishni boshlash — oferta shartlarini qabul qilish demakdir.",
+        },
+        {
+          kind: "table",
+          head: ["Ma'lumot", "Qiymat"],
+          rows: [
+            ["Tashkilot", "«AGROMIND AL» MChJ"],
+            ["STIR (INN)", "312488501"],
+            ["Manzil", "Toshkent shahri, O'zbekiston"],
+            ["Telefon", "+998 95 555 52 29"],
+            ["Email", "agromind5229@gmail.com"],
+          ],
+        },
+      ],
+    },
+    {
       id: "service",
       heading: "Xizmat haqida",
       blocks: [

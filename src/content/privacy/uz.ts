@@ -15,6 +15,27 @@ export const privacyUz: LegalDocument = {
     "Growen City qanday ma'lumot to'playdi, nima uchun, qancha saqlaydi va uni qanday o'chirish mumkin.",
   sections: [
     {
+      id: "operator",
+      heading: "Operator haqida",
+      blocks: [
+        {
+          kind: "p",
+          text: "Shaxsga doir ma'lumotlarni qayta ishlovchi operator — quyidagi yuridik shaxs. Maxfiylik bo'yicha har qanday savol yoki so'rovni shu manzillarga yo'llashingiz mumkin.",
+        },
+        {
+          kind: "table",
+          head: ["Ma'lumot", "Qiymat"],
+          rows: [
+            ["Tashkilot", "«AGROMIND AL» MChJ"],
+            ["STIR (INN)", "312488501"],
+            ["Manzil", "Toshkent shahri, O'zbekiston"],
+            ["Telefon", "+998 95 555 52 29"],
+            ["Email", "agromind5229@gmail.com"],
+          ],
+        },
+      ],
+    },
+    {
       id: "intro",
       heading: "Qisqacha",
       blocks: [
