@@ -241,7 +241,19 @@ const UI = {
   "legal.contents": { uz: "Bo'limlar", ru: "Содержание" },
   "nav.legal": { uz: "Hujjatlar", ru: "Документы" },
   "nav.privacy": { uz: "Maxfiylik siyosati", ru: "Конфиденциальность" },
-  "nav.terms": { uz: "Foydalanish shartlari", ru: "Условия использования" },
+  /* "Public offer", not "terms of use".
+     One document with two names was the state of this for a while: the app
+     called it an offer on its login screen, the web called it terms of use
+     in the footer, and the document's own title agreed with neither sign-in
+     checkbox. In Uzbek and Russian practice a public offer is the form with
+     legal weight, so that is the name everywhere now.
+     The PATH stays /terms. It is in a shipped app build, in the nginx
+     redirects from the old /legal URLs, and in the store listings — a URL
+     is an address, not a label. */
+  "nav.terms": {
+    uz: "Ommaviy oferta shartlari",
+    ru: "Условия публичной оферты",
+  },
   "nav.deletion": { uz: "Hisobni o'chirish", ru: "Удаление аккаунта" },
   "nav.support": { uz: "Yordam", ru: "Поддержка" },
   "footer.updated": { uz: "Yangilangan:", ru: "Обновлено:" },
@@ -420,10 +432,9 @@ const UI = {
   "auth.name": { uz: "Ism", ru: "Имя" },
   "auth.save": { uz: "Saqlash", ru: "Сохранить" },
   "auth.acceptPrefix": { uz: "Men", ru: "Я принимаю" },
-  /* The link text in the sign-in checkbox, and deliberately NOT nav.terms.
-     The app calls this document "Ommaviy oferta shartlari" on its own login
-     screen, and a person who signs in on both should be agreeing to a thing
-     with one name. See the note where it is used. */
+  /* The sign-in checkbox says it mid-sentence, so it is lower-case where
+     nav.terms is a heading. Same document, same name, different position in
+     a sentence — which is the only reason this is a separate key. */
   "auth.acceptOffer": {
     uz: "ommaviy oferta shartlari",
     ru: "условия публичной оферты",

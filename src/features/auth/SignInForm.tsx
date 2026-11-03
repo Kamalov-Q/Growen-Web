@@ -284,15 +284,9 @@ export function SignInForm({ lang }: { lang: Lang }) {
         autoFocus
       />
 
-      {/* `auth.acceptOffer`, not `nav.terms`.
-          The same document, but the app's login screen calls it "Ommaviy
-          oferta shartlari" and this one called it "Foydalanish shartlari".
-          Somebody who signs in on both should be agreeing to a thing with
-          one name — and "public offer" is the one with legal weight here.
-
-          The page it opens is still titled "Foydalanish shartlari", which
-          is the remaining half of the same mismatch and a wording decision
-          rather than a code one. */}
+      {/* `auth.acceptOffer` rather than `nav.terms` only because this one
+          sits mid-sentence and wants lower case. Same document, same name,
+          same title on the page it opens. */}
       <Checkbox id="accept-terms" checked={accepted} onChange={setAccepted}>
         {t(lang, "auth.acceptPrefix")}{" "}
         <Link

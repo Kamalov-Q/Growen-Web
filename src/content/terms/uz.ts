@@ -1,7 +1,7 @@
 import type { LegalDocument } from "../types";
 
 export const termsUz: LegalDocument = {
-  title: "Foydalanish shartlari",
+  title: "Ommaviy oferta shartlari",
   summary:
     "Growen City ilovasidan foydalanish qoidalari: kim e'lon joylashi mumkin, nima taqiqlanadi va javobgarlik qanday taqsimlanadi.",
   sections: [

@@ -1,7 +1,7 @@
 import type { LegalDocument } from "../types";
 
 export const termsRu: LegalDocument = {
-  title: "Условия использования",
+  title: "Условия публичной оферты",
   summary:
     "Правила пользования приложением Growen City: кто может размещать объявления, что запрещено и как распределяется ответственность.",
   sections: [
