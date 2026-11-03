@@ -420,6 +420,14 @@ const UI = {
   "auth.name": { uz: "Ism", ru: "Имя" },
   "auth.save": { uz: "Saqlash", ru: "Сохранить" },
   "auth.acceptPrefix": { uz: "Men", ru: "Я принимаю" },
+  /* The link text in the sign-in checkbox, and deliberately NOT nav.terms.
+     The app calls this document "Ommaviy oferta shartlari" on its own login
+     screen, and a person who signs in on both should be agreeing to a thing
+     with one name. See the note where it is used. */
+  "auth.acceptOffer": {
+    uz: "ommaviy oferta shartlari",
+    ru: "условия публичной оферты",
+  },
   "auth.acceptMiddle": { uz: "va", ru: "и" },
   "auth.acceptSuffix": {
     uz: "bilan tanishdim va roziman",
