@@ -195,7 +195,7 @@ export function HistoryPanel({ lang }: { lang: Lang }) {
           role="alert"
           className="rounded-card bg-surface p-6 text-[15px] text-danger ring-1 ring-line"
         >
-          {t(lang, "home.loadError")}
+          {t(lang, "wallet.txLoadError")}
         </p>
       ) : null}
 

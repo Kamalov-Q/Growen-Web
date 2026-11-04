@@ -14,10 +14,16 @@ import { txConfig } from "./txConfig";
  * is not a number any spreadsheet will sum.
  */
 
-/** One request per page, until the server says there are no more. */
-const PAGE = 100;
-/** A guard, not a limit: 50 pages is 5 000 lines and nobody's ledger. */
-const MAX_PAGES = 50;
+/**
+ * One request per page, until the server says there are no more.
+ *
+ * 50 because that is the server's own ceiling (`PageQueryDto` caps `limit`
+ * at 50) — asking for 100 came back 400 "limit must not be greater than
+ * 50" and the export failed before it had written a line.
+ */
+const PAGE = 50;
+/** A guard, not a limit: 100 pages is 5 000 lines and nobody's ledger. */
+const MAX_PAGES = 100;
 
 export async function fetchAllTransactions(): Promise<WalletTxn[]> {
   const all: WalletTxn[] = [];
