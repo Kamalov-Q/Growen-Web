@@ -1,10 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
+import { Avatar } from "@/src/components/ui/Avatar";
+import { prettyPhone } from "@/src/lib/phone";
 import { Icon, type IconName } from "@/src/components/ui/Icon";
 import { useSession } from "./session";
 import { ConfirmDialog } from "@/src/components/ui/ConfirmDialog";
@@ -60,8 +61,21 @@ export function AuthNav({ lang }: { lang: Lang }) {
   }
 
   const label = [user.name, user.surname].filter(Boolean).join(" ").trim();
-  const display = label || user.phoneNumber || "";
-  const initial = (label || user.phoneNumber || "?").charAt(0).toUpperCase();
+  /**
+   * WHO, then how to reach them — two lines, never one.
+   *
+   * This used to be `name || phoneNumber`, which has the number standing in
+   * for the person: an account with no name was addressed as
+   * "+998900000000", and one with a name lost its number entirely. The name
+   * is the identity and "Mehmon" is what an account without one is called
+   * (the same word the profile's membership pill uses); the number belongs
+   * underneath it, as the quieter line, and formatted — a run of twelve
+   * digits is not checkable at a glance against the phone in your hand.
+   */
+  const who = label || t(lang, "membership.guest");
+  const contact = user.phoneNumber
+    ? prettyPhone(user.phoneNumber)
+    : (user.email ?? "");
 
   return (
     <div ref={wrap} className="relative shrink-0">
@@ -70,24 +84,12 @@ export function AuthNav({ lang }: { lang: Lang }) {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label={display}
-        className="grid size-10 place-items-center overflow-hidden rounded-full bg-brand-soft text-[15px] font-bold text-brand ring-1 ring-brand-line transition hover:ring-brand"
+        aria-label={who}
+        className="grid place-items-center rounded-full ring-1 ring-brand-line transition hover:ring-brand"
       >
-        {user.avatarUrl ? (
-          <Image
-            src={user.avatarUrl}
-            alt=""
-            width={40}
-            height={40}
-            // Already an avatar-sized file from the CDN; Next would generate
-            // larger variants from a small source, which is an upscale and
-            // a metered optimization for no gain.
-            unoptimized
-            className="size-full object-cover"
-          />
-        ) : (
-          initial
-        )}
+        {/* No photo and no name falls back to a person glyph, never to the
+            first character of the phone number — that is a "+". */}
+        <Avatar uri={user.avatarUrl} name={label} size={40} />
       </button>
 
       {open ? (
@@ -95,9 +97,12 @@ export function AuthNav({ lang }: { lang: Lang }) {
           role="menu"
           className="absolute end-0 top-full z-50 mt-2 min-w-[13rem] overflow-hidden rounded-control bg-raised py-1 shadow-lift ring-1 ring-line"
         >
-          <p className="truncate border-b border-line px-3.5 py-2.5 text-[13px] text-muted">
-            {display}
-          </p>
+          <div className="border-b border-line px-3.5 py-2.5">
+            <p className="truncate text-[14px] font-semibold text-ink">{who}</p>
+            {contact ? (
+              <p className="nums truncate text-[13px] text-muted">{contact}</p>
+            ) : null}
+          </div>
 
           <MenuLink
             href={`/${lang}/profile`}

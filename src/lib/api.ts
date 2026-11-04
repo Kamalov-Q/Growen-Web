@@ -72,14 +72,37 @@ export const onSessionChange = (fn: SessionListener): (() => void) => {
   };
 };
 
+/** The signed-in user, mirrored here so a partial update has a base. */
+let currentUser: SessionUser | null = null;
+
 export function applySession(data: SessionResponse): void {
   setAccessToken(data.accessToken);
+  currentUser = data.user;
   for (const fn of listeners) fn(data.user);
 }
 
 export function clearSession(): void {
   setAccessToken(null);
+  currentUser = null;
   for (const fn of listeners) fn(null);
+}
+
+/**
+ * Fold a change into the session user without a round trip.
+ *
+ * The profile form writes to `/profile`, but the HEADER reads the session —
+ * so without this, somebody who has just saved their name goes on being
+ * greeted as "Mehmon" by the avatar menu until the next page load. The
+ * alternative was to re-run the refresh for its user payload, which rotates
+ * the refresh token to pick up two fields that are already in hand.
+ *
+ * A no-op when signed out: there is nothing to patch, and inventing a user
+ * from a partial would sign somebody in by accident.
+ */
+export function patchSessionUser(patch: Partial<SessionUser>): void {
+  if (!currentUser) return;
+  currentUser = { ...currentUser, ...patch };
+  for (const fn of listeners) fn(currentUser);
 }
 
 // ---- single-flight refresh ------------------------------------------------

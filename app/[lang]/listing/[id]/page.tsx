@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Page } from "@/src/components/Page";
+import { Avatar } from "@/src/components/ui/Avatar";
 import { ContactButton } from "@/src/features/listings/ContactButton";
 import { Gallery } from "@/src/features/listings/Gallery";
 import { ListingJsonLd } from "@/src/features/listings/ListingJsonLd";
@@ -224,12 +225,14 @@ export default async function ListingPage({
                   {t(lang, "detail.seller")}
                 </h2>
                 <div className="flex items-center gap-4 rounded-card bg-surface p-4 shadow-card ring-1 ring-line">
-                  <span
-                    aria-hidden
-                    className="grid size-12 shrink-0 place-items-center rounded-full bg-brand-soft text-[17px] font-bold text-brand"
-                  >
-                    {(sellerName ?? "?").charAt(0).toUpperCase()}
-                  </span>
+                  {/* The seller's actual photo, which this block had but
+                      never drew — it showed a "?" to anyone without a name
+                      and nothing at all to everyone else. */}
+                  <Avatar
+                    uri={seller.avatarThumbUrl ?? seller.avatarUrl}
+                    name={sellerName}
+                    size={48}
+                  />
                   <div className="flex min-w-0 flex-1 flex-col">
                     <span className="truncate text-[15px] font-semibold text-ink">
                       {sellerName ?? "—"}

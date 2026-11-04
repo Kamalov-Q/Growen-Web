@@ -113,14 +113,15 @@ export function HomeViews({
     </button>
   );
 
-  return (
-    <div className="flex flex-col gap-5">
-      {/* ── the bar ─────────────────────────────────────────────────────
-          Views on the left, filters on the right, above everything else.
-          Sort is NOT here: it lives down by the result count, because it
-          changes the order of what you are looking at rather than what you
-          are looking for. */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+  /* ── the bar ───────────────────────────────────────────────────────
+     Views on the left, filters on the right, above everything else. Sort
+     is NOT here: it lives down by the result count, because it changes the
+     order of what you are looking at rather than what you are looking for.
+
+     Held in a variable because in map view it moves: the same markup is
+     rendered inside the panel that floats over the map. */
+  const bar = (
+    <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <div
             role="tablist"
@@ -190,7 +191,12 @@ export function HomeViews({
             />
           ) : null}
         </button>
-      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col gap-5">
+      {view === "map" ? null : bar}
 
       <FilterModal
         lang={lang}
@@ -200,7 +206,7 @@ export function HomeViews({
         onClose={() => setPanel(false)}
       />
 
-      {filters}
+      {view === "map" ? null : filters}
 
       {view === "map" ? (
         /* Out of the 1400px measure and across the window.
@@ -212,11 +218,30 @@ export function HomeViews({
            left-1/2 + -translate-x-1/2 is the standard break-out: the
            element is still in flow, so nothing below it moves. body has
            `overflow-x: clip` so the 100vw does not add a scrollbar. */
-        <div className="relative left-1/2 w-screen -translate-x-1/2 px-3 sm:px-4 lg:px-6">
+        /* Flush on every side.
+           `-mt-6` cancels main's top padding so the map starts under the
+           header, and `-mb-26` cancels the rest of the page's furniture
+           below it: main's own 1.5rem bottom padding plus the footer's
+           5rem top margin (Page.tsx and Chrome.tsx). Without the second
+           one, scrolling past the map showed a band of empty page
+           background between it and the footer — 104px of nothing under a
+           view that is meant to run to the edge. */
+        <div className="relative left-1/2 -mb-26 -mt-6 w-screen -translate-x-1/2">
           <BrowseMap
+            fill
             lang={lang}
             query={query}
             onOpen={(id) => router.push(`/${lang}/listing/${id}`)}
+            /* The same two rows, now floating over the map — the map is
+               the page here, and a strip of controls above it only
+               shortens the one view where every pixel is content. The map
+               puts them in its glass panel, above its own search row. */
+            overlay={
+              <>
+                {bar}
+                {filters}
+              </>
+            }
           />
         </div>
       ) : (

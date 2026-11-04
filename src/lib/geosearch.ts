@@ -282,3 +282,59 @@ export async function searchPlace(
 
   return fallback ? asPoint(fallback) : null;
 }
+
+/**
+ * The other direction: a point, as a street and a district.
+ *
+ * Only ever called after somebody has pressed a button and the browser has
+ * handed over a position — never on a page load — so the one-request-a-
+ * second policy is kept by the shape of the interaction rather than by a
+ * queue.
+ *
+ * Best effort by design: a miss simply leaves the line off, and the caller
+ * falls back to printing the coordinates. ODbL requires the credit wherever
+ * the answer is SHOWN, which is `GEOSEARCH_CREDIT`.
+ */
+export async function reverseGeocode(
+  lat: number,
+  lon: number,
+  signal?: AbortSignal,
+): Promise<string | null> {
+  const params = new URLSearchParams({
+    lat: String(lat),
+    lon: String(lon),
+    format: "jsonv2",
+    // Street level. A house number is more precision than this card needs
+    // and more than somebody expects to see printed about themselves.
+    zoom: "17",
+    "accept-language": "uz,ru",
+  });
+
+  try {
+    const res = await fetch(
+      `${ENDPOINT.replace("/search", "/reverse")}?${params}`,
+      { signal },
+    );
+    if (!res.ok) return null;
+    const body = (await res.json()) as {
+      display_name?: string;
+      address?: Record<string, string | undefined>;
+    };
+
+    const a = body.address ?? {};
+    // Built from the parts rather than taking `display_name`, which runs to
+    // "12, Katartal ko'chasi, Chilonzor tumani, Toshkent, 100096, O'zbekiston"
+    // — a line nobody reads to the end.
+    const line = [
+      a.road ?? a.neighbourhood ?? a.suburb,
+      a.city_district ?? a.county,
+      a.city ?? a.town ?? a.village,
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    return line || body.display_name || null;
+  } catch {
+    return null;
+  }
+}

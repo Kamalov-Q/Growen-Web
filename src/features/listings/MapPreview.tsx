@@ -2,14 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
-import { num, type Listing, type MapPointFeature } from "@/src/lib/listing-types";
+import { num, type ListingDetail, type MapPointFeature } from "@/src/lib/listing-types";
 import { fetchListing } from "./api";
 import { formatSpecs, primaryOffer } from "./format";
 import { Price } from "./Price";
 import { SaveButton } from "@/src/features/account/SaveButton";
+import { ContactButton } from "./ContactButton";
+import { Avatar } from "@/src/components/ui/Avatar";
+import { VerifiedSeal } from "@/src/components/ui/Seal";
 
 /**
  * The card that appears when a map pin is clicked — the web counterpart of
@@ -32,7 +35,8 @@ export function MapPreview({
   feature: MapPointFeature;
   onClose: () => void;
 }) {
-  const [listing, setListing] = useState<Listing | null>(null);
+  const [listing, setListing] = useState<ListingDetail | null>(null);
+  const card = useRef<HTMLDivElement>(null);
 
   /**
    * No reset of `listing` here.
@@ -56,6 +60,18 @@ export function MapPreview({
     };
   }, [feature.listingId]);
 
+  /**
+   * Bring the card into view when it opens.
+   *
+   * The map is taller than what is left of the window below the toolbar, so
+   * its bottom — where this card sits — can be under the fold. A click on a
+   * pin then appeared to do nothing at all. `nearest` scrolls the minimum
+   * needed and does nothing when the card is already visible.
+   */
+  useEffect(() => {
+    card.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, []);
+
   const offer = listing ? primaryOffer(listing) : null;
   const specs = listing ? formatSpecs(listing, lang) : null;
   const area = listing ? num(listing.areaM2) : null;
@@ -65,27 +81,53 @@ export function MapPreview({
     feature.thumbUrl ??
     null;
 
+  const ownerName =
+    [listing?.owner?.name, listing?.owner?.surname]
+      .filter(Boolean)
+      .join(" ")
+      .trim() || null;
+
   return (
-    <div className="pointer-events-auto absolute inset-x-3 bottom-3 z-20 sm:inset-x-auto sm:start-3 sm:w-[22rem]">
+    <div
+      ref={card}
+      className="pointer-events-auto absolute inset-x-3 bottom-3 z-20 sm:inset-x-auto sm:start-3 sm:w-[22rem]"
+    >
       <div className="relative overflow-hidden rounded-card bg-surface shadow-lift ring-1 ring-line">
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={t(lang, "filters.close")}
-          className="absolute end-2 top-2 z-10 grid size-8 place-items-center rounded-full bg-black/55 text-white backdrop-blur-sm transition hover:bg-black/75"
-        >
-          <svg
-            aria-hidden
-            viewBox="0 0 24 24"
-            className="size-4"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
+        {/* Seller and the way out, on one line above the photo — the two
+            things that are about the card rather than about the listing.
+            The app's sheet puts them here for the same reason, and it is
+            better than a close button floating over the photograph. */}
+        <div className="flex items-center gap-2 px-3 py-2">
+          <Avatar
+            uri={listing?.owner?.avatarThumbUrl ?? listing?.owner?.avatarUrl}
+            name={ownerName}
+            size={28}
+          />
+          <span className="min-w-0 flex-1 truncate text-[14px] font-semibold text-ink">
+            {ownerName ?? t(lang, "detail.seller")}
+          </span>
+          {listing?.owner?.isVerifiedRealtor ? (
+            <VerifiedSeal className="size-4" />
+          ) : null}
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t(lang, "filters.close")}
+            className="grid size-7 shrink-0 place-items-center rounded-full text-muted transition hover:bg-muted-bg hover:text-ink"
           >
-            <path d="M6 6l12 12M18 6 6 18" />
-          </svg>
-        </button>
+            <svg
+              aria-hidden
+              viewBox="0 0 24 24"
+              className="size-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+            >
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
 
         <Link href={`/${lang}/listing/${feature.listingId}`} className="block">
           <div className="relative aspect-[16/10] w-full bg-muted-bg">
@@ -140,8 +182,40 @@ export function MapPreview({
                 {listing.address}
               </p>
             ) : null}
+
+            {listing ? (
+              <p className="nums text-[12px] text-faint">
+                {t(lang, "detail.views", { n: listing.viewCount })}
+              </p>
+            ) : null}
           </div>
         </Link>
+
+        {/* The pair at the foot, as in the app: the number, and the way in.
+            `ContactButton` rather than a bare `tel:` — on the web the
+            seller's number must not be in the markup, so it is fetched on
+            click by somebody signed in. See the note in that file. */}
+        <div className="flex items-stretch gap-2 px-3.5 pb-3.5">
+          <ContactButton lang={lang} listingId={feature.listingId} compact />
+          <Link
+            href={`/${lang}/listing/${feature.listingId}`}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-control bg-brand px-3 py-2.5 text-[14px] font-bold text-brand-ink transition hover:bg-brand-hover"
+          >
+            {t(lang, "map.details")}
+            <svg
+              aria-hidden
+              viewBox="0 0 24 24"
+              className="size-4 rtl:rotate-180"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M5 12h13M13 6l6 6-6 6" />
+            </svg>
+          </Link>
+        </div>
       </div>
     </div>
   );

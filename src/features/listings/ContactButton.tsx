@@ -38,17 +38,44 @@ import { prettyPhone } from "@/src/lib/phone";
 export function ContactButton({
   lang,
   listingId,
+  compact = false,
 }: {
   lang: Lang;
   listingId: string;
+  /**
+   * The half-width version, for the map card.
+   *
+   * Secondary rather than brand — it shares a row with "open the listing",
+   * and two filled buttons side by side say neither is the main one. It
+   * also says "call" instead of printing the number: there is no room for
+   * twelve digits beside another button, and the detail page is where a
+   * number is read off the screen.
+   */
+  compact?: boolean;
 }) {
   const { status } = useSession();
   const [phone, setPhone] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
 
-  const cls =
-    "nums shrink-0 rounded-control bg-brand px-5 py-3 text-sm font-semibold text-brand-ink transition hover:bg-brand-hover disabled:opacity-60";
+  const cls = compact
+    ? "flex flex-1 items-center justify-center gap-1.5 rounded-control px-3 py-2.5 text-[14px] font-bold text-ink ring-1 ring-line transition hover:bg-muted-bg disabled:opacity-60"
+    : "nums shrink-0 rounded-control bg-brand px-5 py-3 text-sm font-semibold text-brand-ink transition hover:bg-brand-hover disabled:opacity-60";
+
+  const phoneIcon = (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      className="size-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M7.5 4.5h-2A1.5 1.5 0 0 0 4 6.2 14 14 0 0 0 17.8 20a1.5 1.5 0 0 0 1.7-1.5v-2a1.3 1.3 0 0 0-1-1.3l-2.4-.5a1.3 1.3 0 0 0-1.3.5l-.8 1a11 11 0 0 1-4.7-4.7l1-.8a1.3 1.3 0 0 0 .5-1.3l-.5-2.4a1.3 1.3 0 0 0-1.3-1Z" />
+    </svg>
+  );
 
   // Signed out: a link to the login page that remembers where to come back
   // to. A link, not a button with a router call — it should be openable in a
@@ -57,7 +84,8 @@ export function ContactButton({
     const next = encodeURIComponent(`/${lang}/listing/${listingId}`);
     return (
       <Link href={`/${lang}/login?next=${next}`} className={cls}>
-        {t(lang, "detail.showPhone")}
+        {compact ? phoneIcon : null}
+        {t(lang, compact ? "map.call" : "detail.showPhone")}
       </Link>
     );
   }
@@ -65,7 +93,10 @@ export function ContactButton({
   if (phone) {
     return (
       <a href={`tel:+${phone.replace(/\D/g, "")}`} className={cls}>
-        {prettyPhone(`+${phone.replace(/\D/g, "")}`)}
+        {compact ? phoneIcon : null}
+        {compact
+          ? t(lang, "map.call")
+          : prettyPhone(`+${phone.replace(/\D/g, "")}`)}
       </a>
     );
   }
@@ -91,7 +122,15 @@ export function ContactButton({
       }}
       className={cls}
     >
-      {t(lang, failed ? "detail.phoneFailed" : "detail.showPhone")}
+      {compact && !failed ? phoneIcon : null}
+      {t(
+        lang,
+        failed
+          ? "detail.phoneFailed"
+          : compact
+            ? "map.call"
+            : "detail.showPhone",
+      )}
     </button>
   );
 }

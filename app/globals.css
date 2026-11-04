@@ -147,8 +147,11 @@
 }
 
 html {
-  /* Anchors land under the sticky header rather than behind it. */
-  scroll-padding-top: 5.5rem;
+  /* Anchors land under the sticky header rather than behind it. Two values,
+     because the header is two rows on a phone — the search box has the
+     width to itself there (see Chrome.tsx) and the bar is that much
+     taller. */
+  scroll-padding-top: 7.5rem;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -165,6 +168,12 @@ body {
   overflow-x: clip;
   /* Tabular figures off by default but on for prices — see .nums. */
   font-feature-settings: "cv05" 1;
+}
+
+@media (min-width: 640px) {
+  html {
+    scroll-padding-top: 5.5rem;
+  }
 }
 
 /* Prices and areas line up in a grid only if the digits are the same width. */

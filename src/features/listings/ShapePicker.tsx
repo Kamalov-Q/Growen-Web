@@ -223,8 +223,14 @@ export function ShapePicker({
 
         {/* The same search / locate / fullscreen controls the browse map
             has. Finding the address is most of the work of placing a pin,
-            and typing a district is faster than panning to it. */}
-        <MapControls lang={lang} map={instance} ready={ready} />
+            and typing a district is faster than panning to it.
+
+            The row places itself in flow now — the browse map stacks it
+            under its own floating panel — so the wrapper is what puts it
+            over the top of this map. */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 p-3">
+          <MapControls lang={lang} map={instance} ready={ready} />
+        </div>
 
         <div className="pointer-events-none absolute inset-x-3 bottom-3 flex flex-col items-center gap-2">
           <p className="rounded-control bg-surface/95 px-3 py-2 text-center text-[13px] text-muted shadow-card ring-1 ring-line backdrop-blur-sm">

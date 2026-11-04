@@ -34,6 +34,7 @@ export type IconName =
   | "wallet"
   | "listings"
   | "heart"
+  | "add"
   | "logout"
   | "trash"
   // information
@@ -123,6 +124,12 @@ const PATHS: Record<IconName, React.ReactNode> = {
   ),
   heart: (
     <path d="M12 20.3 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13Z" />
+  ),
+  add: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 8.2v7.6M8.2 12h7.6" />
+    </>
   ),
   logout: (
     <>

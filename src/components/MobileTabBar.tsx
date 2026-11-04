@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
 import { useSession } from "@/src/features/auth/session";
@@ -111,9 +110,27 @@ function Icon({ name, active }: { name: Tab["key"]; active: boolean }) {
   }
 }
 
-export function MobileTabBar({ lang }: { lang: Lang }) {
-  const pathname = usePathname();
+export function MobileTabBar({
+  lang,
+  path,
+}: {
+  lang: Lang;
+  /**
+   * The page's own path, without the language segment ("/", "/saved",
+   * "/listings/mine"), handed down by `Page`.
+   *
+   * NOT `usePathname()`, and that is a hydration fix rather than a
+   * preference. The home route declares `generateStaticParams` and also
+   * reads `searchParams`, so Next prerenders a static shell for it — and in
+   * that shell the hook does not resolve to `/uz`. The bar came out of the
+   * oven with no tab lit, the browser then lit "home", and React found two
+   * different trees. The server already knows which page it is rendering,
+   * so asking the client to work it out again is the mistake.
+   */
+  path: string;
+}) {
   const { status } = useSession();
+  const here = `/${lang}${path === "/" ? "" : path}`;
 
   const tabs: Tab[] = [
     { key: "home", href: `/${lang}`, label: t(lang, "tabs.home"), gated: false },
@@ -144,8 +161,8 @@ export function MobileTabBar({ lang }: { lang: Lang }) {
    */
   const isActive = (href: string) =>
     href === `/${lang}`
-      ? pathname === href
-      : pathname === href || pathname.startsWith(`${href}/`);
+      ? here === href
+      : here === href || here.startsWith(`${href}/`);
 
   /**
    * Same rule as PostCta: only send someone to login once we KNOW they are

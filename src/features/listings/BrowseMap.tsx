@@ -8,7 +8,13 @@ import {
   NavigationControl,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { SATELLITE_STYLE, STREET_STYLE, TASHKENT } from "@/src/lib/mapStyles";
+import { TASHKENT } from "@/src/lib/mapStyles";
+import {
+  readMapLayer,
+  styleFor,
+  writeMapLayer,
+  type MapLayer,
+} from "@/src/lib/map-layer";
 import { ensureMapWorker } from "@/src/lib/maplibre";
 
 /** See the `moveend` handler — a flick settles several times. */
@@ -36,20 +42,6 @@ import { clusterPoints } from "./cluster";
  */
 
 const PRIMARY = "#0f766e";
-const LAYER_KEY = "growencity.map.layer";
-
-type Layer = "street" | "satellite";
-
-function readLayer(): Layer {
-  try {
-    return localStorage.getItem(LAYER_KEY) === "satellite"
-      ? "satellite"
-      : "street";
-  } catch {
-    // Private mode and blocked storage both throw rather than return null.
-    return "street";
-  }
-}
 
 const money = (price: string, currency: string) => {
   const n = Math.round(Number(price));
@@ -65,11 +57,29 @@ export function BrowseMap({
   lang,
   query,
   onOpen,
+  fill = false,
+  overlay,
 }: {
   lang: Lang;
   /** The whole feed query — the map honours every filter the chips set. */
   query: FeedQuery;
   onOpen: (listingId: string) => void;
+  /**
+   * Fill the window instead of sitting in the page as a card.
+   *
+   * The browse page passes this: there, the map IS the page, so it runs
+   * edge to edge from under the header to the bottom of the window and the
+   * controls float on top of it. Everywhere else — the add-listing shape
+   * picker — the map is one element among others and keeps its corners.
+   */
+  fill?: boolean;
+  /**
+   * What floats above the map's own controls: the view switcher, the
+   * purpose tabs and the category chips. Passed in rather than imported,
+   * because those belong to the browse page and this component is also the
+   * map in the listing form.
+   */
+  overlay?: React.ReactNode;
 }) {
   // See the viewport effect's dependency list.
   const queryKey = JSON.stringify([
@@ -93,7 +103,7 @@ export function BrowseMap({
    * initialiser because this component is loaded with `ssr: false` and so
    * only ever runs in a browser, where `localStorage` exists.
    */
-  const [layer, setLayer] = useState<Layer>(() => readLayer());
+  const [layer, setLayer] = useState<MapLayer>(() => readMapLayer());
   /**
    * The style has finished loading.
    *
@@ -118,6 +128,20 @@ export function BrowseMap({
   const [count, setCount] = useState<number | null>(null);
   /** The pin whose preview card is open, if any. */
   const [selected, setSelected] = useState<MapPointFeature | null>(null);
+  /**
+   * A cluster the camera cannot split, fanned out into its members.
+   *
+   * Several listings at one address stay one badge however far you zoom —
+   * `fitBounds` on a zero-area box does nothing at all, so the badge reads
+   * as broken. Clicking one of those spreads its members around the spot
+   * instead, which is the only way to reach them. Holds the cluster key.
+   */
+  const [expanded, setExpanded] = useState<string | null>(null);
+  /**
+   * The last features drawn, so fanning a cluster out can redraw without
+   * going back to the server for data that has not changed.
+   */
+  const lastFeatures = useRef<(MapPointFeature | MapPolygonFeature)[]>([]);
 
   /**
    * Draw the pins for the current viewport.
@@ -173,6 +197,10 @@ export function BrowseMap({
        */
       const marker = (label: string, cluster: boolean) => {
         const wrap = document.createElement("div");
+        // Stated here rather than left to a utility class: this element is
+        // the hit target, and an inherited `pointer-events: none` from any
+        // future overlay would make every pin on the map dead.
+        wrap.style.pointerEvents = "auto";
 
         const el = document.createElement("button");
         el.type = "button";
@@ -209,11 +237,61 @@ export function BrowseMap({
           wrap.style.zIndex = "";
         });
 
+        /**
+         * A press on a pin must not start a map drag.
+         *
+         * MapLibre's pan handler listens on the canvas container, which is
+         * this marker's PARENT, so a `mousedown` that is not stopped here
+         * bubbles up and begins a drag. Move the pointer a pixel or two
+         * before releasing — a trackpad does this on its own — and the
+         * release lands somewhere other than where the press started, so
+         * the browser fires no `click` at all and the pin appears dead.
+         * Both event families, because MapLibre uses whichever the browser
+         * sends.
+         */
+        for (const kind of ["pointerdown", "mousedown", "touchstart"]) {
+          el.addEventListener(kind, (e) => e.stopPropagation());
+        }
+
         wrap.appendChild(el);
         return { wrap, el };
       };
 
-      for (const c of clusterPoints(points, lngSpan)) {
+      const centre = bounds.getCenter();
+      const width = instance.getContainer().clientWidth;
+
+      for (const c of clusterPoints(points, lngSpan, width, centre.lat)) {
+        /**
+         * A fanned-out cluster: its members, on a ring around the spot.
+         *
+         * The offset is in PIXELS and the coordinate stays the real one, so
+         * the ring holds its shape at any zoom and each pin still points at
+         * where its listing actually is.
+         */
+        if (c.key === expanded && c.members.length > 1) {
+          const radius = 42 + c.members.length * 5;
+          c.members.forEach((f, i) => {
+            const angle = (2 * Math.PI * i) / c.members.length - Math.PI / 2;
+            const { wrap, el } = marker(money(f.price, f.currency), false);
+            el.addEventListener("click", (e) => {
+              e.stopPropagation();
+              setSelected(f);
+            });
+            markers.current.push(
+              new Marker({
+                element: wrap,
+                offset: [
+                  Math.cos(angle) * radius,
+                  Math.sin(angle) * radius,
+                ],
+              })
+                .setLngLat(f.centroid.coordinates)
+                .addTo(instance),
+            );
+          });
+          continue;
+        }
+
         if (c.single) {
           const f = c.single;
           const { wrap, el } = marker(money(f.price, f.currency), false);
@@ -235,16 +313,34 @@ export function BrowseMap({
         );
         el.addEventListener("click", (e) => {
           e.stopPropagation();
-          instance.fitBounds(
-            [
-              [c.bbox[0], c.bbox[1]],
-              [c.bbox[2], c.bbox[3]],
-            ],
-            // A cluster whose members share one coordinate has a zero-area
-            // box; `maxZoom` stops the camera diving to street level and
-            // leaving the person with no idea where they are.
-            { padding: 64, maxZoom: 17, duration: 500 },
-          );
+
+          const box: [[number, number], [number, number]] = [
+            [c.bbox[0], c.bbox[1]],
+            [c.bbox[2], c.bbox[3]],
+          ];
+
+          /**
+           * Would moving the camera actually separate them?
+           *
+           * `cameraForBounds` answers that without moving anything. A
+           * cluster of listings at one address has a zero-area box and
+           * comes back at the current zoom or lower — zooming would then
+           * leave the person somewhere new with the same badge still
+           * saying "3", which is the version of this that looked broken.
+           * Those get fanned out instead.
+           */
+          const camera = instance.cameraForBounds(box, { padding: 64 });
+          const worthZooming =
+            camera?.zoom !== undefined &&
+            camera.zoom > instance.getZoom() + 0.3;
+
+          if (!worthZooming) {
+            setExpanded(c.key);
+            return;
+          }
+
+          setExpanded(null);
+          instance.fitBounds(box, { padding: 64, maxZoom: 17, duration: 500 });
         });
         markers.current.push(
           new Marker({ element: wrap })
@@ -268,7 +364,7 @@ export function BrowseMap({
         );
       }
     },
-    [onOpen, lang],
+    [onOpen, lang, expanded],
   );
 
   // One map instance for the lifetime of the component.
@@ -278,7 +374,7 @@ export function BrowseMap({
     ensureMapWorker();
     const instance = new MapLibreMap({
       container: holder.current,
-      style: readLayer() === "satellite" ? SATELLITE_STYLE : STREET_STYLE,
+      style: styleFor(readMapLayer()),
       center: TASHKENT,
       zoom: 11,
       // The licences require the credits to stay reachable; compact keeps
@@ -328,6 +424,7 @@ export function BrowseMap({
         abort.signal,
       )
         .then((res) => {
+          lastFeatures.current = res.features;
           draw(res.features);
           // Set here, in the async callback, rather than inside draw():
           // draw() is also reachable synchronously from this effect, and
@@ -379,18 +476,37 @@ export function BrowseMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryKey, draw]);
 
+  /**
+   * Redraw when a cluster is fanned out or folded back.
+   *
+   * `draw` closes over `expanded`, so a new one arrives on every change —
+   * and the features are the ones already in hand, since nothing about the
+   * viewport moved. Without this the ring would not appear until the next
+   * pan.
+   */
+  useEffect(() => {
+    if (lastFeatures.current.length) draw(lastFeatures.current);
+  }, [draw]);
+
+  /** Moving the camera folds any fanned-out cluster back up. */
+  useEffect(() => {
+    const instance = map.current;
+    if (!instance) return;
+    const collapse = () => setExpanded(null);
+    instance.on("movestart", collapse);
+    return () => {
+      instance.off("movestart", collapse);
+    };
+  }, []);
+
   const toggle = () => {
-    const next: Layer = layer === "street" ? "satellite" : "street";
+    const next: MapLayer = layer === "street" ? "satellite" : "street";
     setLayer(next);
-    try {
-      localStorage.setItem(LAYER_KEY, next);
-    } catch {
-      // Remembering the preference is a convenience, not a requirement.
-    }
+    writeMapLayer(next);
     // Changing the style wipes every source and layer the controls added,
     // so they are told to put them back once the new style is in.
     setReady(false);
-    map.current?.setStyle(next === "satellite" ? SATELLITE_STYLE : STREET_STYLE);
+    map.current?.setStyle(styleFor(next));
   };
 
   return (
@@ -401,10 +517,39 @@ export function BrowseMap({
 
        `min-h` rather than a plain height so the controls across the top
        always have somewhere to sit. */
-    <div className="relative h-[calc(100dvh-13rem)] min-h-[26rem] w-full overflow-hidden rounded-card shadow-card ring-1 ring-line sm:h-[calc(100dvh-15rem)] lg:h-[calc(100dvh-13rem)]">
+    <div
+      className={
+        fill
+          ? /* Header to the foot of the window, nothing below it. The two
+               values are the header's two heights: one row from `sm` up,
+               two rows on a phone where the search box has the width to
+               itself (see Chrome.tsx). */
+            "relative h-[calc(100dvh-7rem)] min-h-[26rem] w-full overflow-hidden sm:h-[calc(100dvh-4rem)]"
+          : "relative h-[calc(100dvh-13rem)] min-h-[26rem] w-full overflow-hidden rounded-card shadow-card ring-1 ring-line sm:h-[calc(100dvh-15rem)] lg:h-[calc(100dvh-13rem)]"
+      }
+    >
       <div ref={holder} className="size-full" />
 
-      <MapControls lang={lang} map={instanceForControls} ready={ready} />
+      {/* Everything that floats at the top, in ONE pane of glass: the
+          page's rows and the map's own search row, which used to be pinned
+          to this corner independently and landed on top of each other.
+
+          The column lets clicks through to the map; the panel takes them
+          back for itself. Without `fill` there is no panel — the map is
+          then one element in a form, and a sheet of glass over it would be
+          a frame around nothing. */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 p-3">
+        <div
+          className={
+            fill
+              ? "pointer-events-auto mx-auto flex w-full max-w-[1400px] flex-col gap-3 rounded-card bg-surface/80 p-3 shadow-lift ring-1 ring-line backdrop-blur-xl supports-[backdrop-filter]:bg-surface/60"
+              : ""
+          }
+        >
+          {overlay}
+          <MapControls lang={lang} map={instanceForControls} ready={ready} />
+        </div>
+      </div>
 
       {selected ? (
         <MapPreview

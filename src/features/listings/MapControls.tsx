@@ -186,11 +186,18 @@ export function MapControls({
 
   return (
     <>
-      {/* On a phone the search box takes the full row and the two buttons
+      {/* IN FLOW, not absolutely placed.
+          The row used to pin itself to the map's top-left corner, which is
+          also where the browse page's own floating panel goes — the two
+          landed on top of each other. The parent stacks whatever floats
+          over the map in one column instead, so this row simply follows
+          whatever is above it and neither has to know the other's height.
+
+          On a phone the search box takes the full row and the two buttons
           drop beneath it as icons. Before this they shared one line with
           their labels, so at 459px "Butun ekran" was sliced off the right
           edge and the search input had about forty pixels to itself. */}
-      <div className="pointer-events-none absolute inset-x-3 top-3 flex flex-col items-stretch gap-2 sm:flex-row sm:items-start">
+      <div className="pointer-events-none flex flex-col items-stretch gap-2 sm:flex-row sm:items-start">
         {/* A <div>, NOT a <form>.
             ShapePicker drops this map inside CreateListingForm's own
             <form>, and HTML forbids a form inside a form: the parser throws
@@ -272,8 +279,11 @@ export function MapControls({
         </div>
       </div>
 
+      {/* Under the row it belongs to, in the same column. It used to be
+          pinned to the bottom of the map, which is now where the listing
+          preview card opens. */}
       {found || error ? (
-        <div className="pointer-events-none absolute inset-x-3 bottom-12 flex justify-center">
+        <div className="pointer-events-none flex justify-center">
           <p className="pointer-events-auto max-w-full truncate rounded-control bg-surface/95 px-3 py-1.5 text-[12px] shadow-card ring-1 ring-line backdrop-blur-sm">
             {error ? (
               <span className="text-danger">{error}</span>

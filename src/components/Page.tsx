@@ -59,7 +59,9 @@ export function Page({
         aria-hidden
         className="h-[calc(58px+env(safe-area-inset-bottom))] md:hidden"
       />
-      <MobileTabBar lang={lang} />
+      {/* `path` rather than the hook the bar used to call — see the note
+          on its props. */}
+      <MobileTabBar lang={lang} path={path} />
     </div>
   );
 }

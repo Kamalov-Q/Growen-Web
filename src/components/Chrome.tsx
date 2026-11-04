@@ -64,22 +64,35 @@ export function Header({
   minimal?: boolean;
 }) {
   /**
-   * Translucent, not opaque.
+   * Glass, not a lid.
    *
-   * The map now runs the full width of the window underneath this bar, and
-   * a solid strip across the top of it reads as a lid on the page. At 65%
-   * with a heavy blur the colour behind comes through enough to feel like
-   * one surface, while the blur keeps the search box and the buttons
-   * legible over whatever happens to be there — which plain transparency
-   * would not.
+   * The map runs the full width of the window underneath this bar, and a
+   * solid strip across the top of it reads as a lid on the page. At 45%
+   * with a heavy blur and a little extra saturation, the streets and the
+   * parks carry through — the bar belongs to the map instead of covering
+   * it — while the blur keeps the search box and the buttons legible over
+   * whatever happens to be behind them, which plain transparency would
+   * not.
+   *
+   * The border goes with it: a hard line under a pane of glass is the one
+   * thing that gives it away as a separate strip, so it is a hairline of
+   * white at 10% rather than the page's own divider colour.
    *
    * `supports-[backdrop-filter]` steps the background back up to 92% where
-   * the blur is unavailable, because 65% with nothing behind it is
+   * the blur is unavailable, because 45% with nothing behind it is
    * unreadable text over a satellite photograph.
    */
   return (
-    <header className="sticky top-0 z-30 border-b border-line/70 bg-surface/92 shadow-bar backdrop-blur-xl supports-[backdrop-filter]:bg-surface/65">
-      <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-3 px-4">
+    <header className="sticky top-0 z-30 border-b border-line/70 bg-surface/92 shadow-bar backdrop-blur-2xl backdrop-saturate-150 supports-[backdrop-filter]:border-white/10 supports-[backdrop-filter]:bg-surface/45">
+      {/* TWO ROWS on a phone, one from `sm` up.
+          Everything used to share one row, and the search box took what was
+          left after the logo, the avatar, the theme toggle and the language
+          menu — about 140px on a 390px screen, which cuts the placeholder
+          mid-word and leaves room for roughly two words of a query.
+          Wrapping gives it the full width instead. No duplicated markup:
+          the order is reshuffled with `order-*` and reset above `sm`, so
+          there is one header, not a mobile one and a desktop one. */}
+      <div className="mx-auto flex max-w-[1400px] flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 sm:h-16 sm:flex-nowrap sm:py-0">
         <Link
           href={`/${lang}`}
           className="flex shrink-0 items-center gap-2.5 text-[17px] font-bold tracking-tight text-ink"
@@ -103,9 +116,9 @@ export function Header({
             The fallback is the same shape, so nothing shifts when it
             hydrates. */}
         {minimal ? (
-          <div className="flex-1" />
+          <div className="hidden flex-1 sm:block" />
         ) : (
-          <div className="min-w-0 flex-1">
+          <div className="order-3 w-full min-w-0 sm:order-none sm:w-auto sm:flex-1">
             <Suspense
             fallback={
               <div
@@ -121,7 +134,10 @@ export function Header({
 
         {minimal ? null : <PostCta lang={lang} />}
 
-        <div className="flex shrink-0 items-center gap-2">
+        {/* Pulled to the end of the first row on a phone — `ms-auto` is what
+            keeps it against the edge once the search box has wrapped away
+            from between them. */}
+        <div className="order-2 ms-auto flex shrink-0 items-center gap-2 sm:order-none sm:ms-0">
           {minimal ? null : <AuthNav lang={lang} />}
 
           <ThemeToggle lang={lang} />

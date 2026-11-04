@@ -6,6 +6,7 @@ import { ConfirmDialog } from "@/src/components/ui/ConfirmDialog";
 import { Icon } from "@/src/components/ui/Icon";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
+import { absoluteTime, relativeTime } from "@/src/lib/time";
 import { api } from "@/src/lib/api";
 
 interface SessionRow {
@@ -27,30 +28,6 @@ interface SessionRow {
  *
  * dd.MM.yyyy is how both Uzbek and Russian write a date anyway.
  */
-const pad = (n: number) => String(n).padStart(2, "0");
-
-function absolute(date: Date): string {
-  return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
-
-/**
- * "5 daqiqa oldin" beats "02.11.2026 23:45" for the question this screen
- * answers — is somebody on my account RIGHT NOW — and the exact timestamp
- * stays one hover away in `title`.
- */
-function relative(iso: string, lang: Lang): string {
-  const then = new Date(iso);
-  const minutes = Math.floor((Date.now() - then.getTime()) / 60000);
-
-  if (minutes < 1) return t(lang, "time.now");
-  if (minutes < 60) return t(lang, "time.minutes", { n: minutes });
-  if (minutes < 60 * 24) {
-    return t(lang, "time.hours", { n: Math.floor(minutes / 60) });
-  }
-  if (minutes < 60 * 48) return t(lang, "time.yesterday");
-  return absolute(then);
-}
-
 /**
  * The signed-in devices, and the ability to end them.
  *
@@ -219,15 +196,15 @@ export function SessionsList({ lang }: { lang: Lang }) {
                   one answers "was that me on Tuesday?". */}
               <span
                 className="text-[13px] text-muted"
-                title={absolute(new Date(row.lastSeenAt))}
+                title={absoluteTime(new Date(row.lastSeenAt))}
               >
                 {t(lang, "sessions.lastSeen", {
-                  when: relative(row.lastSeenAt, lang),
+                  when: relativeTime(row.lastSeenAt, lang),
                 })}
               </span>
               <span className="nums text-[12px] text-faint">
                 {t(lang, "sessions.started", {
-                  when: absolute(new Date(row.startedAt)),
+                  when: absoluteTime(new Date(row.startedAt)),
                 })}
               </span>
             </div>

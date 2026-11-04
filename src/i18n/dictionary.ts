@@ -10,9 +10,13 @@ import type { Lang } from "./config";
  */
 const UI = {
   "settings.title": { uz: "Sozlamalar", ru: "Настройки" },
+  /* The page is no longer only preferences — it opens with the account
+     rows, as the app's does — so the lead no longer describes three
+     settings. What IS only true of the browser is said at the foot of the
+     page, where it belongs: see settings.browserNote. */
   "settings.lead": {
-    uz: "Ko'rinish, valyuta va til — barchasi shu brauzer uchun saqlanadi.",
-    ru: "Тема, валюта и язык — всё сохраняется для этого браузера.",
+    uz: "Hisobingiz, ko'rinish va hujjatlar — barchasi shu yerda.",
+    ru: "Аккаунт, оформление и документы — всё в одном месте.",
   },
   "settings.appearance": { uz: "Ko'rinish", ru: "Оформление" },
   "settings.themeSystem": { uz: "Tizim", ru: "Система" },
@@ -51,6 +55,20 @@ const UI = {
     ru: "Баланс и история платежей. Пополнение — в мобильном приложении.",
   },
   "wallet.balance": { uz: "Balans", ru: "Баланс" },
+  /* The card's own words, taken from the app so the plate reads the same in
+     both places — see src/features/account/VirtualCard.tsx. */
+  "wallet.currentBalance": { uz: "Joriy balans", ru: "Текущий баланс" },
+  "wallet.currentBalanceUsd": {
+    uz: "Joriy balans (USD)",
+    ru: "Текущий баланс (USD)",
+  },
+  "wallet.toUsd": { uz: "USD ga", ru: "В USD" },
+  "wallet.toUzs": { uz: "UZS ga", ru: "В UZS" },
+  "wallet.topup": { uz: "To'ldirish", ru: "Пополнить" },
+  "wallet.flipHint": {
+    uz: "Bosib almashtiring (USD / UZS)",
+    ru: "Нажмите для переключения (USD / UZS)",
+  },
   "wallet.history": { uz: "Tarix", ru: "История" },
   "wallet.empty": { uz: "Amaliyotlar yo'q", ru: "Операций нет" },
   "profile.linkMine": { uz: "E'lonlarim", ru: "Мои объявления" },
@@ -67,7 +85,184 @@ const UI = {
   "profile.verified": { uz: "Tasdiqlangan rieltor", ru: "Проверенный риелтор" },
   "profile.noName": { uz: "Ism kiritilmagan", ru: "Имя не указано" },
   "profile.phone": { uz: "Telefon", ru: "Телефон" },
-  "profile.memberSince": { uz: "Ro'yxatdan o'tgan", ru: "Регистрация" },
+  /* The app's wording, with the month spelled out by the formatter — "since
+     March 2024" says what "2024-03-11" makes the reader work out. */
+  "profile.memberSince": { uz: "{{date}} dan beri", ru: "На сайте с {{date}}" },
+  "profile.linkAdd": { uz: "Yangi e'lon joylash", ru: "Разместить объявление" },
+  /* Two badges, and they must not be confused: the SEAL is a passport
+     check, this pill is a filled-in form. See components/ui/Seal.tsx. */
+  /* ── The edit form, and the prompt that leads to it ─────────────────
+     Every string here is the app's own (mobile/src/i18n/locales), because
+     the two forms ask for the same things and a person who filled one in
+     should recognise the other. */
+  "profile.edit": { uz: "Profilni tahrirlash", ru: "Редактировать профиль" },
+  "profile.editLead": {
+    uz: "Bu ma'lumotlar profilingizda va e'lonlaringiz yonida ko'rinadi.",
+    ru: "Эти данные видны в вашем профиле и рядом с объявлениями.",
+  },
+  "profile.changePhoto": { uz: "Rasm tanlash", ru: "Выбрать фото" },
+  "profile.removePhoto": { uz: "Rasmni o'chirish", ru: "Удалить фото" },
+  "profile.removePhotoConfirm": {
+    uz: "Profil rasmini o'chirmoqchimisiz?",
+    ru: "Удалить фото профиля?",
+  },
+  "profile.photoTooBig": {
+    uz: "Rasm 5 MB dan katta bo'lmasin",
+    ru: "Фото должно быть не больше 5 МБ",
+  },
+  "profile.contactHint": {
+    uz: "Raqam SMS-kod bilan tasdiqlangan va bu yerda o'zgartirilmaydi.",
+    ru: "Номер подтверждён SMS-кодом и здесь не редактируется.",
+  },
+  "auth.surname": { uz: "Familiya", ru: "Фамилия" },
+  "auth.namePlaceholder": { uz: "Ismingiz", ru: "Ваше имя" },
+  "auth.surnamePlaceholder": { uz: "Familiyangiz", ru: "Ваша фамилия" },
+  "profileInfo.birthDate": { uz: "Tug'ilgan sana", ru: "Дата рождения" },
+  "profileInfo.birthDatePlaceholder": {
+    uz: "KK.OO.YYYY",
+    ru: "ДД.ММ.ГГГГ",
+  },
+  "profileInfo.birthDateInvalid": {
+    uz: "Sanani KK.OO.YYYY ko'rinishida kiriting",
+    ru: "Введите дату в формате ДД.ММ.ГГГГ",
+  },
+  "profileInfo.ageRange": {
+    uz: "Yosh {{min}} va {{max}} orasida bo'lsin",
+    ru: "Возраст должен быть от {{min}} до {{max}}",
+  },
+  "profileInfo.gender": { uz: "Jins", ru: "Пол" },
+  "profileInfo.genderMale": { uz: "Erkak", ru: "Мужской" },
+  "profileInfo.genderFemale": { uz: "Ayol", ru: "Женский" },
+  "profileInfo.bio": { uz: "O'zingiz haqingizda", ru: "О себе" },
+  "profileInfo.bioPlaceholder": {
+    uz: "Bir-ikki gap — nima bilan shug'ullanasiz, qaysi hududda ishlaysiz",
+    ru: "Пара фраз — чем занимаетесь, в каком районе работаете",
+  },
+  "profileInfo.socials": { uz: "Ijtimoiy tarmoqlar", ru: "Социальные сети" },
+  "profileInfo.socialsHint": {
+    uz: "Foydalanuvchi nomi yoki to'liq havola",
+    ru: "Имя пользователя или полная ссылка",
+  },
+  "profileInfo.privacy": {
+    uz: "Yosh, jins va manzilni boshqa foydalanuvchilar ko'rmaydi",
+    ru: "Возраст, пол и адрес не видны другим пользователям",
+  },
+  "validation.minChars": {
+    uz: "Kamida {{count}} ta belgi",
+    ru: "Минимум {{count}} символа",
+  },
+  "validation.maxChars": {
+    uz: "Ko'pi bilan {{count}} ta belgi",
+    ru: "Максимум {{count}} символов",
+  },
+  "common.save": { uz: "Saqlash", ru: "Сохранить" },
+  "common.delete": { uz: "O'chirish", ru: "Удалить" },
+  /* The standing invitation on a profile that is still mostly empty. It is
+     "incomplete", never "unverified": the seal is a passport check and must
+     not share language with a form anybody can fill in. */
+  "completeProfile.bannerTitle": {
+    uz: "Profilingiz to'liq emas",
+    ru: "Профиль заполнен не полностью",
+  },
+  "completeProfile.bannerText": {
+    uz: "Ma'lumotlarni to'ldiring — GrowenCity a'zosi bo'ling",
+    ru: "Заполните данные — станьте участником GrowenCity",
+  },
+  "completeProfile.bannerMissing": {
+    uz: "Qolgani: {{fields}}",
+    ru: "Осталось: {{fields}}",
+  },
+  "completeProfile.fieldSurname": { uz: "familiya", ru: "фамилия" },
+  "completeProfile.fieldGender": { uz: "jins", ru: "пол" },
+  "completeProfile.fieldBirthDate": {
+    uz: "tug'ilgan sana",
+    ru: "дата рождения",
+  },
+  "completeProfile.fieldBio": { uz: "o'zingiz haqingizda", ru: "о себе" },
+  "membership.member": { uz: "GrowenCity a'zosi", ru: "Участник GrowenCity" },
+  "membership.guest": { uz: "Mehmon", ru: "Гость" },
+  /* ── Applying for the badge ──────────────────────────────────────────
+     Word for word from the app (mobile/app/verify-profile.tsx and its
+     locales): the same three photographs go to the same moderators, so a
+     person who started on the phone and finished here must not be told two
+     different things about what is wanted or what happens next. */
+  "verify.title": { uz: "Profilni tasdiqlash", ru: "Подтверждение профиля" },
+  "verify.heading": {
+    uz: "Shaxsingizni tasdiqlaymiz",
+    ru: "Подтвердим вашу личность",
+  },
+  "verify.intro": {
+    uz: "Ko'k belgi e'lonlaringiz va hikoyalaringiz yonida turadi. U xaridorga bitta narsani aytadi: ro'yxatdan o'tgan odam bilan gaplashyapsiz.",
+    ru: "Синий значок стоит рядом с вашими объявлениями и историями. Он говорит покупателю одно: перед ним реальный человек.",
+  },
+  "verify.passportFront": {
+    uz: "Pasportning asosiy sahifasi",
+    ru: "Главная страница паспорта",
+  },
+  "verify.passportBack": {
+    uz: "Pasportning orqa sahifasi",
+    ru: "Оборотная страница паспорта",
+  },
+  "verify.selfie": {
+    uz: "Pasport bilan birga selfi",
+    ru: "Селфи вместе с паспортом",
+  },
+  "verify.ruleLight": {
+    uz: "Hujjat to'liq kadrga sig'sin, raqamlari o'qilsin",
+    ru: "Документ целиком в кадре, цифры читаются",
+  },
+  "verify.ruleFace": {
+    uz: "Selfida yuzingiz ham, hujjat ham aniq ko'rinsin",
+    ru: "На селфи видно и лицо, и документ",
+  },
+  "verify.ruleBlurry": {
+    uz: "Xira, qorong'i yoki qirqilgan rasm qaytariladi",
+    ru: "Размытые, тёмные и обрезанные фото вернём",
+  },
+  "verify.privacy": {
+    uz: "Hujjatlaringizni faqat moderatorlar ko'radi, boshqa foydalanuvchilarga hech qachon ko'rsatilmaydi",
+    ru: "Ваши документы видят только модераторы и никогда — другие пользователи",
+  },
+  "verify.timeline": {
+    uz: "Odatda 1-3 ish kunida javob beramiz",
+    ru: "Обычно отвечаем за 1–3 рабочих дня",
+  },
+  "verify.submit": { uz: "Tekshiruvga yuborish", ru: "Отправить на проверку" },
+  "verify.sent": { uz: "Arizangiz qabul qilindi", ru: "Заявка принята" },
+  "verify.sentAt": { uz: "Yuborilgan:", ru: "Отправлено:" },
+  "verify.pendingTitle": { uz: "Tekshiruvda", ru: "На проверке" },
+  "verify.pendingBody": {
+    uz: "Moderator hujjatlaringizni ko'rib chiqmoqda. Javob shu yerda va Yordam markazida paydo bo'ladi.",
+    ru: "Модератор смотрит ваши документы. Ответ появится здесь и в Поддержке.",
+  },
+  "verify.verifiedTitle": {
+    uz: "Shaxsingiz tasdiqlandi",
+    ru: "Личность подтверждена",
+  },
+  "verify.verifiedBody": {
+    uz: "Ismingiz yonida endi ko'k belgi turadi — e'lonlaringiz va hikoyalaringizda ham ko'rinadi.",
+    ru: "Рядом с именем теперь синий значок — он виден и в объявлениях, и в историях.",
+  },
+  "verify.rejectedTitle": { uz: "Ariza qaytarildi", ru: "Заявка возвращена" },
+  "verify.rejectedBody": {
+    uz: "Moderator hujjatlarni qabul qilmadi.",
+    ru: "Модератор не принял документы.",
+  },
+  "verify.tryAgain": { uz: "Qaytadan yuborish", ru: "Отправить заново" },
+  /* Web-only: the app opens a photo library, a browser opens a file
+     dialog, and the picker is the one part of this that cannot be the
+     app's. */
+  "verify.pick": { uz: "Rasm tanlash", ru: "Выбрать фото" },
+  "verify.replace": { uz: "Almashtirish", ru: "Заменить" },
+  "verify.tooBig": {
+    uz: "Rasm 10 MB dan katta bo'lmasin",
+    ru: "Фото должно быть не больше 10 МБ",
+  },
+  "verify.needPhone": {
+    uz: "Avval telefon raqamingizni tasdiqlang — pasport shunga solishtiriladi.",
+    ru: "Сначала подтвердите номер телефона — паспорт сверяется с ним.",
+  },
+  "verify.badge": { uz: "Tasdiqlangan", ru: "Подтверждён" },
   "profile.links": { uz: "Bo'limlar", ru: "Разделы" },
   "profile.onlyInApp": {
     uz: "E'lonlarim, saqlanganlar va hamyon hozircha mobil ilovada.",
@@ -82,6 +277,24 @@ const UI = {
   "map.searchPlaceholder": { uz: "Tuman, bekat yoki manzil", ru: "Район, станция или адрес" },
   "map.searchEmpty": { uz: "Hech narsa topilmadi", ru: "Ничего не найдено" },
   "map.searchFailed": { uz: "Qidiruv ishlamadi", ru: "Поиск не удался" },
+  /* The settings card — the app's words (mobile locale `location`). */
+  "location.title": { uz: "Joylashuv", ru: "Местоположение" },
+  "location.myLocation": {
+    uz: "Mening joylashuvim",
+    ru: "Моё местоположение",
+  },
+  "location.previewHint": {
+    uz: "Joylashuvingizni xaritada ko'rsatamiz",
+    ru: "Покажем ваше местоположение на карте",
+  },
+  "location.show": {
+    uz: "Xaritada ko'rsatish",
+    ru: "Показать на карте",
+  },
+  "location.tapToOpen": {
+    uz: "To'liq xarita uchun bosing",
+    ru: "Нажмите, чтобы открыть карту",
+  },
   "map.locate": { uz: "Men qayerdaman", ru: "Где я" },
   "map.noGeo": { uz: "Brauzer joylashuvni qo'llab-quvvatlamaydi", ru: "Браузер не поддерживает геолокацию" },
   "map.geoDenied": { uz: "Joylashuvga ruxsat berilmadi", ru: "Доступ к геолокации запрещён" },
@@ -90,6 +303,11 @@ const UI = {
   "map.exitFull": { uz: "Yopish", ru: "Закрыть" },
   "map.fullFailed": { uz: "Butun ekran ochilmadi", ru: "Полный экран недоступен" },
   "view.map": { uz: "Xaritada", ru: "На карте" },
+  /* The map card's two buttons — the app's own words (its
+     ListingPreviewSheet). "Batafsil" opens the listing; the number sits
+     behind a sign-in, which the app does not need to do. */
+  "map.details": { uz: "Batafsil", ru: "Подробнее" },
+  "map.call": { uz: "Qo'ng'iroq", ru: "Позвонить" },
   "filters.close": { uz: "Yopish", ru: "Закрыть" },
   "filters.purposeTitle": { uz: "Maqsad", ru: "Цель" },
   "filters.categoryTitle": { uz: "Ko'chmas mulk turi", ru: "Тип недвижимости" },
@@ -232,8 +450,313 @@ const UI = {
 
   /* Rows the app has and the web has not built. Wording taken from the
      app's own screen (mobile/app/settings.tsx) so the two agree. */
+  /* ── The settings screen, section for section as the app has it ─────
+     Hints included: the app gives the rows that MATTER a second line that
+     says where you stand ("Есть вопрос? Напишите нам"), and a column of
+     bare labels is a worse answer to "why would I tap this". */
+  /* ── Your activity ───────────────────────────────────────────────────
+     The app's hub and its six lists, word for word (mobile/app/activity).
+     The endpoints are the same `/me/...` ones, so a comment written on the
+     phone is the same row here. */
+  "activity.title": { uz: "Mening faoliyatim", ru: "Моя активность" },
+  "activity.intro": {
+    uz: "Saqlaganlaringiz, yoqtirishlaringiz, izoh va sharhlaringiz",
+    ru: "Сохранённое, отметки «нравится», комментарии и отзывы",
+  },
+  "activity.saved": { uz: "Saqlanganlar", ru: "Сохранённое" },
+  "activity.savedHint": {
+    uz: "Belgilab qo'ygan e'lonlaringiz",
+    ru: "Отмеченные вами объявления",
+  },
+  "activity.likes": { uz: "Yoqtirishlarim", ru: "Мои отметки" },
+  "activity.likesHint": {
+    uz: "Siz yoqtirgan izohlar",
+    ru: "Комментарии, которые вам понравились",
+  },
+  "activity.comments": { uz: "Izohlarim", ru: "Мои комментарии" },
+  "activity.commentsHint": {
+    uz: "Siz yozgan izoh va javoblar",
+    ru: "Ваши комментарии и ответы",
+  },
+  "activity.reviews": { uz: "Sharhlarim", ru: "Мои отзывы" },
+  "activity.reviewsHint": {
+    uz: "Siz qoldirgan baholar",
+    ru: "Оставленные вами оценки",
+  },
+  "activity.photoOnly": { uz: "Rasm", ru: "Фото" },
+  "activity.commentsEmpty": {
+    uz: "Hali izoh yozmagansiz",
+    ru: "Вы пока не комментировали",
+  },
+  "activity.commentsEmptyHint": {
+    uz: "E'lon ostida savol bering — u shu yerda ko'rinadi.",
+    ru: "Задайте вопрос под объявлением — он появится здесь.",
+  },
+  "activity.likesEmpty": {
+    uz: "Hali hech narsa yoqtirmagansiz",
+    ru: "Вы пока ничего не отмечали",
+  },
+  "activity.likesEmptyHint": {
+    uz: "Izohga yurakcha bosing — u shu yerda saqlanadi.",
+    ru: "Поставьте сердечко комментарию — он сохранится здесь.",
+  },
+  "activity.reviewsEmpty": {
+    uz: "Hali sharh qoldirmagansiz",
+    ru: "Вы пока не оставляли отзывов",
+  },
+  "activity.reviewsEmptyHint": {
+    uz: "Ko'rgan joyingizni baholang — u shu yerda ko'rinadi.",
+    ru: "Оцените объект, который смотрели — он появится здесь.",
+  },
+  /* Web-only: the app pages by scrolling, a page with a footer pages by
+     asking. The number is what is left, so the button says what it buys. */
+  "activity.more": { uz: "Yana {{n}} ta", ru: "Ещё {{n}}" },
+  "notifications.title": { uz: "Bildirishnomalar", ru: "Уведомления" },
+  "notifications.empty": {
+    uz: "Hozircha bildirishnoma yo'q",
+    ru: "Уведомлений пока нет",
+  },
+  "notifications.emptyHint": {
+    uz: "Yangiliklar va javoblar shu yerda ko'rinadi.",
+    ru: "Новости и ответы появятся здесь.",
+  },
+  "notifications.videoReady": {
+    uz: "Videongiz joylashtirildi",
+    ru: "Ваше видео опубликовано",
+  },
+  "notifications.videoFailed": {
+    uz: "Video joylashtirilmadi",
+    ru: "Видео не опубликовано",
+  },
+  "notifications.videoAwaitingPayment": {
+    uz: "Video to'lov kutmoqda",
+    ru: "Видео ожидает оплаты",
+  },
+  "notifications.videoLike": {
+    uz: "videongizni yoqtirdi",
+    ru: "оценил ваше видео",
+  },
+  "notifications.videoComment": {
+    uz: "videongizga izoh qoldirdi",
+    ru: "прокомментировал ваше видео",
+  },
+  "notifications.commentReply": {
+    uz: "izohingizga javob berdi",
+    ru: "ответил на ваш комментарий",
+  },
+  "notifications.newFollower": {
+    uz: "sizga obuna bo'ldi",
+    ru: "подписался на вас",
+  },
+  "notifications.followedUserPosted": {
+    uz: "yangi video joyladi",
+    ru: "опубликовал новое видео",
+  },
+  "notifications.listingComment": {
+    uz: "e'loningizga izoh qoldirdi",
+    ru: "оставил комментарий к вашему объявлению",
+  },
+  "notifications.listingCommentReply": {
+    uz: "izohingizga javob berdi",
+    ru: "ответил на ваш комментарий",
+  },
+  "notifications.listingReview": {
+    uz: "e'loningizni baholadi",
+    ru: "оценил ваше объявление",
+  },
+  "notifications.priceBidReceived": {
+    uz: "e'loningizga narx taklif qildi",
+    ru: "предложил цену за ваше объявление",
+  },
+  "notifications.priceBidCountered": {
+    uz: "qarshi taklif yubordi",
+    ru: "отправил встречное предложение",
+  },
+  "notifications.priceBidAccepted": {
+    uz: "narx taklifingizni qabul qildi",
+    ru: "принял ваше предложение цены",
+  },
+  "notifications.priceBidDeclined": {
+    uz: "narx taklifingizni rad etdi",
+    ru: "отклонил ваше предложение цены",
+  },
+  "notifications.priceBidExpired": {
+    uz: "Narx taklifingiz muddati tugadi",
+    ru: "Срок вашего предложения цены истёк",
+  },
+  "notifications.chatMessage": {
+    uz: "sizga xabar yubordi",
+    ru: "отправил вам сообщение",
+  },
+  "notifications.topupSucceeded": {
+    uz: "Hisobingiz to'ldirildi",
+    ru: "Баланс пополнен",
+  },
+  "notifications.topupFailed": {
+    uz: "To'lov amalga oshmadi",
+    ru: "Платёж не прошёл",
+  },
+  "notifications.tariffPaid": {
+    uz: "Tarif uchun to'lov qabul qilindi",
+    ru: "Оплата тарифа принята",
+  },
+  "notifications.tariffExpiring": {
+    uz: "Tarifingiz tugayapti",
+    ru: "Срок тарифа заканчивается",
+  },
+  "bids.myTitle": { uz: "Narx takliflari", ru: "Предложения цены" },
+  "bids.myHint": {
+    uz: "Siz yuborgan va sizga kelgan takliflar",
+    ru: "Ваши предложения и предложения вам",
+  },
+  "bids.myEmpty": { uz: "Hali taklif yo'q", ru: "Предложений пока нет" },
+  "bids.myEmptyHint": {
+    uz: "E'londa «Narx taklif qilish» tugmasini bosib savdoni boshlang.",
+    ru: "Откройте объявление и нажмите «Предложить цену», чтобы начать торг.",
+  },
+  "bids.rowYou": { uz: "Siz taklif qildingiz", ru: "Ваше предложение" },
+  "bids.rowThem": { uz: "Sizga taklif qilindi", ru: "Предложение вам" },
+  "bids.statusPending": { uz: "Kutilmoqda", ru: "Ожидает ответа" },
+  "bids.statusAccepted": { uz: "Qabul qilindi", ru: "Принято" },
+  "bids.statusDeclined": { uz: "Rad etildi", ru: "Отклонено" },
+  "bids.statusCountered": {
+    uz: "Qarshi taklif berildi",
+    ru: "Отправлено встречное",
+  },
+  "bids.statusWithdrawn": { uz: "Qaytarib olindi", ru: "Отозвано" },
+  "bids.statusExpired": { uz: "Muddati tugadi", ru: "Срок истёк" },
+  "blocks.title": {
+    uz: "Bloklangan foydalanuvchilar",
+    ru: "Заблокированные",
+  },
+  "blocks.hint": {
+    uz: "Ular sizga yoza olmaydi",
+    ru: "Они не смогут вам писать",
+  },
+  "blocks.unblock": { uz: "Blokdan chiqarish", ru: "Разблокировать" },
+  "blocks.unblockConfirm": {
+    uz: "U sizga yana xabar yoza oladi.",
+    ru: "Он снова сможет вам писать.",
+  },
+  "blocks.emptyTitle": {
+    uz: "Bloklangan foydalanuvchilar yo'q",
+    ru: "Заблокированных нет",
+  },
+  "blocks.emptyHint": {
+    uz: "Kimnidir bloklasangiz, u shu yerda ko'rinadi.",
+    ru: "Если вы кого-то заблокируете, он появится здесь.",
+  },
+  "settings.verificationHint": {
+    uz: "Ko'k belgi oling va ishonchni oshiring",
+    ru: "Получите синий значок и больше доверия",
+  },
+  "settings.activityHint": {
+    uz: "Saqlaganlaringiz, yoqtirishlaringiz, izoh va sharhlaringiz",
+    ru: "Сохранённое, отметки «нравится», комментарии и отзывы",
+  },
+  "settings.placesHint": {
+    uz: "Tez-tez qidiradigan hududlaringiz",
+    ru: "Районы, которые вы ищете чаще всего",
+  },
+  "settings.supportHint": {
+    uz: "Savolingiz bormi? Bizga yozing",
+    ru: "Есть вопрос? Напишите нам",
+  },
+  "settings.sessionsHint": {
+    uz: "Hisobingizga kirgan qurilmalar",
+    ru: "Устройства, на которых выполнен вход",
+  },
+  /* ── Deleting your account ───────────────────────────────────────────
+     A PAGE, not a dialog, and the app's reasoning holds here: both stores
+     require the path to exist and be reachable without support, and a
+     two-line confirm cannot say which records survive and which do not.
+     Strings are the app's own (mobile/app/delete-account.tsx). */
+  "deleteAccount.title": { uz: "Akkauntni o'chirish", ru: "Удаление аккаунта" },
+  "deleteAccount.intro": {
+    uz: "Bu amalni ortga qaytarib bo'lmaydi. O'chirilgan ma'lumotlar tiklanmaydi.",
+    ru: "Это действие необратимо. Удалённые данные восстановить невозможно.",
+  },
+  "deleteAccount.balanceWarning": {
+    uz: "Hamyoningizda {{balance}} bor. Akkaunt o'chirilgandan keyin bu mablag' qaytarilmaydi — avval sarflashni tavsiya qilamiz.",
+    ru: "На вашем кошельке {{balance}}. После удаления аккаунта эти средства не возвращаются — рекомендуем сначала их израсходовать.",
+  },
+  "deleteAccount.removedTitle": { uz: "Nima o'chiriladi", ru: "Что удаляется" },
+  "deleteAccount.goesProfile": {
+    uz: "Ismingiz, rasmingiz va profilingizdagi barcha ma'lumotlar",
+    ru: "Ваше имя, фотография и все данные профиля",
+  },
+  "deleteAccount.goesListings": {
+    uz: "Barcha e'lonlaringiz — ular xaritadan va qidiruvdan yo'qoladi",
+    ru: "Все ваши объявления — они исчезнут с карты и из поиска",
+  },
+  "deleteAccount.goesVideos": {
+    uz: "Yuklagan videolaringiz",
+    ru: "Загруженные вами видео",
+  },
+  "deleteAccount.goesContacts": {
+    uz: "Telefon raqamingiz va Telegram bog'lanishi",
+    ru: "Номер телефона и привязка к Telegram",
+  },
+  "deleteAccount.goesPush": {
+    uz: "Bildirishnomalar uchun qurilma ro'yxati",
+    ru: "Список устройств для уведомлений",
+  },
+  "deleteAccount.keptTitle": {
+    uz: "Nima saqlanib qoladi",
+    ru: "Что сохраняется",
+  },
+  "deleteAccount.staysMessages": {
+    uz: "Yozishmalaringiz suhbatdoshingizda qoladi, lekin sizning ismingiz ko'rinmaydi",
+    ru: "Переписка останется у собеседника, но ваше имя в ней отображаться не будет",
+  },
+  "deleteAccount.staysPayments": {
+    uz: "To'lov yozuvlari — qonun talabiga ko'ra, shaxsingizga bog'lanmagan holda",
+    ru: "Записи о платежах — по требованию закона, без привязки к вашей личности",
+  },
+  "deleteAccount.reasonTitle": {
+    uz: "Sabab (ixtiyoriy)",
+    ru: "Причина (необязательно)",
+  },
+  "deleteAccount.reasonPlaceholder": {
+    uz: "Nima uchun ketyapsiz? Bu bizga yordam beradi.",
+    ru: "Почему вы уходите? Это поможет нам стать лучше.",
+  },
+  "deleteAccount.action": { uz: "Akkauntni o'chirish", ru: "Удалить аккаунт" },
+  "deleteAccount.confirmTitle": {
+    uz: "Akkaunt o'chirilsinmi?",
+    ru: "Удалить аккаунт?",
+  },
+  "deleteAccount.confirmMessage": {
+    uz: "Bu amalni ortga qaytarib bo'lmaydi. Akkauntingiz va e'lonlaringiz darhol o'chiriladi.",
+    ru: "Это действие необратимо. Ваш аккаунт и объявления будут удалены немедленно.",
+  },
+  "deleteAccount.footnote": {
+    uz: "Savollar bo'lsa: +998 95 555 52 29 yoki agromind5229@gmail.com",
+    ru: "Вопросы: +998 95 555 52 29 или agromind5229@gmail.com",
+  },
+  /* The published policy, which is a different thing from the button: one
+     explains the process to anybody (a store reviewer included), the other
+     performs it for the person signed in. */
+  "deleteAccount.policy": {
+    uz: "O'chirish qoidalari",
+    ru: "Правила удаления",
+  },
+  "settings.deletionHint": {
+    uz: "Bu amalni ortga qaytarib bo'lmaydi. O'chirilgan ma'lumotlar tiklanmaydi.",
+    ru: "Это действие необратимо. Удалённые данные восстановить невозможно.",
+  },
+  "settings.version": { uz: "Versiya {{version}}", ru: "Версия {{version}}" },
+  "settings.browserNote": {
+    uz: "Ko'rinish, valyuta va til shu brauzerda saqlanadi — ilovadagi sozlamalar alohida.",
+    ru: "Тема, валюта и язык сохраняются в этом браузере — настройки в приложении отдельные.",
+  },
   "settings.inAppSection": { uz: "Mobil ilovada", ru: "В приложении" },
   "settings.inApp": { uz: "Ilovada", ru: "В приложении" },
+  /* NOT the same claim as "Ilovada", and the difference is the point:
+     "in the app" says go and use it there, "soon" says it exists nowhere
+     yet. Marking an unbuilt feature as app-only sends somebody to hunt
+     through the app for a screen that is not in it. */
+  "settings.soon": { uz: "Tez orada", ru: "Скоро" },
   "settings.verification": { uz: "Tasdiqlash", ru: "Верификация" },
   "settings.activity": { uz: "Faollik", ru: "Активность" },
   "settings.places": { uz: "Saqlangan joylar", ru: "Сохранённые места" },

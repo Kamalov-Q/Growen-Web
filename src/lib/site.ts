@@ -13,6 +13,20 @@ export const SITE_URL =
 export const SITE_NAME = "Growen City";
 
 /**
+ * What the settings screen signs off with, the way the app prints its own
+ * version there (`about.version`).
+ *
+ * Read from the env at build time rather than hardcoded, so a deploy cannot
+ * claim to be a version it is not: Vercel sets `NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA`,
+ * and anything else can set `NEXT_PUBLIC_APP_VERSION`. With neither — a
+ * local `next dev` — it says "dev", which is true.
+ */
+export const APP_VERSION =
+  process.env.NEXT_PUBLIC_APP_VERSION ??
+  process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ??
+  "dev";
+
+/**
  * The API's ORIGIN — no path. Matches what the mobile app's eas.json sets.
  */
 export const API_ORIGIN =
