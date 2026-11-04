@@ -15,7 +15,7 @@ import { enumLabel } from "@/src/i18n/dictionary";
 import {
   createListing,
   uploadImages,
-  type CreateListingInput,
+  type CreateOffer,
   type UploadedImage,
 } from "./create-api";
 import { PostPriceNotice } from "./PostPriceNotice";
@@ -79,7 +79,7 @@ export function CreateListingForm({
   const { user } = useSession();
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const [purpose, setPurpose] = useState<CreateListingInput["purpose"]>("SALE");
+  const [purpose, setPurpose] = useState<CreateOffer["purpose"]>("SALE");
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [currency, setCurrency] = useState<"USD" | "UZS">("USD");
@@ -199,10 +199,13 @@ export function CreateListingForm({
 
       setBusy("create");
       const listing = await createListing({
-        purpose,
-        price: priceNum,
-        currency,
         category,
+        // purpose/price/currency belong ONLY inside an offer. The API's
+        // CreateListingDto does not declare them at the top level and its
+        // validation pipe runs with forbidNonWhitelisted, so sending them
+        // next to `offers` rejects the whole request with
+        // "property purpose should not exist" — before the listing is
+        // written and before the wallet is touched.
         offers: [{ purpose, price: priceNum, currency }],
         title: title.trim() || undefined,
         descriptionHtml: description.trim()

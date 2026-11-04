@@ -54,9 +54,9 @@ export interface CreateOffer {
 }
 
 export interface CreateListingInput {
-  purpose: CreateOffer["purpose"];
-  price: number;
-  currency: "USD" | "UZS";
+  // No top-level purpose/price/currency: those are an offer's fields, and
+  // the API rejects them here. Mirroring the server's CreateListingDto
+  // exactly is what stops the shape drifting back.
   category: string;
   offers: CreateOffer[];
   title?: string;
