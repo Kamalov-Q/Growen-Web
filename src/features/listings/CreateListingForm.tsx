@@ -233,11 +233,18 @@ export function CreateListingForm({
         ...(locMode === "POLYGON"
           ? { coordinates: [closeRing(ring)] }
           : { point: point! }),
-        images: images.map((img) => ({
+        // position and isPrimary are REQUIRED by the API's ImageInputDto
+        // (@IsInt @Min(0) and @IsBoolean, neither optional) — omitting them
+        // fails validation on images.0 before anything is written. Order is
+        // the order they were picked, and the first one is the cover, which
+        // is what the mobile app sends too.
+        images: images.map((img, idx) => ({
           url: img.url,
           thumbUrl: img.thumbUrl,
           width: img.width,
           height: img.height,
+          position: idx,
+          isPrimary: idx === 0,
         })),
       });
 

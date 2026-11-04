@@ -80,7 +80,19 @@ export interface CreateListingInput {
   coordinates?: [number, number][][];
   areaM2?: number;
   properties?: string[];
-  images?: { url: string; thumbUrl: string; width?: number; height?: number }[];
+  /**
+   * Mirrors the API's ImageInputDto. `position` and `isPrimary` are not
+   * optional there, so they are not optional here — a missing one is a 400
+   * on images.N, after the files have already been uploaded.
+   */
+  images?: {
+    url: string;
+    thumbUrl: string;
+    width?: number;
+    height?: number;
+    position: number;
+    isPrimary: boolean;
+  }[];
 }
 
 export const createListing = (input: CreateListingInput) =>
