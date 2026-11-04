@@ -285,6 +285,19 @@ export const createTopup = (input: {
   amount: number;
   provider: TopupProvider;
   clientId: string;
+  /**
+   * The payer's language. Payme's checkout opens in it; Click's follows
+   * the payer's own account, so it is ignored there.
+   */
+  lang?: "uz" | "ru";
+  /**
+   * Where the payment started. It is NOT a URL — the server chooses
+   * between the return addresses it is configured with, because one taken
+   * from the request would be an open redirect on a payment page. "WEB"
+   * asks for the website's result page instead of the app's deep link,
+   * which a desktop browser cannot follow.
+   */
+  client?: "APP" | "WEB";
 }) => api<TopupOrder>("/wallet/topup", { method: "POST", body: input });
 
 export interface TopupStatus {
@@ -296,9 +309,58 @@ export interface TopupStatus {
   paidAt: string | null;
 }
 
+/**
+ * Paynet's link, with this account's number and the amount filled in.
+ *
+ * PUSH-MODEL, and that is the whole difference from Click and Payme: there
+ * is no order to create and therefore nothing to poll. The payer pays into
+ * their account number at a terminal or in Paynet's app, and the money
+ * arrives whenever Paynet's webhook says it did — which may be minutes
+ * later, or after the browser has long since been closed.
+ */
+export const paynetLink = (amount: number) =>
+  api<{ accountNo: number; payUrl: string }>(
+    `/wallet/paynet-link?amount=${amount}`,
+  );
+
 /** Where one attempt stands. The webhook decides it, never the return link. */
 export const getTopupStatus = (id: string) =>
   api<TopupStatus>(`/wallet/topup/${id}`);
+
+export type FiscalStatus =
+  | "NONE"
+  | "BY_PROVIDER"
+  | "PENDING"
+  | "SENDING"
+  | "SENT"
+  | "FAILED";
+
+/** The provider payment behind a top-up, its bonus, or its reversal. */
+export interface TransactionPayment {
+  id: string;
+  /** Our order number — the one Click prints on its receipt. */
+  orderNo: number;
+  provider: TopupProvider;
+  status: PaymentStatus | "PREPARED";
+  amount: string;
+  bonusAmount: string;
+  providerTxnId: string | null;
+  fiscalStatus: FiscalStatus;
+  createdAt: string;
+  paidAt: string | null;
+  cancelledAt: string | null;
+  cancelReason: string | null;
+}
+
+export interface WalletTxnDetail extends WalletTxn {
+  /** Set only for a promotion, so the row can open the advert it paid for. */
+  listingId: string | null;
+  /** Null for a charge: nothing was paid to anybody outside. */
+  payment: TransactionPayment | null;
+}
+
+export const getTransaction = (id: string) =>
+  api<WalletTxnDetail>(`/wallet/transactions/${id}`);
 
 export const getTransactions = (limit = 30, offset = 0) =>
   api<WalletTxnPage>(`/wallet/transactions?limit=${limit}&offset=${offset}`);

@@ -13,6 +13,7 @@ import {
 import {
   createTopup,
   getWallet,
+  paynetLink,
   type TopupProvider,
   type Wallet,
 } from "@/src/features/account/api";
@@ -54,7 +55,7 @@ const METHODS: {
   subtitle: UiKey;
   badge: UiKey;
   badgeClass: string;
-  /** Listed, but not yet payable here — see `wallet.soon`. */
+  /** Listed, but not payable here — see `wallet.soon`. */
   soon?: boolean;
 }[] = [
   {
@@ -77,10 +78,6 @@ const METHODS: {
     subtitle: "wallet.paynetSubtitle",
     badge: "wallet.badgeCash",
     badgeClass: "bg-[#00A859]/15 text-[#00A859]",
-    // Push-model: the payer types an account number into a terminal rather
-    // than being sent to a checkout, so it is a different walk-through and
-    // not the one this screen performs yet.
-    soon: true,
   },
 ];
 
@@ -101,6 +98,8 @@ export function TopupPanel({ lang }: { lang: Lang }) {
   const [method, setMethod] = useState<TopupProvider>("CLICK");
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** Shown after Paynet opens: there is no result page to come back to. */
+  const [paynetOpened, setPaynetOpened] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -155,15 +154,66 @@ export function TopupPanel({ lang }: { lang: Lang }) {
    */
   async function pay() {
     if (!valid || paying) return;
-    // The server refuses without a verified number (PhoneRequiredGuard).
-    // Saying so here turns a 403 into a sentence somebody can act on.
-    if (!user?.phoneNumber) {
+
+    /**
+     * The tab is opened NOW, before any await.
+     *
+     * A popup opened after an `await` has lost the click that justified it
+     * and browsers block it — which is how "pay" ends up doing nothing
+     * visible. This one is opened blank while the gesture is still live
+     * and pointed at the URL once the server answers. Only Paynet needs
+     * it: Click and Payme navigate this tab, because they come back to it.
+     */
+    const tab =
+      active === "PAYNET" ? window.open("", "_blank", "noopener") : null;
+
+    /**
+     * The phone gate is for the ORDER, not for every provider.
+     *
+     * `POST /wallet/topup` sits behind PhoneRequiredGuard — a card payment
+     * is vouched for by a verified number — while `/wallet/paynet-link`
+     * does not, because paying into an account number needs nothing of the
+     * sort. Gating Paynet here would invent a requirement the server does
+     * not have.
+     */
+    if (active !== "PAYNET" && !user?.phoneNumber) {
       setError(t(lang, "wallet.needPhone"));
       return;
     }
 
     setError(null);
     setPaying(true);
+
+    /**
+     * Paynet first, because it is not the same kind of thing.
+     *
+     * There is no order to create and no checkout to return from: the
+     * server hands back a link carrying this account's number and the
+     * amount, the payer settles it at a terminal or in Paynet's app, and
+     * the money lands when Paynet's webhook says so. Nothing here can wait
+     * for that, so nothing here pretends to — the page says what will
+     * happen and the balance updates on the next load.
+     */
+    if (active === "PAYNET") {
+      try {
+        const { payUrl } = await paynetLink(amount);
+        // The blank tab opened above, pointed at the link now it is here.
+        if (tab) tab.location.href = payUrl;
+        // The popup was blocked: take this tab instead of doing nothing
+        // visible. Paynet has nowhere to send the payer back to anyway.
+        else window.location.assign(payUrl);
+        setPaynetOpened(true);
+      } catch (err) {
+        tab?.close();
+        setError(
+          err instanceof ApiError ? err.message : t(lang, "auth.genericError"),
+        );
+      } finally {
+        setPaying(false);
+      }
+      return;
+    }
+
     try {
       const order = await createTopup({
         amount,
@@ -171,6 +221,11 @@ export function TopupPanel({ lang }: { lang: Lang }) {
         // One per attempt: the server is idempotent on it, so a double
         // click cannot open two payments for one amount.
         clientId: crypto.randomUUID(),
+        // So Payme's checkout opens in the language this page is in, and
+        // so the provider returns the payer to the WEBSITE rather than to
+        // the app's deep link.
+        lang,
+        client: "WEB",
       });
 
       // Remembered BEFORE leaving: Click's return URL is one address for
@@ -406,12 +461,27 @@ export function TopupPanel({ lang }: { lang: Lang }) {
           : t(lang, "wallet.pay")}
       </button>
 
-      {/* Paynet's own route: the payer types this number into a terminal,
-          which is why the row above says "soon" and this says the number. */}
+      {/* After Paynet: there is no result page to send anybody to, so the
+          outcome is stated here. */}
+      {paynetOpened ? (
+        <section className="flex flex-col gap-1.5 rounded-card bg-sold-soft p-4 ring-1 ring-gold/30">
+          <p className="text-[15px] font-bold text-ink">
+            {t(lang, "wallet.paynetOpened")}
+          </p>
+          <p className="text-[13px] leading-5 text-muted">
+            {t(lang, "wallet.paynetOpenedHint")}
+          </p>
+        </section>
+      ) : null}
+
+      {/* The number the payer types into a terminal. Printed whatever is
+          selected: somebody standing at a Paynet machine needs it, and by
+          then this page is in their pocket. */}
       {wallet?.accountNo ? (
-        <p className="nums text-center text-[13px] text-muted">
-          {t(lang, "wallet.accountNo")}:{" "}
-          <span className="font-bold text-ink">{wallet.accountNo}</span>
+        <p className="text-center text-[13px] text-muted">
+          {t(lang, active === "PAYNET" ? "wallet.paynetAccountHint" : "wallet.accountNo")}
+          {": "}
+          <span className="nums font-bold text-ink">{wallet.accountNo}</span>
         </p>
       ) : null}
 

@@ -85,17 +85,6 @@ const UI = {
     ru: "У вас пока нет истории платежей",
   },
   "wallet.accountNo": { uz: "Hisob raqami", ru: "Номер счёта" },
-  /* Said plainly, where the app's pay button is. The web does not take
-     money yet, and a button that looks like it does is worse than a
-     sentence that says where to go. */
-  "wallet.payInApp": {
-    uz: "To'ldirish hozircha mobil ilovada",
-    ru: "Пополнение пока доступно в мобильном приложении",
-  },
-  "wallet.payInAppHint": {
-    uz: "Summani va usulni shu yerda tanlab, to'lovni ilovada yakunlang — hisob raqamingiz o'sha-o'sha.",
-    ru: "Выберите сумму и способ здесь, а оплату завершите в приложении — номер счёта тот же.",
-  },
   /* Paying, and coming back from it. The app's words (its wallet locale). */
   "wallet.pay": { uz: "To'lash", ru: "Оплатить" },
   "wallet.paymentCancelled": {
@@ -142,7 +131,82 @@ const UI = {
   /* Paynet is push-model — the payer types an account number into a
      terminal — and the web has not built that walk-through yet, so the row
      stays visible and says so rather than being quietly dropped. */
+  /* Paynet has no checkout to come back from, so the page says what will
+     happen instead of pretending to wait for it. */
+  "wallet.paynetOpened": {
+    uz: "Paynet ochildi",
+    ru: "Paynet открыт",
+  },
+  "wallet.paynetOpenedHint": {
+    uz: "To'lovni Paynetda yakunlang. Mablag' tasdiqlangach balansga tushadi — darhol emas.",
+    ru: "Завершите оплату в Paynet. Средства поступят на баланс после подтверждения — не мгновенно.",
+  },
+  "wallet.paynetAccountHint": {
+    uz: "Terminalda shu hisob raqamini kiriting",
+    ru: "В терминале введите этот номер счёта",
+  },
   "wallet.soon": { uz: "Tez orada", ru: "Скоро" },
+  /* The ledger, and one line of it in full — the app's transaction detail
+     screen, field for field. */
+  "wallet.transactions": { uz: "Tranzaksiyalar", ru: "История транзакций" },
+  "wallet.txDetailsTitle": {
+    uz: "Operatsiya tafsilotlari",
+    ru: "Детали операции",
+  },
+  "wallet.txLoadError": {
+    uz: "To'lov ma'lumotlarini yuklab bo'lmadi",
+    ru: "Не удалось загрузить данные платежа",
+  },
+  "wallet.sectionOperation": { uz: "Operatsiya", ru: "Операция" },
+  "wallet.sectionPayment": { uz: "To'lov", ru: "Платёж" },
+  "wallet.statusPaid": { uz: "To'langan", ru: "Оплачено" },
+  "wallet.statusPending": { uz: "Kutilmoqda", ru: "В обработке" },
+  "wallet.statusCancelled": { uz: "Bekor qilingan", ru: "Отменено" },
+  "wallet.statusCompleted": { uz: "Bajarildi", ru: "Выполнено" },
+  "wallet.fieldType": { uz: "Turi", ru: "Тип" },
+  "wallet.fieldDate": { uz: "Sana va vaqt", ru: "Дата и время" },
+  "wallet.fieldAmount": { uz: "Summa", ru: "Сумма" },
+  "wallet.fieldBonus": { uz: "Bonus", ru: "Бонус" },
+  "wallet.fieldBalanceAfter": {
+    uz: "Operatsiyadan keyingi balans",
+    ru: "Баланс после операции",
+  },
+  "wallet.fieldNote": { uz: "Izoh", ru: "Комментарий" },
+  "wallet.fieldProvider": { uz: "To'lov tizimi", ru: "Платёжная система" },
+  "wallet.fieldStatus": { uz: "Holati", ru: "Статус" },
+  "wallet.fieldOrderNo": { uz: "Buyurtma raqami", ru: "Номер заказа" },
+  "wallet.fieldProviderTxn": {
+    uz: "To'lov tizimidagi ID",
+    ru: "ID в платёжной системе",
+  },
+  "wallet.fieldPaymentId": { uz: "To'lov ID", ru: "ID платежа" },
+  "wallet.fieldTransactionId": { uz: "Operatsiya ID", ru: "ID операции" },
+  "wallet.fieldCreatedAt": { uz: "Yaratilgan", ru: "Создан" },
+  "wallet.fieldPaidAt": { uz: "To'langan vaqti", ru: "Оплачен" },
+  "wallet.fieldCancelledAt": { uz: "Bekor qilingan vaqti", ru: "Отменён" },
+  "wallet.fieldCancelReason": {
+    uz: "Bekor qilish sababi",
+    ru: "Причина отмены",
+  },
+  "wallet.fieldReceipt": { uz: "Fiskal chek", ru: "Фискальный чек" },
+  "wallet.receiptSent": { uz: "Yuborilgan", ru: "Отправлен" },
+  "wallet.receiptPending": { uz: "Yuborilmoqda", ru: "Отправляется" },
+  "wallet.receiptByProvider": {
+    uz: "To'lov tizimi yuboradi",
+    ru: "Отправляет платёжная система",
+  },
+  "wallet.receiptFailed": { uz: "Xatolik", ru: "Ошибка" },
+  "wallet.receiptNone": { uz: "Yo'q", ru: "Нет" },
+  "wallet.copied": { uz: "Nusxa olindi", ru: "Скопировано" },
+  "wallet.copy": { uz: "Nusxalash", ru: "Копировать" },
+  "wallet.openListing": { uz: "E'lonni ochish", ru: "Открыть объявление" },
+  /* Web-only: a phone has nowhere to put a file, a browser does. The whole
+     ledger as a spreadsheet — which is what somebody reconciling an
+     accounting entry actually wants. */
+  "wallet.download": { uz: "Yuklab olish (CSV)", ru: "Скачать (CSV)" },
+  "wallet.downloading": { uz: "Tayyorlanmoqda…", ru: "Готовим…" },
+  "wallet.loadMore": { uz: "Yana {{n}} ta", ru: "Ещё {{n}}" },
+  "wallet.refresh": { uz: "Yangilash", ru: "Обновить" },
   "wallet.topupTx": { uz: "Hisobni to'ldirish", ru: "Пополнение баланса" },
   "wallet.bonusTx": { uz: "To'ldirish bonusi", ru: "Бонус за пополнение" },
   "wallet.listingPostTx": {
