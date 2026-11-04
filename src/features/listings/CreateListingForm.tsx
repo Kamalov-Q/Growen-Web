@@ -19,6 +19,7 @@ import {
   type UploadedImage,
 } from "./create-api";
 import { PostPriceNotice } from "./PostPriceNotice";
+import { normalizePhone } from "@/src/lib/phone";
 
 // MapLibre touches `window` at import time, so it cannot server-render, and
 // it is the heaviest dependency here. Loaded when the form is.
@@ -217,7 +218,11 @@ export function CreateListingForm({
         floor: sendFloors ? num(floor) : undefined,
         totalFloors: sendFloors ? num(totalFloors) : undefined,
         address: address.trim() || undefined,
-        contactPhone: phone ? `998${phone}` : undefined,
+        // Through normalizePhone, not `998${phone}`: the API's IsUzPhone
+        // validator tests /^\+998(20|33|50|55|77|88|9\d)\d{7}$/, so a
+        // missing plus rejects the whole request. The helper also strips
+        // whatever the mask left behind and tolerates a pasted 998-prefix.
+        contactPhone: phone ? normalizePhone(phone) : undefined,
         sellerType: sellerType || undefined,
         buildingType: (showBuildingType && buildingType) || undefined,
         repairType: (showRepairType && repairType) || undefined,
