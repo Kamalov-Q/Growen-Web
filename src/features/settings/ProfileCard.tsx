@@ -10,6 +10,7 @@ import { Avatar } from "@/src/components/ui/Avatar";
 import { Icon, type IconName } from "@/src/components/ui/Icon";
 import { MembershipPill, VerifiedPill, VerifiedSeal } from "@/src/components/ui/Seal";
 import { prettyPhone } from "@/src/lib/phone";
+import { monthYear } from "@/src/lib/time";
 import {
   getCounts,
   getProfile,
@@ -186,10 +187,7 @@ export function ProfileCard({ lang }: { lang: Lang }) {
         {profile ? (
           <p className="text-[13px] text-faint">
             {t(lang, "profile.memberSince", {
-              date: new Date(profile.createdAt).toLocaleDateString(locale, {
-                year: "numeric",
-                month: "long",
-              }),
+              date: monthYear(profile.createdAt, lang),
             })}
           </p>
         ) : null}

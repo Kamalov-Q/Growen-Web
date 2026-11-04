@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { Page } from "@/src/components/Page";
 import { RequireAuth } from "@/src/features/auth/RequireAuth";
 import { AccountScreen } from "@/src/features/account/AccountScreen";
-import { WalletPanel } from "@/src/features/account/WalletPanel";
+import { TopupPanel } from "@/src/features/wallet/TopupPanel";
 import { isLang, LANGS, type Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
 import { pageMetadata } from "@/src/lib/metadata";
@@ -44,10 +44,10 @@ export default async function WalletPage({
       <RequireAuth lang={lang as Lang}>
         <AccountScreen
           lang={lang as Lang}
-          title={t(lang, "wallet.title")}
+          title={t(lang, "wallet.topupTitle")}
           lead={t(lang, "wallet.lead")}
         >
-          <WalletPanel lang={lang as Lang} />
+          <TopupPanel lang={lang as Lang} />
         </AccountScreen>
       </RequireAuth>
     </Page>

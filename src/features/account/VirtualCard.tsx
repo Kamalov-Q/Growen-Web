@@ -92,6 +92,14 @@ interface Props {
   /** Undefined while the wallet request is still out. */
   balance?: number | string;
   topupHref: string;
+  /**
+   * "full" drops the top-up pill.
+   *
+   * The card carries it on the profile, where it is the way IN to the
+   * wallet. On the wallet page itself the way in has already been taken,
+   * and a button that reloads the page you are on is furniture.
+   */
+  variant?: "compact" | "full";
 }
 
 export function VirtualCard({
@@ -102,6 +110,7 @@ export function VirtualCard({
   accountNo,
   balance,
   topupHref,
+  variant = "compact",
 }: Props) {
   const { rate } = usePrefs();
   const [flipped, setFlipped] = useState(false);
@@ -110,7 +119,7 @@ export function VirtualCard({
     phone: cardPhone(phone),
     id: cardId(userId, accountNo),
     name: name.toUpperCase(),
-    topupHref,
+    topupHref: variant === "full" ? null : topupHref,
     lang,
   };
 
@@ -191,7 +200,8 @@ function Face({
   phone: string;
   id: string;
   name: string;
-  topupHref: string;
+  /** null on the full card — see `variant`. */
+  topupHref: string | null;
   className?: string;
 }) {
   return (
@@ -279,6 +289,7 @@ function Face({
 
         {/* A link, not a button: it goes to the wallet page. The click must
             not also reach the card, or topping up flips it on the way. */}
+        {topupHref ? (
         <Link
           href={topupHref}
           onClick={(e) => e.stopPropagation()}
@@ -298,6 +309,7 @@ function Face({
           </svg>
           {t(lang, "wallet.topup")}
         </Link>
+        ) : null}
       </div>
 
       <div className="relative flex items-end justify-between gap-3">

@@ -57,6 +57,113 @@ const UI = {
   "wallet.balance": { uz: "Balans", ru: "Баланс" },
   /* The card's own words, taken from the app so the plate reads the same in
      both places — see src/features/account/VirtualCard.tsx. */
+  /* ── Topping up, as the app's wallet screen has it ───────────────────
+     The screen is the app's; the PAYMENT is not here yet, which the notice
+     at the foot says in so many words rather than by a button that does
+     nothing. */
+  "wallet.topupTitle": { uz: "Balansni to'ldirish", ru: "Пополнение баланса" },
+  "wallet.historyTitle": { uz: "To'lov tarixi", ru: "История платежей" },
+  "wallet.enterAmount": { uz: "Summani kiriting", ru: "Введите сумму" },
+  "wallet.paymentMethods": { uz: "To'lov usullari", ru: "Способы оплаты" },
+  "wallet.paymeSubtitle": {
+    uz: "Uzcard va Humo orqali tezkor to'lov",
+    ru: "Оплата через Uzcard и Humo",
+  },
+  "wallet.clickSubtitle": {
+    uz: "Barcha bank kartalari bilan to'lash",
+    ru: "Оплата любыми банковскими картами",
+  },
+  "wallet.paynetSubtitle": {
+    uz: "Naqd pul va terminallar orqali",
+    ru: "Наличными и через терминалы",
+  },
+  "wallet.badgeInstant": { uz: "Tezkor", ru: "Мгновенно" },
+  "wallet.badgeZeroFee": { uz: "0% komissiya", ru: "0% комиссия" },
+  "wallet.badgeCash": { uz: "Naqd pul", ru: "Наличные" },
+  "wallet.noHistory": {
+    uz: "Sizda hali to'lov tarixi yo'q",
+    ru: "У вас пока нет истории платежей",
+  },
+  "wallet.accountNo": { uz: "Hisob raqami", ru: "Номер счёта" },
+  /* Said plainly, where the app's pay button is. The web does not take
+     money yet, and a button that looks like it does is worse than a
+     sentence that says where to go. */
+  "wallet.payInApp": {
+    uz: "To'ldirish hozircha mobil ilovada",
+    ru: "Пополнение пока доступно в мобильном приложении",
+  },
+  "wallet.payInAppHint": {
+    uz: "Summani va usulni shu yerda tanlab, to'lovni ilovada yakunlang — hisob raqamingiz o'sha-o'sha.",
+    ru: "Выберите сумму и способ здесь, а оплату завершите в приложении — номер счёта тот же.",
+  },
+  /* Paying, and coming back from it. The app's words (its wallet locale). */
+  "wallet.pay": { uz: "To'lash", ru: "Оплатить" },
+  "wallet.paymentCancelled": {
+    uz: "To'lov bekor qilindi",
+    ru: "Платёж отменён",
+  },
+  "wallet.resultChecking": {
+    uz: "To'lov tekshirilmoqda…",
+    ru: "Проверяем платёж…",
+  },
+  "wallet.resultCheckingBody": {
+    uz: "To'lov tizimi tasdiqlashini kutyapmiz. Bu odatda bir necha soniya oladi.",
+    ru: "Ждём подтверждения от платёжной системы. Обычно это занимает несколько секунд.",
+  },
+  "wallet.resultPaid": { uz: "To'lov qabul qilindi", ru: "Платёж получен" },
+  "wallet.resultPaidBody": {
+    uz: "{{amount}} UZS balansingizga qo'shildi.",
+    ru: "{{amount}} UZS зачислено на ваш баланс.",
+  },
+  "wallet.resultPaidBodyNoAmount": {
+    uz: "Mablag' balansingizga qo'shildi.",
+    ru: "Средства зачислены на ваш баланс.",
+  },
+  "wallet.resultCancelledBody": {
+    uz: "Hisobingizdan pul yechilmadi. Qaytadan urinib ko'rishingiz mumkin.",
+    ru: "Деньги не были списаны. Вы можете попробовать ещё раз.",
+  },
+  "wallet.resultPending": {
+    uz: "To'lov hali tasdiqlanmadi",
+    ru: "Платёж ещё не подтверждён",
+  },
+  "wallet.resultPendingBody": {
+    uz: "Agar to'lagan bo'lsangiz, mablag' tez orada balansga tushadi — holatini to'lov tarixida ko'ring.",
+    ru: "Если вы оплатили, средства скоро поступят на баланс — статус можно посмотреть в истории платежей.",
+  },
+  "wallet.resultBackToWallet": {
+    uz: "Hamyonga qaytish",
+    ru: "Вернуться в кошелёк",
+  },
+  "wallet.needPhone": {
+    uz: "To'lov uchun avval telefon raqamingizni tasdiqlang.",
+    ru: "Для оплаты сначала подтвердите номер телефона.",
+  },
+  /* Paynet is push-model — the payer types an account number into a
+     terminal — and the web has not built that walk-through yet, so the row
+     stays visible and says so rather than being quietly dropped. */
+  "wallet.soon": { uz: "Tez orada", ru: "Скоро" },
+  "wallet.topupTx": { uz: "Hisobni to'ldirish", ru: "Пополнение баланса" },
+  "wallet.bonusTx": { uz: "To'ldirish bonusi", ru: "Бонус за пополнение" },
+  "wallet.listingPostTx": {
+    uz: "E'lon joylashtirish",
+    ru: "Публикация объявления",
+  },
+  "wallet.listingPromoteTx": {
+    uz: "E'lonni ko'tarish",
+    ru: "Продвижение объявления",
+  },
+  "wallet.videoPostTx": { uz: "Video joylashtirish", ru: "Публикация видео" },
+  "wallet.refundTx": { uz: "Mablag'ni qaytarish", ru: "Возврат средств" },
+  "wallet.adminAdjustTx": {
+    uz: "Admin tomonidan o'zgartirish",
+    ru: "Корректировка администратора",
+  },
+  "wallet.balanceAfter": { uz: "Qoldiq: {{amount}}", ru: "Остаток: {{amount}}" },
+  "validation.range": {
+    uz: "{{min}} dan {{max}} gacha bo'lsin",
+    ru: "Должно быть от {{min}} до {{max}}",
+  },
   "wallet.currentBalance": { uz: "Joriy balans", ru: "Текущий баланс" },
   "wallet.currentBalanceUsd": {
     uz: "Joriy balans (USD)",

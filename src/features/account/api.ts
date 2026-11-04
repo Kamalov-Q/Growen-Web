@@ -153,8 +153,21 @@ export const getSavedIds = () => api<string[]>("/listings/saved/ids");
 export const toggleSaved = (id: string) =>
   api<{ saved: boolean }>(`/listings/${id}/save`, { method: "PUT" });
 
+export type TopupProvider = "CLICK" | "PAYME" | "PAYNET";
+
 export interface Wallet {
   balance: number | string;
+  /** The same figure in tiyin, which is what the server actually stores. */
+  balanceTiyin?: number;
+  /**
+   * The providers the SERVER has credentials for right now.
+   *
+   * Click and Payme drop out when their keys are unset, Paynet when its
+   * service id is. Offering one the server has disabled ends in a
+   * PROVIDER_UNAVAILABLE after somebody has already chosen an amount, and
+   * turning a provider off would otherwise need a deploy.
+   */
+  providers?: TopupProvider[];
   currency?: string;
   /**
    * The number a payer types into Paynet. Printed on the virtual card —
@@ -201,17 +214,91 @@ export interface Tariff {
  */
 export const getTariffs = () => api<Tariff[]>("/tariffs");
 
+/** The ledger kinds the server writes. Mirrors `TxKind` in the app. */
+export type TxKind =
+  | "TOPUP"
+  | "TOPUP_BONUS"
+  | "LISTING_POST"
+  | "LISTING_PROMOTE"
+  | "VIDEO_POST"
+  | "REFUND"
+  | "ADMIN_ADJUST";
+
 export interface WalletTxn {
   id: string;
-  amount: number | string;
-  type?: string;
-  status?: string;
+  /** Signed: a charge is negative. A string, because it is `numeric`. */
+  amount: string;
+  kind: TxKind;
+  referenceId: string | null;
+  balanceAfter: string;
+  note: string | null;
   createdAt: string;
-  description?: string | null;
-  [k: string]: unknown;
+}
+
+/**
+ * A PAGE, not an array.
+ *
+ * This was typed as `WalletTxn[]` and the endpoint has always answered
+ * `{ items, total, limit, offset }` — so `txns.length` was `undefined` and
+ * the history panel showed "no operations" to every account that had some.
+ * The shape here now matches what the server sends (billing.controller:
+ * `listTransactions`).
+ */
+export interface WalletTxnPage {
+  items: WalletTxn[];
+  total: number;
+  limit: number;
+  offset: number;
 }
 
 export const getWallet = () => api<Wallet>("/wallet");
 
+export type PaymentStatus =
+  | "CREATED"
+  | "PENDING"
+  | "PAID"
+  | "CANCELLED"
+  | "FAILED";
+
+export interface TopupOrder {
+  paymentId: string;
+  status: PaymentStatus;
+  provider: TopupProvider;
+  /** The provider's checkout, to send the payer to. */
+  payUrl: string;
+  bonusPreview?: { percent: number; amount: string };
+}
+
+/**
+ * Start a top-up.
+ *
+ * `clientId` is a UUID made once per ATTEMPT, and it is what makes this
+ * idempotent: sending the same one again returns the same order instead of
+ * creating a second. A double-click, or a browser that re-sends on back,
+ * therefore cannot open two payments for one amount.
+ *
+ * The server refuses without a verified phone (PhoneRequiredGuard), which
+ * is why the caller checks first — a 403 after somebody has chosen an
+ * amount is not something they can act on.
+ */
+export const createTopup = (input: {
+  amount: number;
+  provider: TopupProvider;
+  clientId: string;
+}) => api<TopupOrder>("/wallet/topup", { method: "POST", body: input });
+
+export interface TopupStatus {
+  id: string;
+  provider: TopupProvider;
+  status: PaymentStatus;
+  amount: string;
+  bonusAmount: string;
+  paidAt: string | null;
+}
+
+/** Where one attempt stands. The webhook decides it, never the return link. */
+export const getTopupStatus = (id: string) =>
+  api<TopupStatus>(`/wallet/topup/${id}`);
+
 export const getTransactions = (limit = 30, offset = 0) =>
-  api<WalletTxn[]>(`/wallet/transactions?limit=${limit}&offset=${offset}`);
+  api<WalletTxnPage>(`/wallet/transactions?limit=${limit}&offset=${offset}`);
