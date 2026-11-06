@@ -56,6 +56,14 @@ export function LocationMapLoader(props: {
   const [near, setNear] = useState(false);
   const slot = useRef<HTMLDivElement>(null);
 
+  /**
+   * The map also prints an "open in Yandex / Google" line under itself,
+   * and only when it has a point to link to — `centroid ?? ring[0]`, the
+   * same test `LocationMap` makes. The placeholder reserves that line too,
+   * or the section grows by a row when the map arrives.
+   */
+  const hasLinks = (props.centroid ?? props.ring?.[0] ?? null) !== null;
+
   useEffect(() => {
     const el = slot.current;
     if (!el) return;
@@ -91,7 +99,16 @@ export function LocationMapLoader(props: {
       {near ? (
         <LocationMap {...props} />
       ) : (
-        <div className={`bg-muted-bg ${BOX}`} aria-hidden />
+        <div className="flex flex-col gap-2" aria-hidden>
+          <div className={`bg-muted-bg ${BOX}`} />
+          {/* Same element, same classes, no text: the browser computes the
+              identical line box, so there is nothing to guess. */}
+          {hasLinks ? (
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted">
+              &nbsp;
+            </p>
+          ) : null}
+        </div>
       )}
     </div>
   );

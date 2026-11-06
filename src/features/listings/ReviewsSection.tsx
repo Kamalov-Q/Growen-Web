@@ -156,13 +156,28 @@ export function ReviewsSection({
                 {tReviews(lang, "reviews.emptyTitle")}
               </p>
               <p className="mt-1 text-[14px] text-muted">
-                {tReviews(lang, own ? "reviews.emptyOwner" : "reviews.emptyHint")}
+                {tReviews(
+                  lang,
+                  own ? "reviews.emptyOwner" : "reviews.emptyHint",
+                )}
               </p>
             </div>
           )}
         </div>
       ) : (
-        <div className="h-40 animate-pulse rounded-card bg-muted-bg" />
+        /* Matches the empty state below, card and all — see the note in
+           CommentsSection. A flat `h-40` was 160px against the ~134px this
+           resolves to, so the page jumped up by 26px on every listing with
+           no reviews. */
+        <div
+          aria-hidden
+          className="flex flex-col gap-5 rounded-card bg-surface p-5 shadow-card ring-1 ring-line"
+        >
+          <div className="py-6 text-center">
+            <div className="mx-auto h-[15px] w-44 animate-pulse rounded bg-muted-bg" />
+            <div className="mx-auto mt-1 h-[14px] w-60 max-w-full animate-pulse rounded bg-muted-bg" />
+          </div>
+        </div>
       )}
 
       <ConfirmDialog
@@ -201,7 +216,10 @@ function Summary({ lang, page }: { lang: Lang; page: ReviewsPage }) {
             <div
               key={star}
               className="flex items-center gap-2"
-              aria-label={tReviews(lang, "reviews.barLabel", { star, count: n })}
+              aria-label={tReviews(lang, "reviews.barLabel", {
+                star,
+                count: n,
+              })}
             >
               <span className="nums w-3 text-[12px] text-faint">{star}</span>
               <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted-bg">

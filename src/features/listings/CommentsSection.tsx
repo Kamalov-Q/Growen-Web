@@ -119,7 +119,20 @@ export function CommentsSection({
       )}
 
       {items === null ? (
-        <div className="h-28 animate-pulse rounded-card bg-muted-bg" />
+        /* The SHAPE of the empty state, not an arbitrary grey box.
+           It used to be a flat `h-28`, and the empty state it resolves
+           into is a card of `px-6 py-10` around two lines — a different
+           height, so every listing without comments yet (which is most of
+           them) shifted the page the moment the fetch returned. Same
+           container, same padding, two lines of the same size: an empty
+           result now costs nothing. */
+        <div
+          aria-hidden
+          className="rounded-card bg-surface px-6 py-10 text-center shadow-card ring-1 ring-line"
+        >
+          <div className="mx-auto h-[15px] w-40 animate-pulse rounded bg-muted-bg" />
+          <div className="mx-auto mt-1 h-[14px] w-56 max-w-full animate-pulse rounded bg-muted-bg" />
+        </div>
       ) : !items.length ? (
         <div className="rounded-card bg-surface px-6 py-10 text-center shadow-card ring-1 ring-line">
           <p className="text-[15px] font-semibold text-ink">
@@ -313,7 +326,11 @@ function Replies({
 
   const shown = (extra ?? thread.replies).map((reply) =>
     edits[reply.id] !== undefined
-      ? { ...reply, body: edits[reply.id] ?? reply.body, updatedAt: new Date().toISOString() }
+      ? {
+          ...reply,
+          body: edits[reply.id] ?? reply.body,
+          updatedAt: new Date().toISOString(),
+        }
       : reply,
   );
   const hidden = thread.replyCount - shown.length;
