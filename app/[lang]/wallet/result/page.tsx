@@ -4,7 +4,7 @@ import { Page } from "@/src/components/Page";
 import { RequireAuth } from "@/src/features/auth/RequireAuth";
 import { ResultPanel } from "@/src/features/wallet/ResultPanel";
 import { isLang, LANGS, type Lang } from "@/src/i18n/config";
-import { t } from "@/src/i18n/dictionary";
+import { tw } from "@/src/i18n/strings/wallet";
 import { pageMetadata } from "@/src/lib/metadata";
 
 const PATH = "/wallet/result";
@@ -24,8 +24,8 @@ export async function generateMetadata({
     ...pageMetadata({
       lang,
       path: PATH,
-      title: t(lang, "wallet.resultChecking"),
-      description: t(lang, "wallet.resultCheckingBody"),
+      title: tw(lang, "wallet.resultChecking"),
+      description: tw(lang, "wallet.resultCheckingBody"),
     }),
     robots: { index: false, follow: false },
   };

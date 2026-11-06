@@ -3,7 +3,7 @@ import { Page } from "@/src/components/Page";
 import { RequireAuth } from "@/src/features/auth/RequireAuth";
 import { VerifyPanel } from "@/src/features/verification/VerifyPanel";
 import { isLang, LANGS, type Lang } from "@/src/i18n/config";
-import { t } from "@/src/i18n/dictionary";
+import { tVerify } from "@/src/i18n/strings/verify";
 import { pageMetadata } from "@/src/lib/metadata";
 
 const PATH = "/verify";
@@ -23,8 +23,8 @@ export async function generateMetadata({
     ...pageMetadata({
       lang,
       path: PATH,
-      title: t(lang, "verify.title"),
-      description: t(lang, "verify.intro"),
+      title: tVerify(lang, "verify.title"),
+      description: tVerify(lang, "verify.intro"),
     }),
     // An application for a badge, with passport scans in it. Not a page for
     // an index, and not one a crawler should keep a copy of.
@@ -41,7 +41,7 @@ export default async function Verify({
   if (!isLang(lang)) notFound();
 
   return (
-    <Page lang={lang} path={PATH} title={t(lang, "verify.title")}>
+    <Page lang={lang} path={PATH} title={tVerify(lang, "verify.title")}>
       <div className="mx-auto w-full max-w-2xl">
         {/* Everything inside the guard — see RequireAuth. The panel asks the
             server where this account stands; nothing about it is rendered

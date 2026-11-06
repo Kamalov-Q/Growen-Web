@@ -40,6 +40,7 @@ export function Toolbar({
     if (query.q?.trim()) params.set("q", query.q.trim());
     if (query.category) params.set("category", query.category);
     if (sort !== "newest") params.set("sort", sort);
+    if (query.view === "list") params.set("view", "list");
     return `/${lang}?${params}`;
   };
 

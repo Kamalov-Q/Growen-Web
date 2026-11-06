@@ -22,6 +22,9 @@ function href(lang: Lang, base: FeedQuery, patch: Partial<FeedQuery>) {
   if (next.q?.trim()) params.set("q", next.q.trim());
   if (next.category) params.set("category", next.category);
   if (next.sort && next.sort !== "newest") params.set("sort", next.sort);
+  // The view rides along: changing a filter from the list must not drop
+  // the reader back into the grid. "grid" is the default and is left off.
+  if (next.view === "list") params.set("view", "list");
   return `/${lang}?${params}`;
 }
 

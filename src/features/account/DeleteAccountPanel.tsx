@@ -3,11 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
-import { t, type UiKey } from "@/src/i18n/dictionary";
+import { t } from "@/src/i18n/dictionary";
+import {
+  tDeleteAccount,
+  type DeleteAccountKey,
+} from "@/src/i18n/strings/deleteAccount";
 import { ConfirmDialog } from "@/src/components/ui/ConfirmDialog";
 import { groupDigits } from "@/src/features/listings/format";
 import { ApiError, clearSession } from "@/src/lib/api";
-import { chatSocket } from "@/src/lib/socket";
 import { deleteAccount, getWallet, type Wallet } from "./api";
 
 /**
@@ -24,7 +27,7 @@ import { deleteAccount, getWallet, type Wallet } from "./api";
 const REASON_MAX = 500;
 
 /** Section 3 of the published deletion policy, in the same order. */
-const REMOVED: UiKey[] = [
+const REMOVED: DeleteAccountKey[] = [
   "deleteAccount.goesProfile",
   "deleteAccount.goesListings",
   "deleteAccount.goesVideos",
@@ -33,7 +36,7 @@ const REMOVED: UiKey[] = [
 ];
 
 /** And section 4 — the records that outlive the account, and why. */
-const KEPT: UiKey[] = [
+const KEPT: DeleteAccountKey[] = [
   "deleteAccount.staysMessages",
   "deleteAccount.staysPayments",
 ];
@@ -77,6 +80,10 @@ export function DeleteAccountPanel({ lang }: { lang: Lang }) {
        * socket authenticates with the access token still in memory, so
        * dropping it after the session is cleared leaves it reconnecting.
        */
+      // Dynamic for the same reason as sign-out: this page has no other
+      // use for socket.io, and a static import would put it in the
+      // account bundle.
+      const { chatSocket } = await import("@/src/lib/socket");
       chatSocket.disconnect();
       clearSession();
 
@@ -94,7 +101,7 @@ export function DeleteAccountPanel({ lang }: { lang: Lang }) {
   return (
     <div className="flex flex-col gap-8">
       <p className="text-[15px] leading-7 text-muted">
-        {t(lang, "deleteAccount.intro")}
+        {tDeleteAccount(lang, "deleteAccount.intro")}
       </p>
 
       {/* Shown only when there is money to lose: a standing warning on an
@@ -102,7 +109,7 @@ export function DeleteAccountPanel({ lang }: { lang: Lang }) {
       {balance > 0 ? (
         <p className="flex items-start gap-3 rounded-card bg-danger/10 p-4 text-[15px] leading-6 text-ink ring-1 ring-danger/30">
           <WalletGlyph />
-          {t(lang, "deleteAccount.balanceWarning", {
+          {tDeleteAccount(lang, "deleteAccount.balanceWarning", {
             balance: `${groupDigits(Math.round(balance))} ${
               wallet?.currency === "USD" ? "$" : "so'm"
             }`,
@@ -110,18 +117,18 @@ export function DeleteAccountPanel({ lang }: { lang: Lang }) {
         </p>
       ) : null}
 
-      <Section title={t(lang, "deleteAccount.removedTitle")}>
+      <Section title={tDeleteAccount(lang, "deleteAccount.removedTitle")}>
         {REMOVED.map((key) => (
           <Line key={key} tone="danger">
-            {t(lang, key)}
+            {tDeleteAccount(lang, key)}
           </Line>
         ))}
       </Section>
 
-      <Section title={t(lang, "deleteAccount.keptTitle")}>
+      <Section title={tDeleteAccount(lang, "deleteAccount.keptTitle")}>
         {KEPT.map((key) => (
           <Line key={key} tone="muted">
-            {t(lang, key)}
+            {tDeleteAccount(lang, key)}
           </Line>
         ))}
       </Section>
@@ -131,14 +138,14 @@ export function DeleteAccountPanel({ lang }: { lang: Lang }) {
           htmlFor="reason"
           className="text-[13px] font-semibold uppercase tracking-wide text-muted"
         >
-          {t(lang, "deleteAccount.reasonTitle")}
+          {tDeleteAccount(lang, "deleteAccount.reasonTitle")}
         </label>
         <div className="rounded-control bg-surface px-3.5 ring-1 ring-line transition focus-within:ring-2 focus-within:ring-brand">
           <textarea
             id="reason"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder={t(lang, "deleteAccount.reasonPlaceholder")}
+            placeholder={tDeleteAccount(lang, "deleteAccount.reasonPlaceholder")}
             rows={3}
             maxLength={REASON_MAX}
             className="w-full resize-y bg-transparent py-3 text-[15px] leading-6 text-ink outline-none placeholder:text-faint"
@@ -172,18 +179,18 @@ export function DeleteAccountPanel({ lang }: { lang: Lang }) {
         ) : (
           <TrashGlyph />
         )}
-        {t(lang, "deleteAccount.action")}
+        {tDeleteAccount(lang, "deleteAccount.action")}
       </button>
 
       <p className="text-center text-[13px] text-faint">
-        {t(lang, "deleteAccount.footnote")}
+        {tDeleteAccount(lang, "deleteAccount.footnote")}
       </p>
 
       <ConfirmDialog
         open={confirming}
-        title={t(lang, "deleteAccount.confirmTitle")}
-        body={t(lang, "deleteAccount.confirmMessage")}
-        confirmLabel={t(lang, "deleteAccount.action")}
+        title={tDeleteAccount(lang, "deleteAccount.confirmTitle")}
+        body={tDeleteAccount(lang, "deleteAccount.confirmMessage")}
+        confirmLabel={tDeleteAccount(lang, "deleteAccount.action")}
         cancelLabel={t(lang, "common.cancel")}
         danger
         onConfirm={() => void remove()}

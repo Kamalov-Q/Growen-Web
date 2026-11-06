@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { Page } from "@/src/components/Page";
 import { HomeViews } from "@/src/features/listings/HomeViews";
 import { ListingCard } from "@/src/features/listings/ListingCard";
 import { ListingRow } from "@/src/features/listings/ListingRow";
+import { FeedSkeleton } from "@/src/features/listings/FeedSkeleton";
 import { Filters } from "@/src/features/listings/Filters";
 import { PurposeBar } from "@/src/features/listings/PurposeBar";
 import { TopShelf } from "@/src/features/listings/TopShelf";
@@ -14,7 +16,7 @@ import {
   type OfferPurpose,
 } from "@/src/features/listings/api";
 import type { Listing } from "@/src/lib/listing-types";
-import { LANGS, isLang } from "@/src/i18n/config";
+import { LANGS, isLang, type Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
 import { SITE_NAME } from "@/src/lib/site";
 import { pageMetadata } from "@/src/lib/metadata";
@@ -24,6 +26,17 @@ export function generateStaticParams() {
 }
 
 const PURPOSES: OfferPurpose[] = ["SALE", "RENT_MONTHLY", "RENT_DAILY"];
+
+/** Everything this page reads out of the query string. */
+interface HomeSearchParams {
+  purpose?: string;
+  q?: string;
+  category?: string;
+  sort?: string;
+  priceMin?: string;
+  priceMax?: string;
+  view?: string;
+}
 
 const readPurpose = (v: string | undefined): OfferPurpose =>
   PURPOSES.includes(v as OfferPurpose) ? (v as OfferPurpose) : "SALE";
@@ -75,7 +88,20 @@ export async function generateMetadata({
  *
  * A SERVER component that fetches the feed and renders the cards, so the
  * listings are in the HTML — which is the entire reason this site exists.
- * The view switcher and the map are the only client parts, layered on top.
+ *
+ * ── One view per render ───────────────────────────────────────────────────
+ *
+ * Grid or list comes from `?view=`, and only the one being looked at is
+ * rendered. It used to render BOTH and let the client hide one with CSS,
+ * which put every listing on the wire twice over — once in the HTML and
+ * again in the RSC payload beside it, so four copies of every card for a
+ * page that shows one. The switch is a link now; the feed is cached for
+ * five minutes (see `fetchFeed`), so flipping it costs no API call, and
+ * the chosen view is in the URL where it can be shared and crawled like
+ * every other choice this page makes.
+ *
+ * The map is the exception and stays client state: it renders nothing on
+ * the server, and a navigation would tear down and rebuild the map.
  */
 /**
  * A price bound from the URL, or undefined.
@@ -91,23 +117,65 @@ function readPrice(raw: string | undefined): number | undefined {
   return Number.isFinite(n) && n >= 0 ? n : undefined;
 }
 
+/**
+ * The shell, and nothing that has to wait for it.
+ *
+ * ── Why this half is synchronous ──────────────────────────────────────────
+ *
+ * It awaits `params` — known at build time, free — and NOT `searchParams`,
+ * which is what forces a request to be looked at before anything can be
+ * rendered. So the header, the search field, the language switcher, the
+ * footer and the tab bar are written to the response immediately and the
+ * browser can start fetching the CSS and the fonts while the API is still
+ * thinking about the feed. Before this, an API that took 400ms meant 400ms
+ * of white screen: the page is one `async` function and nothing leaves the
+ * server until the slowest thing in it has finished.
+ *
+ * The feed arrives later in the SAME response — this is streaming, not a
+ * second request, so there is no extra round trip and no client-side fetch.
+ *
+ * ── Why a Suspense boundary and not `loading.tsx` ─────────────────────────
+ *
+ * A route-level `loading.tsx` replaces the whole page, chrome included, and
+ * it would do it on every filter press. This boundary sits below the
+ * chrome, and because the router navigates inside a transition React keeps
+ * the listings you are already looking at on screen until the new ones are
+ * ready, instead of blinking the skeleton at you for 50ms. The skeleton is
+ * for the first load, where there is nothing to keep.
+ */
 export default async function Home({
   params,
   searchParams,
 }: {
   params: Promise<{ lang: string }>;
-  searchParams: Promise<{
-    purpose?: string;
-    q?: string;
-    category?: string;
-    sort?: string;
-    priceMin?: string;
-    priceMax?: string;
-  }>;
+  searchParams: Promise<HomeSearchParams>;
 }) {
   const { lang } = await params;
   if (!isLang(lang)) notFound();
 
+  return (
+    <Page lang={lang} path="" title="" width="wide">
+      <Suspense fallback={<FeedSkeleton lang={lang} />}>
+        <Feed lang={lang} searchParams={searchParams} />
+      </Suspense>
+    </Page>
+  );
+}
+
+/**
+ * The half that waits: the query string, the API, the listings.
+ *
+ * A SERVER component still — the listings are in the HTML, which is the
+ * entire reason this site exists. It is only separated so that what it
+ * waits for does not hold up what does not.
+ */
+async function Feed({
+  lang,
+  searchParams,
+}: {
+  lang: Lang;
+  searchParams: Promise<HomeSearchParams>;
+}) {
   const sp = await searchParams;
   const query: FeedQuery = {
     purpose: readPurpose(sp.purpose),
@@ -117,6 +185,10 @@ export default async function Home({
     priceMax: readPrice(sp.priceMax),
     sort:
       sp.sort === "priceAsc" || sp.sort === "priceDesc" ? sp.sort : "newest",
+    // Grid unless the URL says list. Anything else — a stale link, a typo,
+    // somebody's experiment — reads as the default rather than as an error:
+    // there is nothing here worth failing a page load over.
+    view: sp.view === "list" ? "list" : "grid",
     limit: 24,
   };
 
@@ -146,9 +218,6 @@ export default async function Home({
     ? all.filter((l) => !promoted.includes(l))
     : all;
 
-  // Rendered once each and handed to the client switcher. Both are in the
-  // HTML, so whichever view a visitor lands in, a crawler reads the
-  // listings — and switching costs no round trip.
   const empty = (
     <div className="flex flex-col items-center gap-2 rounded-card bg-surface px-6 py-20 text-center shadow-card ring-1 ring-line">
       <p className="text-[17px] font-semibold text-ink">
@@ -161,54 +230,48 @@ export default async function Home({
   const blank = failed || listings.length === 0;
 
   return (
-    <Page lang={lang} path="" title="" width="wide">
-      <HomeViews
-        lang={lang}
-        query={query}
-        count={all.length}
-        categories={categories}
-        filters={
-          <div className="flex flex-col gap-4">
-            <PurposeBar lang={lang} query={query} />
-            <Filters lang={lang} query={query} categories={categories} />
-          </div>
-        }
-        shelf={<TopShelf listings={promoted} lang={lang} />}
-        grid={
-          blank ? (
-            empty
-          ) : (
-            <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-              {listings.map((listing, i) => (
-                <li key={listing.id}>
-                  {/* The first row is above the fold at every breakpoint. */}
-                  <ListingCard
-                    listing={listing}
-                    lang={lang}
-                    priority={!promoted.length && i < 5}
-                  />
-                </li>
-              ))}
-            </ul>
-          )
-        }
-        rows={
-          blank ? (
-            empty
-          ) : (
-            <ul className="flex flex-col gap-3">
-              {listings.map((listing) => (
-                <li key={listing.id}>
-                  {/* No `priority` here: the grid is the default view, so
-                      the LCP image is one of ITS cards. Marking both sets
-                      would preload two images for one visible element. */}
-                  <ListingRow listing={listing} lang={lang} />
-                </li>
-              ))}
-            </ul>
-          )
-        }
-      />
-    </Page>
+    <HomeViews
+      lang={lang}
+      query={query}
+      count={all.length}
+      categories={categories}
+      filters={
+        <div className="flex flex-col gap-4">
+          <PurposeBar lang={lang} query={query} />
+          <Filters lang={lang} query={query} categories={categories} />
+        </div>
+      }
+      shelf={<TopShelf listings={promoted} lang={lang} />}
+      feed={
+        blank ? (
+          empty
+        ) : query.view === "list" ? (
+          <ul className="flex flex-col gap-3">
+            {listings.map((listing, i) => (
+              <li key={listing.id}>
+                <ListingRow
+                  listing={listing}
+                  lang={lang}
+                  priority={!promoted.length && i < 3}
+                />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {listings.map((listing, i) => (
+              <li key={listing.id}>
+                {/* The first row is above the fold at every breakpoint. */}
+                <ListingCard
+                  listing={listing}
+                  lang={lang}
+                  priority={!promoted.length && i < 5}
+                />
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    />
   );
 }

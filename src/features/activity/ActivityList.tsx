@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
-import { t, type UiKey } from "@/src/i18n/dictionary";
 import { ACTIVITY_PAGE, type ActivityPage } from "./api";
+import { tLabel, type ActivityKey } from "./labels";
 
 /**
  * The body of every activity screen: a page of rows, a way to ask for the
@@ -36,8 +36,8 @@ export function ActivityList<T>({
   load: (limit: number, offset: number) => Promise<ActivityPage<T>>;
   keyOf: (item: T) => string;
   render: (item: T) => React.ReactNode;
-  emptyTitle: UiKey;
-  emptyHint: UiKey;
+  emptyTitle: ActivityKey;
+  emptyHint: ActivityKey;
   icon: React.ReactNode;
 }) {
   const [items, setItems] = useState<T[] | null>(null);
@@ -90,7 +90,7 @@ export function ActivityList<T>({
         role="alert"
         className="rounded-card bg-surface p-6 text-[15px] text-danger ring-1 ring-line"
       >
-        {t(lang, "home.loadError")}
+        {tLabel(lang, "home.loadError")}
       </p>
     );
   }
@@ -112,10 +112,10 @@ export function ActivityList<T>({
           {icon}
         </span>
         <p className="text-[16px] font-semibold text-ink">
-          {t(lang, emptyTitle)}
+          {tLabel(lang, emptyTitle)}
         </p>
         <p className="max-w-prose text-[14px] leading-6 text-muted">
-          {t(lang, emptyHint)}
+          {tLabel(lang, emptyHint)}
         </p>
       </div>
     );
@@ -136,7 +136,7 @@ export function ActivityList<T>({
         >
           {busy
             ? "…"
-            : t(lang, "activity.more", { n: total - items.length })}
+            : tLabel(lang, "activity.more", { n: total - items.length })}
         </button>
       ) : null}
     </div>

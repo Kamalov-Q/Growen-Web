@@ -3,7 +3,7 @@ import { Page } from "@/src/components/Page";
 import { RequireAuth } from "@/src/features/auth/RequireAuth";
 import { SessionsList } from "@/src/features/auth/SessionsList";
 import { LANGS, isLang } from "@/src/i18n/config";
-import { t } from "@/src/i18n/dictionary";
+import { tSessions } from "@/src/i18n/strings/sessions";
 
 const PATH = "/account/sessions";
 
@@ -30,10 +30,10 @@ export default async function SessionsPage({
         <div className="flex flex-col gap-8">
           <header className="flex flex-col gap-2">
             <h1 className="text-[1.75rem] font-bold leading-tight tracking-tight text-ink">
-              {t(lang, "sessions.title")}
+              {tSessions(lang, "sessions.title")}
             </h1>
             <p className="max-w-2xl text-[15px] leading-7 text-muted">
-              {t(lang, "sessions.lead")}
+              {tSessions(lang, "sessions.lead")}
             </p>
           </header>
 

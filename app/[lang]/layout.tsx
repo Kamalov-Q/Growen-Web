@@ -8,17 +8,50 @@ import { ThemeProvider } from "@/src/features/theme/theme";
 import { PrefsProvider } from "@/src/features/settings/prefs";
 import { SavedProvider } from "@/src/features/account/saved-store";
 import { SessionProvider } from "@/src/features/auth/session";
+import { Toaster } from "@/src/components/ui/Toast";
 
 /**
  * Self-hosted by next/font: it downloads the file at build time and serves
  * it from our own origin, so there is no render-blocking request to a third
  * party and no layout shift while it arrives.
  *
- * Cyrillic is NOT optional here — half the site is Russian, and without the
- * subset every Russian page falls back to a system font mid-paragraph.
+ * ── Two instances, one per script ─────────────────────────────────────────
+ *
+ * `subsets` does not decide which glyphs EXIST. next/font downloads all
+ * seven of Inter's subsets at build time either way and declares each as
+ * its own `@font-face` with a `unicode-range`; what `subsets` decides is
+ * which of those files get a `<link rel="preload">` on every single page.
+ * Asking for all three of latin, latin-ext and cyrillic put 152 KB of font
+ * in front of every visitor, in both languages:
+ *
+ *     latin       48 KB   needed everywhere
+ *     latin-ext   85 KB   needed nowhere — U+0100–02BA is Polish, Czech,
+ *                         Hungarian. Uzbek's oʻ/gʻ is U+02BB, which is in
+ *                         the plain latin subset, not this one.
+ *     cyrillic    19 KB   needed on /ru, dead weight on /uz
+ *
+ * So: latin alone for Uzbek, latin plus cyrillic for Russian. An Uzbek page
+ * now preloads 48 KB instead of 152 KB, a Russian one 67 KB.
+ *
+ * Nothing breaks when a glyph falls outside the preloaded set — a Russian
+ * comment on an Uzbek listing, an accented name. The `@font-face` for that
+ * range is still in the stylesheet, so the browser fetches that one file
+ * when it first meets the character and `display: "swap"` paints the
+ * fallback until it lands. That is already how greek, vietnamese and
+ * cyrillic-ext behave here, and has been all along.
+ *
+ * Written out twice rather than built from a shared options object on
+ * purpose: next/font is a compile-time transform and reads its arguments
+ * out of the source, so a spread or a variable makes the build fail.
  */
-const inter = Inter({
-  subsets: ["latin", "latin-ext", "cyrillic"],
+const interLatin = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+const interCyrillic = Inter({
+  subsets: ["latin", "cyrillic"],
   display: "swap",
   variable: "--font-inter",
 });
@@ -70,6 +103,10 @@ export default async function LangLayout({
   // 200 with no content is a page Google will index.
   if (!isLang(lang)) notFound();
 
+  // Which script this page is written in. Both instances define the same
+  // `--font-inter`, and only one class is ever on the document.
+  const font = lang === "ru" ? interCyrillic : interLatin;
+
   return (
     // `suppressHydrationWarning` on <html> only: the pre-paint script below
     // sets `data-theme` before React sees the document, so the server markup
@@ -77,7 +114,7 @@ export default async function LangLayout({
     // this element — it does not travel to children.
     <html
       lang={HTML_LANG[lang as Lang]}
-      className={inter.variable}
+      className={font.variable}
       suppressHydrationWarning
     >
       <head>
@@ -139,6 +176,10 @@ export default async function LangLayout({
             </SessionProvider>
           </PrefsProvider>
         </ThemeProvider>
+
+        {/* One for the whole app, outside the providers: it is a fixed
+            overlay and belongs to no page in particular. */}
+        <Toaster />
       </body>
     </html>
   );

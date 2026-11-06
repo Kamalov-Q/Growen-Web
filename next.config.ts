@@ -47,6 +47,26 @@ const config: NextConfig = {
      */
     deviceSizes: [640, 828, 1080, 1440, 1920],
     imageSizes: [128, 256, 384],
+
+    /**
+     * A year, against a default of four hours.
+     *
+     * The optimizer keeps a generated variant for `minimumCacheTTL` and
+     * then throws it away and fetches the original again. Four hours is the
+     * right default for a URL whose contents can change; ours cannot. Every
+     * listing photo is written once under a uuid filename and never
+     * rewritten — a replaced photo is a new row with a new name — so
+     * re-fetching it is work with no possible new result.
+     *
+     * What that default was costing: a billed re-optimization per image per
+     * four hours on Vercel, and — every time the cache lapsed — another
+     * chance to hit the optimizer's 7-second upstream timeout, which has
+     * already shown up here as a listing with two broken photos.
+     *
+     * The thing to remember if a photo ever IS replaced in place: this is
+     * the line that will keep serving the old one.
+     */
+    minimumCacheTTL: 31536000,
     // Modern formats first; browsers that cannot take them fall back.
     formats: ["image/avif", "image/webp"],
 

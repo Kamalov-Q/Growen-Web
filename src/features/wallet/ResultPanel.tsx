@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import type { Lang } from "@/src/i18n/config";
-import { t } from "@/src/i18n/dictionary";
+import { tw } from "@/src/i18n/strings/wallet";
 import { formatThousands } from "@/src/features/account/VirtualCard";
 import { getTopupStatus, type PaymentStatus } from "@/src/features/account/api";
 import {
@@ -123,28 +123,28 @@ export function ResultPanel({ lang }: { lang: Lang }) {
           className="size-10 animate-spin rounded-full border-4 border-current border-t-transparent"
         />
       ),
-      title: t(lang, "wallet.resultChecking"),
-      body: t(lang, "wallet.resultCheckingBody"),
+      title: tw(lang, "wallet.resultChecking"),
+      body: tw(lang, "wallet.resultCheckingBody"),
     },
     paid: {
       tone: "bg-brand-soft text-brand",
       icon: <Glyph d="m5 12.5 4.5 4.5L19 7.5" />,
-      title: t(lang, "wallet.resultPaid"),
+      title: tw(lang, "wallet.resultPaid"),
       body: amount
-        ? t(lang, "wallet.resultPaidBody", { amount: formatThousands(amount) })
-        : t(lang, "wallet.resultPaidBodyNoAmount"),
+        ? tw(lang, "wallet.resultPaidBody", { amount: formatThousands(amount) })
+        : tw(lang, "wallet.resultPaidBodyNoAmount"),
     },
     cancelled: {
       tone: "bg-danger/10 text-danger",
       icon: <Glyph d="M6 6l12 12M18 6 6 18" />,
-      title: t(lang, "wallet.paymentCancelled"),
-      body: t(lang, "wallet.resultCancelledBody"),
+      title: tw(lang, "wallet.paymentCancelled"),
+      body: tw(lang, "wallet.resultCancelledBody"),
     },
     pending: {
       tone: "bg-gold/15 text-gold",
       icon: <Glyph d="M12 7v5.5l3.5 2" circle />,
-      title: t(lang, "wallet.resultPending"),
-      body: t(lang, "wallet.resultPendingBody"),
+      title: tw(lang, "wallet.resultPending"),
+      body: tw(lang, "wallet.resultPendingBody"),
     },
   }[outcome];
 
@@ -179,7 +179,7 @@ export function ResultPanel({ lang }: { lang: Lang }) {
               : "bg-brand text-brand-ink hover:bg-brand-hover"
           }`}
         >
-          {t(lang, "wallet.resultBackToWallet")}
+          {tw(lang, "wallet.resultBackToWallet")}
         </button>
 
         {outcome === "paid" || outcome === "pending" ? (
@@ -188,7 +188,7 @@ export function ResultPanel({ lang }: { lang: Lang }) {
             onClick={() => writePendingTopup(null)}
             className="inline-flex h-12 items-center justify-center rounded-control text-[15px] font-semibold text-ink ring-1 ring-line transition hover:bg-muted-bg"
           >
-            {t(lang, "wallet.historyTitle")}
+            {tw(lang, "wallet.historyTitle")}
           </Link>
         ) : null}
       </div>

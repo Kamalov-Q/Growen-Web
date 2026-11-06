@@ -35,6 +35,7 @@ export function PurposeBar({
         const params = new URLSearchParams({ purpose: p.id });
         if (query.q?.trim()) params.set("q", query.q.trim());
         if (query.category) params.set("category", query.category);
+        if (query.view === "list") params.set("view", "list");
         const active = p.id === query.purpose;
         return (
           <Link

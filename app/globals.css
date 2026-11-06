@@ -176,6 +176,20 @@ body {
   }
 }
 
+/* The toast's entrance. Defined here rather than inline because Tailwind
+   compiles `animate-[…]` into a utility but has nowhere to put the
+   keyframes it names. Guarded by `motion-safe:` at the call site. */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Prices and areas line up in a grid only if the digits are the same width. */
 .nums {
   font-variant-numeric: tabular-nums;

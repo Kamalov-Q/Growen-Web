@@ -1,5 +1,6 @@
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
+import { tVerify } from "@/src/i18n/strings/verify";
 
 /**
  * The verified seal, and the two pills that sit under a name.
@@ -91,7 +92,7 @@ export function VerifiedPill({ lang }: { lang: Lang }) {
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft py-1 pl-1.5 pr-2.5 text-[13px] font-bold text-brand ring-1 ring-brand-line">
       <VerifiedSeal className="size-[18px]" />
-      {t(lang, "verify.badge")}
+      {tVerify(lang, "verify.badge")}
     </span>
   );
 }

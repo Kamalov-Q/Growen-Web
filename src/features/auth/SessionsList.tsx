@@ -6,6 +6,7 @@ import { ConfirmDialog } from "@/src/components/ui/ConfirmDialog";
 import { Icon } from "@/src/components/ui/Icon";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
+import { tSessions } from "@/src/i18n/strings/sessions";
 import { absoluteTime, relativeTime } from "@/src/lib/time";
 import { api } from "@/src/lib/api";
 
@@ -139,7 +140,7 @@ export function SessionsList({ lang }: { lang: Lang }) {
   if (rows.length === 0) {
     return (
       <p className="rounded-card bg-surface p-6 text-[15px] text-muted shadow-card ring-1 ring-line">
-        {t(lang, "sessions.empty")}
+        {tSessions(lang, "sessions.empty")}
       </p>
     );
   }
@@ -149,7 +150,7 @@ export function SessionsList({ lang }: { lang: Lang }) {
   return (
     <div className="flex flex-col gap-4">
       <p className="nums text-[13px] font-medium uppercase tracking-wide text-faint">
-        {t(lang, "sessions.active", { n: rows.length })}
+        {tSessions(lang, "sessions.active", { n: rows.length })}
       </p>
 
       {error ? (
@@ -182,11 +183,11 @@ export function SessionsList({ lang }: { lang: Lang }) {
             <div className="flex min-w-0 flex-1 flex-col gap-1">
               <span className="flex flex-wrap items-center gap-2 text-[15px] font-semibold text-ink">
                 {row.current
-                  ? t(lang, "sessions.thisDevice")
-                  : t(lang, "sessions.otherDevice")}
+                  ? tSessions(lang, "sessions.thisDevice")
+                  : tSessions(lang, "sessions.otherDevice")}
                 {row.current ? (
                   <span className="rounded-full bg-brand px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-brand-ink">
-                    {t(lang, "sessions.current")}
+                    {tSessions(lang, "sessions.current")}
                   </span>
                 ) : null}
               </span>
@@ -198,12 +199,12 @@ export function SessionsList({ lang }: { lang: Lang }) {
                 className="text-[13px] text-muted"
                 title={absoluteTime(new Date(row.lastSeenAt))}
               >
-                {t(lang, "sessions.lastSeen", {
+                {tSessions(lang, "sessions.lastSeen", {
                   when: relativeTime(row.lastSeenAt, lang),
                 })}
               </span>
               <span className="nums text-[12px] text-faint">
-                {t(lang, "sessions.started", {
+                {tSessions(lang, "sessions.started", {
                   when: absoluteTime(new Date(row.startedAt)),
                 })}
               </span>
@@ -221,7 +222,7 @@ export function SessionsList({ lang }: { lang: Lang }) {
                 disabled={busy !== null}
                 className="shrink-0 rounded-control px-3 py-2 text-[13px] font-semibold text-danger ring-1 ring-danger/30 transition hover:bg-danger/10 disabled:opacity-50"
               >
-                {busy === row.familyId ? "…" : t(lang, "sessions.end")}
+                {busy === row.familyId ? "…" : tSessions(lang, "sessions.end")}
               </button>
             )}
           </li>
@@ -231,7 +232,7 @@ export function SessionsList({ lang }: { lang: Lang }) {
       {others.length > 0 ? (
         <div className="flex">
           <Button variant="ghost" onClick={() => setConfirming(true)}>
-            {t(lang, "sessions.endOthers")}
+            {tSessions(lang, "sessions.endOthers")}
           </Button>
         </div>
       ) : null}
@@ -240,9 +241,9 @@ export function SessionsList({ lang }: { lang: Lang }) {
           devices out — including, quite possibly, your own phone. */}
       <ConfirmDialog
         open={confirming}
-        title={t(lang, "sessions.endOthersTitle")}
-        body={t(lang, "sessions.endOthersBody")}
-        confirmLabel={t(lang, "sessions.endOthers")}
+        title={tSessions(lang, "sessions.endOthersTitle")}
+        body={tSessions(lang, "sessions.endOthersBody")}
+        confirmLabel={tSessions(lang, "sessions.endOthers")}
         cancelLabel={t(lang, "common.cancel")}
         danger
         busy={busy === "others"}

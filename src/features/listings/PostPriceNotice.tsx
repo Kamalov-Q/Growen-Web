@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
-import { t } from "@/src/i18n/dictionary";
+import { tCreate } from "@/src/i18n/strings/create";
 import { getTariffs, getWallet } from "@/src/features/account/api";
 
 const ACTION = "LISTING_POST";
@@ -75,7 +75,7 @@ export function PostPriceNotice({ lang }: { lang: Lang }) {
     >
       <div className="flex items-center gap-3">
         <span className="text-[13px] font-semibold uppercase tracking-wide text-muted">
-          {t(lang, "create.cost")}
+          {tCreate(lang, "create.cost")}
         </span>
         <span
           className={`nums ml-auto text-[15px] font-bold ${
@@ -86,7 +86,7 @@ export function PostPriceNotice({ lang }: { lang: Lang }) {
         </span>
         {free ? (
           <span className="rounded-control bg-brand-soft px-2 py-0.5 text-[13px] font-bold text-brand ring-1 ring-brand-line">
-            {t(lang, "create.free")}
+            {tCreate(lang, "create.free")}
           </span>
         ) : null}
       </div>
@@ -94,12 +94,12 @@ export function PostPriceNotice({ lang }: { lang: Lang }) {
       {/* Why it is free, said once. Without this the struck-through price
           reads as a bug or a discount nobody can account for. */}
       {free ? (
-        <p className="text-[13px] text-faint">{t(lang, "create.firstFreeHint")}</p>
+        <p className="text-[13px] text-faint">{tCreate(lang, "create.firstFreeHint")}</p>
       ) : balance !== null ? (
         <p className={`text-[13px] ${short ? "text-danger" : "text-faint"}`}>
           {short
-            ? t(lang, "create.notEnough")
-            : `${t(lang, "create.balance")}: ${money(balance, lang)}`}
+            ? tCreate(lang, "create.notEnough")
+            : `${tCreate(lang, "create.balance")}: ${money(balance, lang)}`}
         </p>
       ) : null}
     </section>

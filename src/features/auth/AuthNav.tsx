@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
+import { tSessions } from "@/src/i18n/strings/sessions";
 import { Avatar } from "@/src/components/ui/Avatar";
 import { prettyPhone } from "@/src/lib/phone";
 import { Icon, type IconName } from "@/src/components/ui/Icon";
@@ -142,7 +143,7 @@ export function AuthNav({ lang }: { lang: Lang }) {
           <MenuLink
             href={`/${lang}/account/sessions`}
             icon="sessions"
-            label={t(lang, "sessions.title")}
+            label={tSessions(lang, "sessions.title")}
             onNavigate={() => setOpen(false)}
             last
           />

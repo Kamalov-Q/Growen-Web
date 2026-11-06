@@ -11,7 +11,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { ensureMapWorker } from "@/src/lib/maplibre";
 import { STREET_STYLE, TASHKENT } from "@/src/lib/mapStyles";
 import type { Lang } from "@/src/i18n/config";
-import { t } from "@/src/i18n/dictionary";
+import { tCreate } from "@/src/i18n/strings/create";
 import { closeRing, ringAreaM2, type Ring } from "./geo-ring";
 import { MapControls } from "./MapControls";
 
@@ -236,11 +236,11 @@ export function ShapePicker({
           <p className="rounded-control bg-surface/95 px-3 py-2 text-center text-[13px] text-muted shadow-card ring-1 ring-line backdrop-blur-sm">
             {mode === "PIN"
               ? point
-                ? t(lang, "create.pinSet")
-                : t(lang, "create.pickPoint")
+                ? tCreate(lang, "create.pinSet")
+                : tCreate(lang, "create.pickPoint")
               : ring.length < 3
-                ? t(lang, "create.drawHint")
-                : t(lang, "create.drawDone", { n: ring.length })}
+                ? tCreate(lang, "create.drawHint")
+                : tCreate(lang, "create.drawDone", { n: ring.length })}
           </p>
         </div>
 
@@ -251,14 +251,14 @@ export function ShapePicker({
               onClick={() => onRing(ring.slice(0, -1))}
               className="h-9 rounded-control bg-surface/95 px-3 text-[13px] font-semibold text-ink shadow-card ring-1 ring-line backdrop-blur-sm transition hover:bg-surface"
             >
-              {t(lang, "create.undo")}
+              {tCreate(lang, "create.undo")}
             </button>
             <button
               type="button"
               onClick={() => onRing([])}
               className="h-9 rounded-control bg-surface/95 px-3 text-[13px] font-semibold text-danger shadow-card ring-1 ring-line backdrop-blur-sm transition hover:bg-surface"
             >
-              {t(lang, "create.clear")}
+              {tCreate(lang, "create.clear")}
             </button>
           </div>
         ) : null}
@@ -270,7 +270,7 @@ export function ShapePicker({
 
       {area > 0 ? (
         <p className="nums text-[13px] text-muted">
-          {t(lang, "create.measured", {
+          {tCreate(lang, "create.measured", {
             n: Math.round(area).toLocaleString(lang === "ru" ? "ru-RU" : "uz-UZ"),
           })}
         </p>

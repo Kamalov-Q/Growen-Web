@@ -6,6 +6,9 @@ import { usePathname } from "next/navigation";
 import type { Lang } from "@/src/i18n/config";
 import { LANGS } from "@/src/i18n/config";
 import { t, type UiKey } from "@/src/i18n/dictionary";
+import { tDeleteAccount } from "@/src/i18n/strings/deleteAccount";
+import { tSessions } from "@/src/i18n/strings/sessions";
+import { tVerify } from "@/src/i18n/strings/verify";
 import { useSession } from "@/src/features/auth/session";
 import { useTheme, type ThemeChoice } from "@/src/features/theme/theme";
 import { Icon, type IconName } from "@/src/components/ui/Icon";
@@ -113,7 +116,7 @@ export function SettingsPanel({ lang }: { lang: Lang }) {
             <Row
               href={`/${lang}/verify`}
               icon="verify"
-              label={t(lang, "verify.title")}
+              label={tVerify(lang, "verify.title")}
               hint={t(lang, "settings.verificationHint")}
             />
             {/* A real page now, like verification: the same `/me/...`
@@ -148,7 +151,7 @@ export function SettingsPanel({ lang }: { lang: Lang }) {
             <Row
               href={`/${lang}/account/sessions`}
               icon="sessions"
-              label={t(lang, "sessions.title")}
+              label={tSessions(lang, "sessions.title")}
               hint={t(lang, "settings.sessionsHint")}
             />
           </Card>
@@ -290,7 +293,7 @@ export function SettingsPanel({ lang }: { lang: Lang }) {
         <Row
           href={`/${lang}/account/delete`}
           icon="trash"
-          label={t(lang, "deleteAccount.action")}
+          label={tDeleteAccount(lang, "deleteAccount.action")}
           hint={t(lang, "settings.deletionHint")}
           danger
         />

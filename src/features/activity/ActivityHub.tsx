@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
-import { t, type UiKey } from "@/src/i18n/dictionary";
 import { getCounts } from "@/src/features/account/api";
 import { unreadCount } from "./api";
+import { tLabel, type ActivityKey } from "./labels";
 
 /**
  * "Your activity" — the hub. One row per thing you have left behind, in the
@@ -20,8 +20,8 @@ import { unreadCount } from "./api";
  */
 interface Row {
   href: string;
-  label: UiKey;
-  hint: UiKey;
+  label: ActivityKey;
+  hint: ActivityKey;
   icon: React.ReactNode;
   count?: number;
 }
@@ -96,14 +96,16 @@ export function ActivityHub({ lang }: { lang: Lang }) {
       href: `/${lang}/activity/blocked`,
       label: "blocks.title",
       hint: "blocks.hint",
-      icon: <Glyph d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm-6.4 2.6 12.8 12.8" />,
+      icon: (
+        <Glyph d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm-6.4 2.6 12.8 12.8" />
+      ),
     },
   ];
 
   return (
     <div className="flex flex-col gap-4">
       <p className="text-[15px] leading-7 text-muted">
-        {t(lang, "activity.intro")}
+        {tLabel(lang, "activity.intro")}
       </p>
 
       <nav className="flex flex-col gap-3">
@@ -119,10 +121,10 @@ export function ActivityHub({ lang }: { lang: Lang }) {
 
             <span className="flex min-w-0 flex-1 flex-col">
               <span className="truncate text-[15px] font-semibold text-ink">
-                {t(lang, row.label)}
+                {tLabel(lang, row.label)}
               </span>
               <span className="truncate text-[13px] text-muted">
-                {t(lang, row.hint)}
+                {tLabel(lang, row.hint)}
               </span>
             </span>
 

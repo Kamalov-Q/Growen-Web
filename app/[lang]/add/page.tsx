@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { Page } from "@/src/components/Page";
 import { RequireAuth } from "@/src/features/auth/RequireAuth";
 import { isLang, LANGS, type Lang } from "@/src/i18n/config";
-import { t } from "@/src/i18n/dictionary";
+import { tCreate } from "@/src/i18n/strings/create";
 import { pageMetadata } from "@/src/lib/metadata";
 import { CreateListingForm } from "@/src/features/listings/CreateListingForm";
 import { fetchAmenities, fetchCategories } from "@/src/features/listings/api";
@@ -24,8 +24,8 @@ export async function generateMetadata({
     ...pageMetadata({
       lang,
       path: PATH,
-      title: t(lang, "create.title"),
-      description: t(lang, "create.lead"),
+      title: tCreate(lang, "create.title"),
+      description: tCreate(lang, "create.lead"),
     }),
     // Behind a sign-in and not a landing page: there is nothing here for a
     // search engine to rank, and an indexed page that every visitor is
@@ -66,10 +66,10 @@ export default async function AddListing({
           <div className="flex flex-col gap-8">
             <header className="flex flex-col gap-2">
               <h1 className="text-[1.75rem] font-bold leading-tight tracking-tight text-ink">
-                {t(lang, "create.title")}
+                {tCreate(lang, "create.title")}
               </h1>
               <p className="text-[15px] leading-7 text-muted">
-                {t(lang, "create.lead")}
+                {tCreate(lang, "create.lead")}
               </p>
             </header>
 

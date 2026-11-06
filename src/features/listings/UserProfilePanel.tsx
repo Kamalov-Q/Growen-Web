@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
 import { t, type UiKey } from "@/src/i18n/dictionary";
+import { tw } from "@/src/i18n/strings/wallet";
 import { Avatar } from "@/src/components/ui/Avatar";
 import { MembershipPill, VerifiedPill, VerifiedSeal } from "@/src/components/ui/Seal";
 import { SocialRow } from "@/src/features/account/SocialRow";
@@ -247,7 +248,7 @@ export function UserProfilePanel({
                 disabled={busy}
                 className="h-12 rounded-control text-[15px] font-semibold text-ink ring-1 ring-line transition hover:bg-muted-bg disabled:opacity-50"
               >
-                {t(lang, "wallet.loadMore", {
+                {tw(lang, "wallet.loadMore", {
                   n: profile.listingCount - listings.length,
                 })}
               </button>

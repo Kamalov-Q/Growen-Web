@@ -1,5 +1,5 @@
 import type { Lang } from "@/src/i18n/config";
-import { t } from "@/src/i18n/dictionary";
+import { tw } from "@/src/i18n/strings/wallet";
 import { getTransactions, type WalletTxn } from "@/src/features/account/api";
 import { txConfig } from "./txConfig";
 
@@ -50,19 +50,19 @@ const cell = (value: string | number | null | undefined): string =>
 
 export function toCsv(rows: WalletTxn[], lang: Lang): string {
   const header = [
-    t(lang, "wallet.fieldDate"),
-    t(lang, "wallet.fieldType"),
-    t(lang, "wallet.fieldAmount"),
-    t(lang, "wallet.fieldBalanceAfter"),
-    t(lang, "wallet.fieldNote"),
-    t(lang, "wallet.fieldTransactionId"),
+    tw(lang, "wallet.fieldDate"),
+    tw(lang, "wallet.fieldType"),
+    tw(lang, "wallet.fieldAmount"),
+    tw(lang, "wallet.fieldBalanceAfter"),
+    tw(lang, "wallet.fieldNote"),
+    tw(lang, "wallet.fieldTransactionId"),
   ];
 
   const lines = rows.map((tx) =>
     [
       // ISO, not the pretty form: a spreadsheet can parse this one.
       tx.createdAt,
-      t(lang, txConfig(tx.kind, Number(tx.amount)).label),
+      tw(lang, txConfig(tx.kind, Number(tx.amount)).label),
       tx.amount,
       tx.balanceAfter,
       tx.note ?? "",

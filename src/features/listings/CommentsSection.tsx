@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
+import { tComments } from "@/src/i18n/strings/comments";
 import { Avatar } from "@/src/components/ui/Avatar";
 import { ConfirmDialog } from "@/src/components/ui/ConfirmDialog";
 import { useSession } from "@/src/features/auth/session";
@@ -89,7 +90,7 @@ export function CommentsSection({
   return (
     <section className="flex flex-col gap-4">
       <h2 className="flex items-center gap-2 text-[1.05rem] font-semibold tracking-tight text-ink">
-        {t(lang, "comments.title")}
+        {tComments(lang, "comments.title")}
         {total ? (
           <span className="nums rounded-full bg-muted-bg px-2 py-0.5 text-[12px] font-semibold text-muted">
             {total}
@@ -113,7 +114,7 @@ export function CommentsSection({
           href={`/${lang}/login?next=${encodeURIComponent(`/${lang}/listing/${listingId}`)}`}
           className="rounded-card bg-surface p-4 text-center text-[14px] font-semibold text-brand shadow-card ring-1 ring-line transition hover:ring-brand-line"
         >
-          {t(lang, "comments.signInToPost")}
+          {tComments(lang, "comments.signInToPost")}
         </Link>
       )}
 
@@ -122,10 +123,10 @@ export function CommentsSection({
       ) : !items.length ? (
         <div className="rounded-card bg-surface px-6 py-10 text-center shadow-card ring-1 ring-line">
           <p className="text-[15px] font-semibold text-ink">
-            {t(lang, "comments.emptyTitle")}
+            {tComments(lang, "comments.emptyTitle")}
           </p>
           <p className="mt-1 text-[14px] text-muted">
-            {t(lang, "comments.emptyHint")}
+            {tComments(lang, "comments.emptyHint")}
           </p>
         </div>
       ) : (
@@ -170,8 +171,8 @@ export function CommentsSection({
 
       <ConfirmDialog
         open={deleting !== null}
-        title={t(lang, "comments.deleteTitle")}
-        body={t(
+        title={tComments(lang, "comments.deleteTitle")}
+        body={tComments(
           lang,
           deleting && deleting.replyCount > 0
             ? "comments.deleteThreadMessage"
@@ -237,7 +238,7 @@ function Composer({
       {replyTo ? (
         <div className="flex items-center gap-2 text-[13px] text-muted">
           <span className="min-w-0 flex-1 truncate">
-            {t(lang, "comments.replyingTo", {
+            {tComments(lang, "comments.replyingTo", {
               name: replyName ?? t(lang, "detail.seller"),
             })}
           </span>
@@ -256,7 +257,7 @@ function Composer({
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          placeholder={t(lang, "comments.placeholder")}
+          placeholder={tComments(lang, "comments.placeholder")}
           rows={2}
           maxLength={2000}
           className="w-full resize-y bg-transparent py-2.5 text-[15px] leading-6 text-ink outline-none placeholder:text-faint"
@@ -276,7 +277,7 @@ function Composer({
           disabled={!body.trim() || busy}
           className="rounded-control bg-brand px-4 py-2 text-[14px] font-bold text-brand-ink transition hover:bg-brand-hover disabled:opacity-50"
         >
-          {t(lang, "comments.send")}
+          {tComments(lang, "comments.send")}
         </button>
       </div>
     </div>
@@ -355,7 +356,7 @@ function Replies({
           disabled={busy}
           className="self-start text-[13px] font-semibold text-brand transition hover:underline disabled:opacity-50"
         >
-          {t(lang, "comments.showReplies", { count: hidden })}
+          {tComments(lang, "comments.showReplies", { count: hidden })}
         </button>
       ) : null}
     </div>
@@ -460,7 +461,7 @@ function Bubble({
               edit, so the two timestamps differing IS the edit. */}
           {comment.updatedAt !== comment.createdAt ? (
             <span className="rounded-full bg-muted-bg px-1.5 py-0.5 text-[11px] font-medium text-faint">
-              {t(lang, "comments.edited")}
+              {tComments(lang, "comments.edited")}
             </span>
           ) : null}
         </div>
@@ -484,7 +485,7 @@ function Bubble({
                 disabled={!draft.trim() || saving}
                 className="rounded-control bg-brand px-3 py-1.5 text-[13px] font-bold text-brand-ink transition hover:bg-brand-hover disabled:opacity-50"
               >
-                {t(lang, "comments.save")}
+                {tComments(lang, "comments.save")}
               </button>
               <button
                 type="button"
@@ -509,7 +510,7 @@ function Bubble({
             type="button"
             onClick={() => void toggleLike()}
             aria-pressed={liked}
-            aria-label={t(lang, "comments.like")}
+            aria-label={tComments(lang, "comments.like")}
             className={`flex items-center gap-1.5 text-[13px] font-semibold transition ${
               liked ? "text-danger" : "text-muted hover:text-ink"
             }`}
@@ -533,7 +534,7 @@ function Bubble({
             onClick={onReply}
             className="text-[13px] font-semibold text-muted transition hover:text-ink"
           >
-            {t(lang, "comments.reply")}
+            {tComments(lang, "comments.reply")}
           </button>
 
           {isMine && !editing ? (
@@ -542,7 +543,7 @@ function Bubble({
               onClick={() => setEditing(true)}
               className="text-[13px] font-semibold text-muted transition hover:text-ink"
             >
-              {t(lang, "comments.edit")}
+              {tComments(lang, "comments.edit")}
             </button>
           ) : null}
 

@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
-import { t, type UiKey } from "@/src/i18n/dictionary";
+import { t } from "@/src/i18n/dictionary";
+import { tw, type WalletKey } from "@/src/i18n/strings/wallet";
 import { useSession } from "@/src/features/auth/session";
 import {
   VirtualCard,
@@ -52,8 +53,8 @@ const MAX_DIGITS = 9;
 const METHODS: {
   id: TopupProvider;
   brand: React.ReactNode;
-  subtitle: UiKey;
-  badge: UiKey;
+  subtitle: WalletKey;
+  badge: WalletKey;
   badgeClass: string;
   /** Listed, but not payable here — see `wallet.soon`. */
   soon?: boolean;
@@ -177,7 +178,7 @@ export function TopupPanel({ lang }: { lang: Lang }) {
      * not have.
      */
     if (active !== "PAYNET" && !user?.phoneNumber) {
-      setError(t(lang, "wallet.needPhone"));
+      setError(tw(lang, "wallet.needPhone"));
       return;
     }
 
@@ -287,7 +288,7 @@ export function TopupPanel({ lang }: { lang: Lang }) {
               htmlFor="amount"
               className="text-[12px] font-medium uppercase tracking-wide text-faint"
             >
-              {t(lang, "wallet.enterAmount")}
+              {tw(lang, "wallet.enterAmount")}
             </label>
             <input
               id="amount"
@@ -295,7 +296,7 @@ export function TopupPanel({ lang }: { lang: Lang }) {
               onChange={(e) => onAmount(e.target.value)}
               inputMode="numeric"
               placeholder="0"
-              aria-label={t(lang, "wallet.enterAmount")}
+              aria-label={tw(lang, "wallet.enterAmount")}
               className="nums w-full bg-transparent text-[26px] font-extrabold tracking-tight text-ink outline-none placeholder:text-faint"
             />
           </span>
@@ -362,7 +363,7 @@ export function TopupPanel({ lang }: { lang: Lang }) {
       {/* ---- how to pay ------------------------------------------------- */}
       <section className="flex flex-col gap-3">
         <h2 className="text-[13px] font-semibold uppercase tracking-wide text-muted">
-          {t(lang, "wallet.paymentMethods")}
+          {tw(lang, "wallet.paymentMethods")}
         </h2>
 
         <div role="radiogroup" className="flex flex-col gap-2.5">
@@ -397,7 +398,7 @@ export function TopupPanel({ lang }: { lang: Lang }) {
                         : m.badgeClass
                     }`}
                   >
-                    {t(lang, m.soon ? "wallet.soon" : m.badge)}
+                    {tw(lang, m.soon ? "wallet.soon" : m.badge)}
                   </span>
                   <span
                     className={`grid size-5 shrink-0 place-items-center rounded-full ring-2 ${
@@ -425,7 +426,7 @@ export function TopupPanel({ lang }: { lang: Lang }) {
                   </span>
                 </span>
                 <span className="text-[13px] text-muted">
-                  {t(lang, m.subtitle)}
+                  {tw(lang, m.subtitle)}
                 </span>
               </button>
             );
@@ -457,8 +458,8 @@ export function TopupPanel({ lang }: { lang: Lang }) {
           />
         ) : null}
         {valid
-          ? `${t(lang, "wallet.pay")} · ${formatThousands(amount)} UZS`
-          : t(lang, "wallet.pay")}
+          ? `${tw(lang, "wallet.pay")} · ${formatThousands(amount)} UZS`
+          : tw(lang, "wallet.pay")}
       </button>
 
       {/* After Paynet: there is no result page to send anybody to, so the
@@ -466,10 +467,10 @@ export function TopupPanel({ lang }: { lang: Lang }) {
       {paynetOpened ? (
         <section className="flex flex-col gap-1.5 rounded-card bg-sold-soft p-4 ring-1 ring-gold/30">
           <p className="text-[15px] font-bold text-ink">
-            {t(lang, "wallet.paynetOpened")}
+            {tw(lang, "wallet.paynetOpened")}
           </p>
           <p className="text-[13px] leading-5 text-muted">
-            {t(lang, "wallet.paynetOpenedHint")}
+            {tw(lang, "wallet.paynetOpenedHint")}
           </p>
         </section>
       ) : null}
@@ -479,7 +480,10 @@ export function TopupPanel({ lang }: { lang: Lang }) {
           then this page is in their pocket. */}
       {wallet?.accountNo ? (
         <p className="text-center text-[13px] text-muted">
-          {t(lang, active === "PAYNET" ? "wallet.paynetAccountHint" : "wallet.accountNo")}
+          {tw(
+            lang,
+            active === "PAYNET" ? "wallet.paynetAccountHint" : "wallet.accountNo",
+          )}
           {": "}
           <span className="nums font-bold text-ink">{wallet.accountNo}</span>
         </p>
@@ -505,7 +509,7 @@ export function TopupPanel({ lang }: { lang: Lang }) {
           </svg>
         </span>
         <span className="flex-1 text-[15px] font-semibold text-ink">
-          {t(lang, "wallet.historyTitle")}
+          {tw(lang, "wallet.historyTitle")}
         </span>
         <svg
           aria-hidden

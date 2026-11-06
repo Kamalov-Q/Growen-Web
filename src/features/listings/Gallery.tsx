@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { cdnSrc } from "@/src/lib/media";
 import {
   useCallback,
   useEffect,
@@ -257,7 +258,7 @@ export function Gallery({
     return (
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-card bg-muted-bg sm:aspect-[16/9]">
         <Image
-          src={only.url}
+          src={cdnSrc(only.url)}
           alt={alt}
           fill
           priority
@@ -319,7 +320,7 @@ export function Gallery({
                 aria-hidden={clone || undefined}
               >
                 <Image
-                  src={image.url}
+                  src={cdnSrc(image.url)}
                   alt={clone ? "" : `${alt} — ${i}/${count}`}
                   fill
                   // Only the first real photo is eager: it is the largest
@@ -347,7 +348,16 @@ export function Gallery({
           aria-label={t(lang, "gallery.prev")}
           className="absolute start-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-surface/80 text-ink opacity-0 shadow-card backdrop-blur transition hover:bg-surface focus-visible:opacity-100 group-hover:opacity-100 max-sm:opacity-100"
         >
-          <svg aria-hidden viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            className="size-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="m15 18-6-6 6-6" />
           </svg>
         </button>
@@ -357,7 +367,16 @@ export function Gallery({
           aria-label={t(lang, "gallery.next")}
           className="absolute end-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-surface/80 text-ink opacity-0 shadow-card backdrop-blur transition hover:bg-surface focus-visible:opacity-100 group-hover:opacity-100 max-sm:opacity-100"
         >
-          <svg aria-hidden viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            className="size-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="m9 18 6-6-6-6" />
           </svg>
         </button>
@@ -401,11 +420,27 @@ export function Gallery({
               }`}
             >
               <Image
-                src={image.url}
+                /**
+                 * `thumbUrl`, not `url`, and NOT optimized — the same call
+                 * `ListingCard` makes, for the same reasons plus one more.
+                 *
+                 * This strip is 96×64. Routing it through the optimizer
+                 * asked the server to downscale a 1600px original to 96px
+                 * and then store three width variants of the result, per
+                 * photo, per listing — billed work on Vercel and one more
+                 * thing that can time out against a slow origin.
+                 *
+                 * The extra reason: `thumbUrl` is the exact URL the card
+                 * this visitor just clicked already loaded, so it is
+                 * normally served from their browser cache with no request
+                 * at all.
+                 */
+                src={cdnSrc(image.thumbUrl)}
                 alt=""
                 fill
                 loading="lazy"
                 sizes="96px"
+                unoptimized
                 className="object-cover"
               />
             </button>

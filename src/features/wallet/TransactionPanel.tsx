@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
-import { t, type UiKey } from "@/src/i18n/dictionary";
+import { tw, type WalletKey } from "@/src/i18n/strings/wallet";
 import { formatThousands } from "@/src/features/account/VirtualCard";
 import {
   getTransaction,
@@ -30,7 +30,7 @@ import { txConfig } from "./txConfig";
  * tickets end up about the wrong payment.
  */
 
-const STATUS: Record<string, { key: UiKey; tone: string }> = {
+const STATUS: Record<string, { key: WalletKey; tone: string }> = {
   PAID: { key: "wallet.statusPaid", tone: "bg-brand-soft text-brand" },
   CREATED: { key: "wallet.statusPending", tone: "bg-gold/15 text-gold" },
   PENDING: { key: "wallet.statusPending", tone: "bg-gold/15 text-gold" },
@@ -39,7 +39,7 @@ const STATUS: Record<string, { key: UiKey; tone: string }> = {
   FAILED: { key: "wallet.statusCancelled", tone: "bg-danger/10 text-danger" },
 };
 
-const RECEIPT: Record<FiscalStatus, UiKey> = {
+const RECEIPT: Record<FiscalStatus, WalletKey> = {
   SENT: "wallet.receiptSent",
   PENDING: "wallet.receiptPending",
   SENDING: "wallet.receiptPending",
@@ -68,7 +68,7 @@ export function TransactionPanel({ lang, id }: { lang: Lang; id: string }) {
         role="alert"
         className="rounded-card bg-surface p-6 text-[15px] text-danger ring-1 ring-line"
       >
-        {t(lang, "wallet.txLoadError")}
+        {tw(lang, "wallet.txLoadError")}
       </p>
     );
   }
@@ -105,37 +105,37 @@ export function TransactionPanel({ lang, id }: { lang: Lang; id: string }) {
           {formatThousands(amount)} UZS
         </p>
         <p className="text-[15px] font-semibold text-ink">
-          {t(lang, config.label)}
+          {tw(lang, config.label)}
         </p>
         <span
           className={`rounded-full px-2.5 py-1 text-[12px] font-bold ${
             status?.tone ?? "bg-muted-bg text-muted"
           }`}
         >
-          {t(lang, status?.key ?? "wallet.statusCompleted")}
+          {tw(lang, status?.key ?? "wallet.statusCompleted")}
         </span>
       </section>
 
-      <Section title={t(lang, "wallet.sectionOperation")}>
-        <Row label={t(lang, "wallet.fieldType")} value={t(lang, config.label)} />
+      <Section title={tw(lang, "wallet.sectionOperation")}>
+        <Row label={tw(lang, "wallet.fieldType")} value={tw(lang, config.label)} />
         <Row
-          label={t(lang, "wallet.fieldDate")}
+          label={tw(lang, "wallet.fieldDate")}
           value={absoluteTime(new Date(tx.createdAt))}
         />
         <Row
-          label={t(lang, "wallet.fieldAmount")}
+          label={tw(lang, "wallet.fieldAmount")}
           value={`${credit ? "+" : ""}${formatThousands(amount)} UZS`}
         />
         <Row
-          label={t(lang, "wallet.fieldBalanceAfter")}
+          label={tw(lang, "wallet.fieldBalanceAfter")}
           value={`${formatThousands(tx.balanceAfter)} UZS`}
         />
         {tx.note ? (
-          <Row label={t(lang, "wallet.fieldNote")} value={tx.note} />
+          <Row label={tw(lang, "wallet.fieldNote")} value={tx.note} />
         ) : null}
         <Row
           lang={lang}
-          label={t(lang, "wallet.fieldTransactionId")}
+          label={tw(lang, "wallet.fieldTransactionId")}
           value={tx.id}
           copyable
         />
@@ -150,7 +150,7 @@ export function TransactionPanel({ lang, id }: { lang: Lang; id: string }) {
           href={`/${lang}/listing/${tx.listingId}`}
           className="inline-flex h-12 items-center justify-center rounded-control text-[15px] font-bold text-ink ring-1 ring-line transition hover:bg-muted-bg"
         >
-          {t(lang, "wallet.openListing")}
+          {tw(lang, "wallet.openListing")}
         </Link>
       ) : null}
     </div>
@@ -168,9 +168,9 @@ function PaymentSection({
   const status = STATUS[payment.status];
 
   return (
-    <Section title={t(lang, "wallet.sectionPayment")}>
+    <Section title={tw(lang, "wallet.sectionPayment")}>
       <Row
-        label={t(lang, "wallet.fieldProvider")}
+        label={tw(lang, "wallet.fieldProvider")}
         value={
           payment.provider === "CLICK" ? (
             <ClickBrand />
@@ -182,60 +182,60 @@ function PaymentSection({
         }
       />
       <Row
-        label={t(lang, "wallet.fieldStatus")}
-        value={t(lang, status?.key ?? "wallet.statusCompleted")}
+        label={tw(lang, "wallet.fieldStatus")}
+        value={tw(lang, status?.key ?? "wallet.statusCompleted")}
       />
       <Row
-        label={t(lang, "wallet.fieldOrderNo")}
+        label={tw(lang, "wallet.fieldOrderNo")}
         value={String(payment.orderNo)}
       />
       <Row
-        label={t(lang, "wallet.fieldAmount")}
+        label={tw(lang, "wallet.fieldAmount")}
         value={`${formatThousands(payment.amount)} UZS`}
       />
       {bonus > 0 ? (
         <Row
-          label={t(lang, "wallet.fieldBonus")}
+          label={tw(lang, "wallet.fieldBonus")}
           value={`+${formatThousands(bonus)} UZS`}
         />
       ) : null}
       {payment.providerTxnId ? (
         <Row
           lang={lang}
-          label={t(lang, "wallet.fieldProviderTxn")}
+          label={tw(lang, "wallet.fieldProviderTxn")}
           value={payment.providerTxnId}
           copyable
         />
       ) : null}
       <Row
-        label={t(lang, "wallet.fieldCreatedAt")}
+        label={tw(lang, "wallet.fieldCreatedAt")}
         value={absoluteTime(new Date(payment.createdAt))}
       />
       {payment.paidAt ? (
         <Row
-          label={t(lang, "wallet.fieldPaidAt")}
+          label={tw(lang, "wallet.fieldPaidAt")}
           value={absoluteTime(new Date(payment.paidAt))}
         />
       ) : null}
       {payment.cancelledAt ? (
         <Row
-          label={t(lang, "wallet.fieldCancelledAt")}
+          label={tw(lang, "wallet.fieldCancelledAt")}
           value={absoluteTime(new Date(payment.cancelledAt))}
         />
       ) : null}
       {payment.cancelReason ? (
         <Row
-          label={t(lang, "wallet.fieldCancelReason")}
+          label={tw(lang, "wallet.fieldCancelReason")}
           value={payment.cancelReason}
         />
       ) : null}
       <Row
-        label={t(lang, "wallet.fieldReceipt")}
-        value={t(lang, RECEIPT[payment.fiscalStatus] ?? "wallet.receiptNone")}
+        label={tw(lang, "wallet.fieldReceipt")}
+        value={tw(lang, RECEIPT[payment.fiscalStatus] ?? "wallet.receiptNone")}
       />
       <Row
         lang={lang}
-        label={t(lang, "wallet.fieldPaymentId")}
+        label={tw(lang, "wallet.fieldPaymentId")}
         value={payment.id}
         copyable
       />
@@ -295,7 +295,7 @@ function Row({
                 })
                 .catch(() => {});
             }}
-            aria-label={lang ? t(lang, "wallet.copy") : undefined}
+            aria-label={lang ? tw(lang, "wallet.copy") : undefined}
             className="shrink-0 text-muted transition hover:text-brand"
           >
             {copied ? (

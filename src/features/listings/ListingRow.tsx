@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { cdnSrc } from "@/src/lib/media";
 import Link from "next/link";
 import type { Lang } from "@/src/i18n/config";
 import { enumLabel, t } from "@/src/i18n/dictionary";
@@ -47,7 +48,7 @@ export function ListingRow({
       <div className="relative aspect-[4/3] w-32 shrink-0 overflow-hidden rounded-[0.7rem] bg-muted-bg sm:w-52">
         {cover ? (
           <Image
-            src={cover.thumbUrl}
+            src={cdnSrc(cover.thumbUrl)}
             alt={listing.title ?? ""}
             fill
             sizes="(max-width: 640px) 128px, 208px"

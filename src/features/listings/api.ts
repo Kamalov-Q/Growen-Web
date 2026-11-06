@@ -12,6 +12,16 @@ export type OfferPurpose = "SALE" | "RENT_MONTHLY" | "RENT_DAILY";
 
 export interface FeedQuery {
   purpose: OfferPurpose;
+  /**
+   * Grid or list, and it lives in the URL like every other choice this
+   * page makes.
+   *
+   * Not sent to the API — it changes nothing about WHICH listings come
+   * back, only how the server draws them. It is in this type because
+   * every link on the feed has to carry it: picking "Ijara" while reading
+   * the list view should not drop you back into the grid.
+   */
+  view?: "grid" | "list";
   q?: string;
   category?: string;
   priceMin?: number;

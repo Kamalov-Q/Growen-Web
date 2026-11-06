@@ -1,11 +1,16 @@
 "use client";
 
 import Image from "next/image";
+import { cdnSrc } from "@/src/lib/media";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
-import { num, type ListingDetail, type MapPointFeature } from "@/src/lib/listing-types";
+import {
+  num,
+  type ListingDetail,
+  type MapPointFeature,
+} from "@/src/lib/listing-types";
 import { fetchListing } from "./api";
 import { formatSpecs, primaryOffer } from "./format";
 import { Price } from "./Price";
@@ -133,7 +138,7 @@ export function MapPreview({
           <div className="relative aspect-[16/10] w-full bg-muted-bg">
             {cover ? (
               <Image
-                src={cover}
+                src={cdnSrc(cover)}
                 alt=""
                 fill
                 sizes="352px"

@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Lang } from "@/src/i18n/config";
@@ -17,9 +18,17 @@ import { Toolbar } from "./Toolbar";
  * all, and it is the largest dependency on the site while most visitors
  * arrive on the list from a search result and never open the map.
  *
- * Both list renderings are produced by the SERVER component above this one
- * and passed in as props, so the listings are in the HTML a crawler reads
- * whichever view happens to be showing.
+ * The feed itself is produced by the SERVER component above this one and
+ * passed in as a prop, so the listings are in the HTML a crawler reads.
+ *
+ * Grid and list are LINKS, not local state: each is its own URL, only the
+ * one asked for is rendered, and the server has the feed cached so the
+ * switch costs no API call. Rendering both and hiding one was four copies
+ * of every listing on the wire — see the page component.
+ *
+ * The map stays local state. It is the one view that renders nothing on the
+ * server, so there is nothing to fetch for it, and routing to it would
+ * remount MapLibre on every toggle.
  */
 
 const BrowseMap = dynamic(
@@ -33,6 +42,8 @@ const BrowseMap = dynamic(
 );
 
 type View = "grid" | "list" | "map";
+/** The two the server can render. The map is not one of them. */
+type FeedView = "grid" | "list";
 
 const ICONS: Record<View, React.ReactNode> = {
   grid: (
@@ -64,8 +75,7 @@ export function HomeViews({
   filters,
   categories,
   shelf,
-  grid,
-  rows,
+  feed,
 }: {
   lang: Lang;
   query: FeedQuery;
@@ -75,26 +85,70 @@ export function HomeViews({
   /** For the modal's category chips. */
   categories: Category[];
   shelf: React.ReactNode;
-  grid: React.ReactNode;
-  rows: React.ReactNode;
+  /** The grid or the rows — whichever `query.view` asked for. */
+  feed: React.ReactNode;
 }) {
-  const [view, setView] = useState<View>("grid");
+  const [mapOpen, setMapOpen] = useState(false);
   const [panel, setPanel] = useState(false);
   const router = useRouter();
 
   const priced = query.priceMin !== undefined || query.priceMax !== undefined;
 
-  const tab = (id: View) => (
-    <button
+  /** What the URL says, with the map laid over it while it is open. */
+  const feedView: FeedView = query.view === "list" ? "list" : "grid";
+  const view: View = mapOpen ? "map" : feedView;
+
+  /**
+   * The same URL with a different view.
+   *
+   * Everything else is carried through — including the price bounds, which
+   * the sort and chip links drop. Changing how a list is drawn must not
+   * silently widen what is in it.
+   */
+  const viewHref = (next: FeedView) => {
+    const params = new URLSearchParams({ purpose: query.purpose });
+    if (query.q?.trim()) params.set("q", query.q.trim());
+    if (query.category) params.set("category", query.category);
+    if (query.sort && query.sort !== "newest") params.set("sort", query.sort);
+    if (query.priceMin !== undefined)
+      params.set("priceMin", String(query.priceMin));
+    if (query.priceMax !== undefined)
+      params.set("priceMax", String(query.priceMax));
+    if (next === "list") params.set("view", "list");
+    return `/${lang}?${params}`;
+  };
+
+  /**
+   * `scroll={false}`: the switch is a navigation, and Next scrolls to the
+   * top of a new page by default. Somebody eight rows down who wants the
+   * same results drawn differently has not asked to be sent back to the
+   * header.
+   *
+   * `prefetch={false}`: these two links sit at the top of the page, so they
+   * are in the viewport from the first paint and Next would fetch the other
+   * view in the background — which is the payload this change exists to
+   * stop sending. The feed is cached server-side, so the click is cheap
+   * without it.
+   *
+   * Links, not `role="tab"`: a tab controls a panel on the same page, and
+   * these go somewhere. `aria-current` is what the sort links use.
+   */
+  const tab = (id: FeedView) => (
+    <Link
       key={id}
-      type="button"
-      role="tab"
-      aria-selected={view === id}
+      href={viewHref(id)}
+      scroll={false}
+      prefetch={false}
+      /* Pressing grid or list while the map is open leaves the map, the
+         way it did when all three were one piece of state. Without this
+         the URL would change under a map that stayed open and the press
+         would look ignored. */
+      onClick={() => setMapOpen(false)}
+      aria-current={feedView === id ? "page" : undefined}
       aria-label={t(lang, `view.${id}` as "view.grid")}
       title={t(lang, `view.${id}` as "view.grid")}
-      onClick={() => setView(id)}
       className={`grid size-9 place-items-center rounded-[0.55rem] transition ${
-        view === id
+        feedView === id
           ? "bg-surface text-ink shadow-card"
           : "text-muted hover:text-ink"
       }`}
@@ -110,7 +164,7 @@ export function HomeViews({
       >
         {ICONS[id]}
       </svg>
-    </button>
+    </Link>
   );
 
   /* ── the bar ───────────────────────────────────────────────────────
@@ -123,11 +177,7 @@ export function HomeViews({
   const bar = (
     <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <div
-            role="tablist"
-            aria-label={t(lang, "view.grid")}
-            className="flex gap-1 rounded-control bg-muted-bg p-1"
-          >
+          <div className="flex gap-1 rounded-control bg-muted-bg p-1">
             {tab("grid")}
             {tab("list")}
           </div>
@@ -137,8 +187,8 @@ export function HomeViews({
               it with them implies it is the same kind of choice. */}
           <button
             type="button"
-            onClick={() => setView(view === "map" ? "grid" : "map")}
-            aria-pressed={view === "map"}
+            onClick={() => setMapOpen((v) => !v)}
+            aria-pressed={mapOpen}
             className={`flex h-11 items-center gap-2 rounded-control px-4 text-[14px] font-semibold transition ${
               view === "map"
                 ? "bg-brand text-brand-ink"
@@ -248,12 +298,7 @@ export function HomeViews({
         <>
           {shelf}
           <Toolbar lang={lang} query={query} count={count} />
-          {/* Both renderings stay MOUNTED and one is hidden, rather than
-              unmounted: throwing one away loses the server-rendered markup
-              and the scroll position, and brings both back only after a
-              re-render. */}
-          <div className={view === "grid" ? "" : "hidden"}>{grid}</div>
-          <div className={view === "list" ? "" : "hidden"}>{rows}</div>
+          {feed}
         </>
       )}
     </div>

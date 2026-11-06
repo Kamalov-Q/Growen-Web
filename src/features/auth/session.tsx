@@ -8,7 +8,6 @@ import {
   useMemo,
   useState,
 } from "react";
-import { chatSocket } from "@/src/lib/socket";
 import {
   api,
   clearSession,
@@ -92,9 +91,18 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       // button that appears to do nothing when the network is down.
     } finally {
       clearSession();
-      // A live socket still holds the old access token and would keep
-      // delivering this account's messages to the next person at this
-      // computer. Dropping the session in memory does not drop the wire.
+      /**
+       * A live socket still holds the old access token and would keep
+       * delivering this account's messages to the next person at this
+       * computer. Dropping the session in memory does not drop the wire.
+       *
+       * Imported HERE, not at the top of the file. This provider is in the
+       * root layout, so a static import put socket.io-client — 14 KB
+       * gzipped — into the shared bundle of every page on the site, for
+       * one line that runs when somebody signs out. Measured: the home
+       * page downloaded it and never opened a socket.
+       */
+      const { chatSocket } = await import("@/src/lib/socket");
       chatSocket.disconnect();
     }
   }, []);

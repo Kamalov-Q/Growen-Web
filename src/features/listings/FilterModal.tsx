@@ -91,6 +91,7 @@ export function FilterModal({
     const hi = n(max);
     if (lo !== null) params.set("priceMin", String(lo));
     if (hi !== null) params.set("priceMax", String(hi));
+    if (query.view === "list") params.set("view", "list");
 
     router.push(`/${lang}?${params}`);
     onClose();
@@ -102,7 +103,9 @@ export function FilterModal({
     setMin("");
     setMax("");
     setSort("newest");
-    router.push(`/${lang}?purpose=${purpose}`);
+    router.push(
+      `/${lang}?purpose=${purpose}${query.view === "list" ? "&view=list" : ""}`,
+    );
     onClose();
   };
 

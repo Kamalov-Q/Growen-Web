@@ -4,7 +4,7 @@ import { RequireAuth } from "@/src/features/auth/RequireAuth";
 import { AccountScreen } from "@/src/features/account/AccountScreen";
 import { HistoryPanel } from "@/src/features/wallet/HistoryPanel";
 import { isLang, LANGS, type Lang } from "@/src/i18n/config";
-import { t } from "@/src/i18n/dictionary";
+import { tw } from "@/src/i18n/strings/wallet";
 import { pageMetadata } from "@/src/lib/metadata";
 
 const PATH = "/wallet/history";
@@ -24,8 +24,8 @@ export async function generateMetadata({
     ...pageMetadata({
       lang,
       path: PATH,
-      title: t(lang, "wallet.historyTitle"),
-      description: t(lang, "wallet.lead"),
+      title: tw(lang, "wallet.historyTitle"),
+      description: tw(lang, "wallet.lead"),
     }),
     robots: { index: false, follow: false },
   };
@@ -44,8 +44,8 @@ export default async function WalletHistoryPage({
       <RequireAuth lang={lang as Lang}>
         <AccountScreen
           lang={lang as Lang}
-          title={t(lang, "wallet.historyTitle")}
-          lead={t(lang, "wallet.history")}
+          title={tw(lang, "wallet.historyTitle")}
+          lead={tw(lang, "wallet.history")}
         >
           <HistoryPanel lang={lang as Lang} />
         </AccountScreen>

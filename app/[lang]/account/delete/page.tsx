@@ -4,7 +4,7 @@ import { Page } from "@/src/components/Page";
 import { RequireAuth } from "@/src/features/auth/RequireAuth";
 import { DeleteAccountPanel } from "@/src/features/account/DeleteAccountPanel";
 import { isLang, LANGS, type Lang } from "@/src/i18n/config";
-import { t } from "@/src/i18n/dictionary";
+import { tDeleteAccount } from "@/src/i18n/strings/deleteAccount";
 import { pageMetadata } from "@/src/lib/metadata";
 
 const PATH = "/account/delete";
@@ -24,8 +24,8 @@ export async function generateMetadata({
     ...pageMetadata({
       lang,
       path: PATH,
-      title: t(lang, "deleteAccount.title"),
-      description: t(lang, "deleteAccount.intro"),
+      title: tDeleteAccount(lang, "deleteAccount.title"),
+      description: tDeleteAccount(lang, "deleteAccount.intro"),
     }),
     /**
      * Not indexed — but /account-deletion, the published POLICY, is, and
@@ -46,7 +46,7 @@ export default async function DeleteAccount({
   if (!isLang(lang)) notFound();
 
   return (
-    <Page lang={lang} path={PATH} title={t(lang, "deleteAccount.title")}>
+    <Page lang={lang} path={PATH} title={tDeleteAccount(lang, "deleteAccount.title")}>
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
         <RequireAuth lang={lang as Lang}>
           <DeleteAccountPanel lang={lang as Lang} />
@@ -59,7 +59,7 @@ export default async function DeleteAccount({
             href={`/${lang}/account-deletion`}
             className="text-muted underline underline-offset-4 transition hover:text-brand"
           >
-            {t(lang, "deleteAccount.policy")}
+            {tDeleteAccount(lang, "deleteAccount.policy")}
           </Link>
         </p>
       </div>

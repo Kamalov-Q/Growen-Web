@@ -3,7 +3,7 @@ import { Page } from "@/src/components/Page";
 import { RequireAuth } from "@/src/features/auth/RequireAuth";
 import { NotificationsPanel } from "@/src/features/activity/panels";
 import { isLang, LANGS, type Lang } from "@/src/i18n/config";
-import { t } from "@/src/i18n/dictionary";
+import { tNotifications } from "@/src/i18n/strings/notifications";
 import { pageMetadata } from "@/src/lib/metadata";
 
 const PATH = "/activity/notifications";
@@ -23,8 +23,8 @@ export async function generateMetadata({
     ...pageMetadata({
       lang,
       path: PATH,
-      title: t(lang, "notifications.title"),
-      description: t(lang, "notifications.emptyHint"),
+      title: tNotifications(lang, "notifications.title"),
+      description: tNotifications(lang, "notifications.emptyHint"),
     }),
     // Somebody's own trail. Never indexed, and never followed.
     robots: { index: false, follow: false },
@@ -40,7 +40,7 @@ export default async function NotificationsPage({
   if (!isLang(lang)) notFound();
 
   return (
-    <Page lang={lang} path={PATH} title={t(lang, "notifications.title")}>
+    <Page lang={lang} path={PATH} title={tNotifications(lang, "notifications.title")}>
       <div className="mx-auto w-full max-w-2xl">
         <RequireAuth lang={lang as Lang}>
           <NotificationsPanel lang={lang as Lang} />

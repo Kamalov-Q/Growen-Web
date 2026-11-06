@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
-import { t, type UiKey } from "@/src/i18n/dictionary";
+import { t } from "@/src/i18n/dictionary";
+import { tVerify, type VerifyKey } from "@/src/i18n/strings/verify";
 import { Button } from "@/src/components/ui/Button";
 import { VerifiedSeal } from "@/src/components/ui/Seal";
 import { useSession } from "@/src/features/auth/session";
@@ -44,7 +45,7 @@ const SLOTS = [
   { key: "passportFrontUrl", label: "verify.passportFront" },
   { key: "passportBackUrl", label: "verify.passportBack" },
   { key: "selfieUrl", label: "verify.selfie" },
-] as const satisfies readonly { key: string; label: UiKey }[];
+] as const satisfies readonly { key: string; label: VerifyKey }[];
 
 type SlotKey = (typeof SLOTS)[number]["key"];
 
@@ -107,7 +108,7 @@ export function VerifyPanel({ lang }: { lang: Lang }) {
       const sized = await downscaleImage(file, DOCUMENT_EDGE, 0.9);
       if (sized.size > DOCUMENT_MAX_BYTES) {
         setSlots((s) => ({ ...s, [key]: undefined }));
-        setError(t(lang, "verify.tooBig"));
+        setError(tVerify(lang, "verify.tooBig"));
         return;
       }
       const url = await uploadDocument(sized);
@@ -132,7 +133,7 @@ export function VerifyPanel({ lang }: { lang: Lang }) {
     // refuses without one (PhoneRequiredGuard). Saying so here turns that
     // 403 into a sentence somebody can act on.
     if (!user?.phoneNumber) {
-      setError(t(lang, "verify.needPhone"));
+      setError(tVerify(lang, "verify.needPhone"));
       return;
     }
 
@@ -188,8 +189,8 @@ export function VerifyPanel({ lang }: { lang: Lang }) {
     return (
       <Verdict
         tone="success"
-        title={t(lang, "verify.verifiedTitle")}
-        body={t(lang, "verify.verifiedBody")}
+        title={tVerify(lang, "verify.verifiedTitle")}
+        body={tVerify(lang, "verify.verifiedBody")}
       />
     );
   }
@@ -199,11 +200,11 @@ export function VerifyPanel({ lang }: { lang: Lang }) {
     return (
       <Verdict
         tone="neutral"
-        title={t(lang, "verify.pendingTitle")}
-        body={t(lang, "verify.pendingBody")}
+        title={tVerify(lang, "verify.pendingTitle")}
+        body={tVerify(lang, "verify.pendingBody")}
         footnote={
           state.request
-            ? `${t(lang, "verify.sentAt")} ${new Date(
+            ? `${tVerify(lang, "verify.sentAt")} ${new Date(
                 state.request.createdAt,
               ).toLocaleDateString(locale)}`
             : undefined
@@ -218,10 +219,10 @@ export function VerifyPanel({ lang }: { lang: Lang }) {
       <div className="flex flex-col gap-4">
         <Verdict
           tone="danger"
-          title={t(lang, "verify.rejectedTitle")}
+          title={tVerify(lang, "verify.rejectedTitle")}
           /* The moderator's own words when there are any. They also arrived
              in support, which is where any argument about them belongs. */
-          body={state.request?.rejectionReason ?? t(lang, "verify.rejectedBody")}
+          body={state.request?.rejectionReason ?? tVerify(lang, "verify.rejectedBody")}
         />
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button
@@ -229,7 +230,7 @@ export function VerifyPanel({ lang }: { lang: Lang }) {
             onClick={() => setReapplying(true)}
             className="sm:flex-1"
           >
-            {t(lang, "verify.tryAgain")}
+            {tVerify(lang, "verify.tryAgain")}
           </Button>
           <Link
             href={`/${lang}/support`}
@@ -251,10 +252,10 @@ export function VerifyPanel({ lang }: { lang: Lang }) {
           <VerifiedSeal className="size-9" />
         </span>
         <h2 className="text-[1.25rem] font-bold tracking-tight text-ink">
-          {t(lang, "verify.heading")}
+          {tVerify(lang, "verify.heading")}
         </h2>
         <p className="max-w-prose text-[14px] leading-6 text-muted">
-          {t(lang, "verify.intro")}
+          {tVerify(lang, "verify.intro")}
         </p>
       </header>
 
@@ -263,7 +264,7 @@ export function VerifyPanel({ lang }: { lang: Lang }) {
           <DocumentSlot
             key={slot.key}
             lang={lang}
-            label={t(lang, slot.label)}
+            label={tVerify(lang, slot.label)}
             slot={slots[slot.key]}
             busy={uploading === slot.key}
             onPick={(file) => void pick(slot.key, file)}
@@ -280,11 +281,11 @@ export function VerifyPanel({ lang }: { lang: Lang }) {
       <div className="flex flex-col gap-1.5 text-[13px] leading-5 text-faint">
         <p className="flex items-start gap-2">
           <Lock />
-          {t(lang, "verify.privacy")}
+          {tVerify(lang, "verify.privacy")}
         </p>
         <p className="flex items-start gap-2">
           <Clock />
-          {t(lang, "verify.timeline")}
+          {tVerify(lang, "verify.timeline")}
         </p>
       </div>
 
@@ -303,7 +304,7 @@ export function VerifyPanel({ lang }: { lang: Lang }) {
         disabled={!ready || uploading !== null}
         loading={submitting}
       >
-        {t(lang, "verify.submit")}
+        {tVerify(lang, "verify.submit")}
       </Button>
     </div>
   );
@@ -372,7 +373,7 @@ function DocumentSlot({
             className="block size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
           />
         ) : (
-          t(lang, slot ? "verify.replace" : "verify.pick")
+          tVerify(lang, slot ? "verify.replace" : "verify.pick")
         )}
       </button>
 
@@ -401,7 +402,7 @@ function Rule({
 }: {
   ok: boolean;
   lang: Lang;
-  labelKey: UiKey;
+  labelKey: VerifyKey;
 }) {
   return (
     <li className="flex items-start gap-2 text-[13px] leading-5 text-muted">
@@ -417,7 +418,7 @@ function Rule({
       >
         {ok ? <path d="m5 12.5 4.5 4.5L19 7.5" /> : <path d="M6 6l12 12M18 6 6 18" />}
       </svg>
-      {t(lang, labelKey)}
+      {tVerify(lang, labelKey)}
     </li>
   );
 }

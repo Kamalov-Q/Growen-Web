@@ -1,4 +1,5 @@
 import type { Lang } from "./config";
+import { fill, type Entry, type TParams } from "./strings/runtime";
 
 /**
  * The handful of words the CHROME needs — navigation, labels, the footer.
@@ -34,7 +35,6 @@ const UI = {
   },
   "settings.language": { uz: "Til", ru: "Язык" },
   "settings.account": { uz: "Hisob", ru: "Аккаунт" },
-  "settings.aboutSection": { uz: "Ma'lumot", ru: "Информация" },
   "mine.title": { uz: "E'lonlarim", ru: "Мои объявления" },
   "mine.lead": {
     uz: "Siz joylagan e'lonlar — faol, arxivlangan va sotilganlar.",
@@ -49,199 +49,10 @@ const UI = {
     ru: "Здесь собираются объявления, которые вы сохранили.",
   },
   "saved.empty": { uz: "Saqlangan e'lonlar yo'q", ru: "Нет сохранённых объявлений" },
-  "wallet.title": { uz: "Hamyon", ru: "Кошелёк" },
-  "wallet.lead": {
-    uz: "Balans va to'lovlar tarixi. To'ldirish mobil ilovada.",
-    ru: "Баланс и история платежей. Пополнение — в мобильном приложении.",
-  },
-  "wallet.balance": { uz: "Balans", ru: "Баланс" },
-  /* The card's own words, taken from the app so the plate reads the same in
-     both places — see src/features/account/VirtualCard.tsx. */
-  /* ── Topping up, as the app's wallet screen has it ───────────────────
-     The screen is the app's; the PAYMENT is not here yet, which the notice
-     at the foot says in so many words rather than by a button that does
-     nothing. */
-  "wallet.topupTitle": { uz: "Balansni to'ldirish", ru: "Пополнение баланса" },
-  "wallet.historyTitle": { uz: "To'lov tarixi", ru: "История платежей" },
-  "wallet.enterAmount": { uz: "Summani kiriting", ru: "Введите сумму" },
-  "wallet.paymentMethods": { uz: "To'lov usullari", ru: "Способы оплаты" },
-  "wallet.paymeSubtitle": {
-    uz: "Uzcard va Humo orqali tezkor to'lov",
-    ru: "Оплата через Uzcard и Humo",
-  },
-  "wallet.clickSubtitle": {
-    uz: "Barcha bank kartalari bilan to'lash",
-    ru: "Оплата любыми банковскими картами",
-  },
-  "wallet.paynetSubtitle": {
-    uz: "Naqd pul va terminallar orqali",
-    ru: "Наличными и через терминалы",
-  },
-  "wallet.badgeInstant": { uz: "Tezkor", ru: "Мгновенно" },
-  "wallet.badgeZeroFee": { uz: "0% komissiya", ru: "0% комиссия" },
-  "wallet.badgeCash": { uz: "Naqd pul", ru: "Наличные" },
-  "wallet.noHistory": {
-    uz: "Sizda hali to'lov tarixi yo'q",
-    ru: "У вас пока нет истории платежей",
-  },
-  "wallet.accountNo": { uz: "Hisob raqami", ru: "Номер счёта" },
-  /* Paying, and coming back from it. The app's words (its wallet locale). */
-  "wallet.pay": { uz: "To'lash", ru: "Оплатить" },
-  "wallet.paymentCancelled": {
-    uz: "To'lov bekor qilindi",
-    ru: "Платёж отменён",
-  },
-  "wallet.resultChecking": {
-    uz: "To'lov tekshirilmoqda…",
-    ru: "Проверяем платёж…",
-  },
-  "wallet.resultCheckingBody": {
-    uz: "To'lov tizimi tasdiqlashini kutyapmiz. Bu odatda bir necha soniya oladi.",
-    ru: "Ждём подтверждения от платёжной системы. Обычно это занимает несколько секунд.",
-  },
-  "wallet.resultPaid": { uz: "To'lov qabul qilindi", ru: "Платёж получен" },
-  "wallet.resultPaidBody": {
-    uz: "{{amount}} UZS balansingizga qo'shildi.",
-    ru: "{{amount}} UZS зачислено на ваш баланс.",
-  },
-  "wallet.resultPaidBodyNoAmount": {
-    uz: "Mablag' balansingizga qo'shildi.",
-    ru: "Средства зачислены на ваш баланс.",
-  },
-  "wallet.resultCancelledBody": {
-    uz: "Hisobingizdan pul yechilmadi. Qaytadan urinib ko'rishingiz mumkin.",
-    ru: "Деньги не были списаны. Вы можете попробовать ещё раз.",
-  },
-  "wallet.resultPending": {
-    uz: "To'lov hali tasdiqlanmadi",
-    ru: "Платёж ещё не подтверждён",
-  },
-  "wallet.resultPendingBody": {
-    uz: "Agar to'lagan bo'lsangiz, mablag' tez orada balansga tushadi — holatini to'lov tarixida ko'ring.",
-    ru: "Если вы оплатили, средства скоро поступят на баланс — статус можно посмотреть в истории платежей.",
-  },
-  "wallet.resultBackToWallet": {
-    uz: "Hamyonga qaytish",
-    ru: "Вернуться в кошелёк",
-  },
-  "wallet.needPhone": {
-    uz: "To'lov uchun avval telefon raqamingizni tasdiqlang.",
-    ru: "Для оплаты сначала подтвердите номер телефона.",
-  },
-  /* Paynet is push-model — the payer types an account number into a
-     terminal — and the web has not built that walk-through yet, so the row
-     stays visible and says so rather than being quietly dropped. */
-  /* Paynet has no checkout to come back from, so the page says what will
-     happen instead of pretending to wait for it. */
-  "wallet.paynetOpened": {
-    uz: "Paynet ochildi",
-    ru: "Paynet открыт",
-  },
-  "wallet.paynetOpenedHint": {
-    uz: "To'lovni Paynetda yakunlang. Mablag' tasdiqlangach balansga tushadi — darhol emas.",
-    ru: "Завершите оплату в Paynet. Средства поступят на баланс после подтверждения — не мгновенно.",
-  },
-  "wallet.paynetAccountHint": {
-    uz: "Terminalda shu hisob raqamini kiriting",
-    ru: "В терминале введите этот номер счёта",
-  },
-  "wallet.soon": { uz: "Tez orada", ru: "Скоро" },
-  /* The ledger, and one line of it in full — the app's transaction detail
-     screen, field for field. */
-  "wallet.transactions": { uz: "Tranzaksiyalar", ru: "История транзакций" },
-  "wallet.txDetailsTitle": {
-    uz: "Operatsiya tafsilotlari",
-    ru: "Детали операции",
-  },
-  "wallet.txLoadError": {
-    uz: "To'lov ma'lumotlarini yuklab bo'lmadi",
-    ru: "Не удалось загрузить данные платежа",
-  },
-  "wallet.sectionOperation": { uz: "Operatsiya", ru: "Операция" },
-  "wallet.sectionPayment": { uz: "To'lov", ru: "Платёж" },
-  "wallet.statusPaid": { uz: "To'langan", ru: "Оплачено" },
-  "wallet.statusPending": { uz: "Kutilmoqda", ru: "В обработке" },
-  "wallet.statusCancelled": { uz: "Bekor qilingan", ru: "Отменено" },
-  "wallet.statusCompleted": { uz: "Bajarildi", ru: "Выполнено" },
-  "wallet.fieldType": { uz: "Turi", ru: "Тип" },
-  "wallet.fieldDate": { uz: "Sana va vaqt", ru: "Дата и время" },
-  "wallet.fieldAmount": { uz: "Summa", ru: "Сумма" },
-  "wallet.fieldBonus": { uz: "Bonus", ru: "Бонус" },
-  "wallet.fieldBalanceAfter": {
-    uz: "Operatsiyadan keyingi balans",
-    ru: "Баланс после операции",
-  },
-  "wallet.fieldNote": { uz: "Izoh", ru: "Комментарий" },
-  "wallet.fieldProvider": { uz: "To'lov tizimi", ru: "Платёжная система" },
-  "wallet.fieldStatus": { uz: "Holati", ru: "Статус" },
-  "wallet.fieldOrderNo": { uz: "Buyurtma raqami", ru: "Номер заказа" },
-  "wallet.fieldProviderTxn": {
-    uz: "To'lov tizimidagi ID",
-    ru: "ID в платёжной системе",
-  },
-  "wallet.fieldPaymentId": { uz: "To'lov ID", ru: "ID платежа" },
-  "wallet.fieldTransactionId": { uz: "Operatsiya ID", ru: "ID операции" },
-  "wallet.fieldCreatedAt": { uz: "Yaratilgan", ru: "Создан" },
-  "wallet.fieldPaidAt": { uz: "To'langan vaqti", ru: "Оплачен" },
-  "wallet.fieldCancelledAt": { uz: "Bekor qilingan vaqti", ru: "Отменён" },
-  "wallet.fieldCancelReason": {
-    uz: "Bekor qilish sababi",
-    ru: "Причина отмены",
-  },
-  "wallet.fieldReceipt": { uz: "Fiskal chek", ru: "Фискальный чек" },
-  "wallet.receiptSent": { uz: "Yuborilgan", ru: "Отправлен" },
-  "wallet.receiptPending": { uz: "Yuborilmoqda", ru: "Отправляется" },
-  "wallet.receiptByProvider": {
-    uz: "To'lov tizimi yuboradi",
-    ru: "Отправляет платёжная система",
-  },
-  "wallet.receiptFailed": { uz: "Xatolik", ru: "Ошибка" },
-  "wallet.receiptNone": { uz: "Yo'q", ru: "Нет" },
-  "wallet.copied": { uz: "Nusxa olindi", ru: "Скопировано" },
-  "wallet.copy": { uz: "Nusxalash", ru: "Копировать" },
-  "wallet.openListing": { uz: "E'lonni ochish", ru: "Открыть объявление" },
-  /* Web-only: a phone has nowhere to put a file, a browser does. The whole
-     ledger as a spreadsheet — which is what somebody reconciling an
-     accounting entry actually wants. */
-  "wallet.download": { uz: "Yuklab olish (CSV)", ru: "Скачать (CSV)" },
-  "wallet.downloading": { uz: "Tayyorlanmoqda…", ru: "Готовим…" },
-  "wallet.loadMore": { uz: "Yana {{n}} ta", ru: "Ещё {{n}}" },
-  "wallet.refresh": { uz: "Yangilash", ru: "Обновить" },
-  "wallet.topupTx": { uz: "Hisobni to'ldirish", ru: "Пополнение баланса" },
-  "wallet.bonusTx": { uz: "To'ldirish bonusi", ru: "Бонус за пополнение" },
-  "wallet.listingPostTx": {
-    uz: "E'lon joylashtirish",
-    ru: "Публикация объявления",
-  },
-  "wallet.listingPromoteTx": {
-    uz: "E'lonni ko'tarish",
-    ru: "Продвижение объявления",
-  },
-  "wallet.videoPostTx": { uz: "Video joylashtirish", ru: "Публикация видео" },
-  "wallet.refundTx": { uz: "Mablag'ni qaytarish", ru: "Возврат средств" },
-  "wallet.adminAdjustTx": {
-    uz: "Admin tomonidan o'zgartirish",
-    ru: "Корректировка администратора",
-  },
-  "wallet.balanceAfter": { uz: "Qoldiq: {{amount}}", ru: "Остаток: {{amount}}" },
   "validation.range": {
     uz: "{{min}} dan {{max}} gacha bo'lsin",
     ru: "Должно быть от {{min}} до {{max}}",
   },
-  "wallet.currentBalance": { uz: "Joriy balans", ru: "Текущий баланс" },
-  "wallet.currentBalanceUsd": {
-    uz: "Joriy balans (USD)",
-    ru: "Текущий баланс (USD)",
-  },
-  "wallet.toUsd": { uz: "USD ga", ru: "В USD" },
-  "wallet.toUzs": { uz: "UZS ga", ru: "В UZS" },
-  "wallet.topup": { uz: "To'ldirish", ru: "Пополнить" },
-  "wallet.flipHint": {
-    uz: "Bosib almashtiring (USD / UZS)",
-    ru: "Нажмите для переключения (USD / UZS)",
-  },
-  "wallet.history": { uz: "Tarix", ru: "История" },
-  "wallet.empty": { uz: "Amaliyotlar yo'q", ru: "Операций нет" },
   "profile.linkMine": { uz: "E'lonlarim", ru: "Мои объявления" },
   "profile.linkSaved": { uz: "Saqlanganlar", ru: "Избранное" },
   "profile.linkWallet": { uz: "Hamyon", ru: "Кошелёк" },
@@ -253,7 +64,6 @@ const UI = {
     uz: "Hisobingiz ma'lumotlari va e'lonlaringiz.",
     ru: "Данные аккаунта и ваши объявления.",
   },
-  "profile.verified": { uz: "Tasdiqlangan rieltor", ru: "Проверенный риелтор" },
   "profile.noName": { uz: "Ism kiritilmagan", ru: "Имя не указано" },
   "profile.phone": { uz: "Telefon", ru: "Телефон" },
   /* The app's wording, with the month spelled out by the formatter — "since
@@ -352,97 +162,9 @@ const UI = {
   "completeProfile.fieldBio": { uz: "o'zingiz haqingizda", ru: "о себе" },
   "membership.member": { uz: "GrowenCity a'zosi", ru: "Участник GrowenCity" },
   "membership.guest": { uz: "Mehmon", ru: "Гость" },
-  /* ── Applying for the badge ──────────────────────────────────────────
-     Word for word from the app (mobile/app/verify-profile.tsx and its
-     locales): the same three photographs go to the same moderators, so a
-     person who started on the phone and finished here must not be told two
-     different things about what is wanted or what happens next. */
-  "verify.title": { uz: "Profilni tasdiqlash", ru: "Подтверждение профиля" },
-  "verify.heading": {
-    uz: "Shaxsingizni tasdiqlaymiz",
-    ru: "Подтвердим вашу личность",
-  },
-  "verify.intro": {
-    uz: "Ko'k belgi e'lonlaringiz va hikoyalaringiz yonida turadi. U xaridorga bitta narsani aytadi: ro'yxatdan o'tgan odam bilan gaplashyapsiz.",
-    ru: "Синий значок стоит рядом с вашими объявлениями и историями. Он говорит покупателю одно: перед ним реальный человек.",
-  },
-  "verify.passportFront": {
-    uz: "Pasportning asosiy sahifasi",
-    ru: "Главная страница паспорта",
-  },
-  "verify.passportBack": {
-    uz: "Pasportning orqa sahifasi",
-    ru: "Оборотная страница паспорта",
-  },
-  "verify.selfie": {
-    uz: "Pasport bilan birga selfi",
-    ru: "Селфи вместе с паспортом",
-  },
-  "verify.ruleLight": {
-    uz: "Hujjat to'liq kadrga sig'sin, raqamlari o'qilsin",
-    ru: "Документ целиком в кадре, цифры читаются",
-  },
-  "verify.ruleFace": {
-    uz: "Selfida yuzingiz ham, hujjat ham aniq ko'rinsin",
-    ru: "На селфи видно и лицо, и документ",
-  },
-  "verify.ruleBlurry": {
-    uz: "Xira, qorong'i yoki qirqilgan rasm qaytariladi",
-    ru: "Размытые, тёмные и обрезанные фото вернём",
-  },
-  "verify.privacy": {
-    uz: "Hujjatlaringizni faqat moderatorlar ko'radi, boshqa foydalanuvchilarga hech qachon ko'rsatilmaydi",
-    ru: "Ваши документы видят только модераторы и никогда — другие пользователи",
-  },
-  "verify.timeline": {
-    uz: "Odatda 1-3 ish kunida javob beramiz",
-    ru: "Обычно отвечаем за 1–3 рабочих дня",
-  },
-  "verify.submit": { uz: "Tekshiruvga yuborish", ru: "Отправить на проверку" },
-  "verify.sent": { uz: "Arizangiz qabul qilindi", ru: "Заявка принята" },
-  "verify.sentAt": { uz: "Yuborilgan:", ru: "Отправлено:" },
-  "verify.pendingTitle": { uz: "Tekshiruvda", ru: "На проверке" },
-  "verify.pendingBody": {
-    uz: "Moderator hujjatlaringizni ko'rib chiqmoqda. Javob shu yerda va Yordam markazida paydo bo'ladi.",
-    ru: "Модератор смотрит ваши документы. Ответ появится здесь и в Поддержке.",
-  },
-  "verify.verifiedTitle": {
-    uz: "Shaxsingiz tasdiqlandi",
-    ru: "Личность подтверждена",
-  },
-  "verify.verifiedBody": {
-    uz: "Ismingiz yonida endi ko'k belgi turadi — e'lonlaringiz va hikoyalaringizda ham ko'rinadi.",
-    ru: "Рядом с именем теперь синий значок — он виден и в объявлениях, и в историях.",
-  },
-  "verify.rejectedTitle": { uz: "Ariza qaytarildi", ru: "Заявка возвращена" },
-  "verify.rejectedBody": {
-    uz: "Moderator hujjatlarni qabul qilmadi.",
-    ru: "Модератор не принял документы.",
-  },
-  "verify.tryAgain": { uz: "Qaytadan yuborish", ru: "Отправить заново" },
-  /* Web-only: the app opens a photo library, a browser opens a file
-     dialog, and the picker is the one part of this that cannot be the
-     app's. */
-  "verify.pick": { uz: "Rasm tanlash", ru: "Выбрать фото" },
-  "verify.replace": { uz: "Almashtirish", ru: "Заменить" },
-  "verify.tooBig": {
-    uz: "Rasm 10 MB dan katta bo'lmasin",
-    ru: "Фото должно быть не больше 10 МБ",
-  },
-  "verify.needPhone": {
-    uz: "Avval telefon raqamingizni tasdiqlang — pasport shunga solishtiriladi.",
-    ru: "Сначала подтвердите номер телефона — паспорт сверяется с ним.",
-  },
-  "verify.badge": { uz: "Tasdiqlangan", ru: "Подтверждён" },
   "profile.links": { uz: "Bo'limlar", ru: "Разделы" },
-  "profile.onlyInApp": {
-    uz: "E'lonlarim, saqlanganlar va hamyon hozircha mobil ilovada.",
-    ru: "Мои объявления, избранное и кошелёк пока в мобильном приложении.",
-  },
   "nav.settings": { uz: "Sozlamalar", ru: "Настройки" },
   "theme.switch": { uz: "Mavzuni almashtirish", ru: "Сменить тему" },
-  "theme.toDark": { uz: "Tungi rejim", ru: "Тёмная тема" },
-  "theme.toLight": { uz: "Kunduzgi rejim", ru: "Светлая тема" },
   "view.grid": { uz: "Katak", ru: "Плитка" },
   "view.list": { uz: "Ro'yxat", ru: "Список" },
   "map.searchPlaceholder": { uz: "Tuman, bekat yoki manzil", ru: "Район, станция или адрес" },
@@ -491,116 +213,6 @@ const UI = {
   "filters.open": { uz: "Filtrlar", ru: "Фильтры" },
   "filters.sortBy": { uz: "Saralash", ru: "Сортировка" },
   "nav.language": { uz: "Til", ru: "Язык" },
-  "create.locationMode": { uz: "Joylashuv turi", ru: "Способ указания" },
-  "create.modePin": { uz: "Nuqta", ru: "Точка" },
-  "create.modePolygon": { uz: "Chegara", ru: "Контур" },
-  "create.pinSet": { uz: "Nuqta belgilandi — surib ko'chiring", ru: "Точка поставлена — перетащите" },
-  "create.drawHint": {
-    uz: "Chegarani chizish uchun xaritaga kamida 3 marta bosing",
-    ru: "Нажмите на карту минимум 3 раза, чтобы обвести контур",
-  },
-  "create.drawDone": { uz: "{{n}} nuqta — surib tuzating", ru: "{{n}} точек — перетащите, чтобы поправить" },
-  "create.undo": { uz: "Oxirgisi", ru: "Отменить" },
-  "create.clear": { uz: "Tozalash", ru: "Очистить" },
-  "create.measured": { uz: "Taxminan {{n}} m²", ru: "Примерно {{n}} м²" },
-  "create.needShape": {
-    uz: "Xaritada joyni belgilang",
-    ru: "Отметьте расположение на карте",
-  },
-  "create.needRing": {
-    uz: "Chegara kamida 3 nuqtadan iborat bo'lishi kerak",
-    ru: "Контур должен состоять минимум из 3 точек",
-  },
-  "create.sellerType": { uz: "Kim joylamoqda", ru: "Кто размещает" },
-  "create.buildingType": { uz: "Bino turi", ru: "Тип здания" },
-  "create.repairType": { uz: "Ta'mir", ru: "Ремонт" },
-  "create.properties": { uz: "Qulayliklar", ru: "Удобства" },
-  "create.areaHint": {
-    uz: "Chegaradan o'lchandi — o'zgartirishingiz mumkin",
-    ru: "Измерено по контуру — можно изменить",
-  },
-  "create.phPrice": { uz: "Masalan, 65 000", ru: "Например, 65 000" },
-  "create.phTitle": { uz: "3 xonali kvartira, Chilonzor", ru: "3-комнатная квартира, Чиланзар" },
-  "create.phAddress": { uz: "Tuman, ko'cha, uy", ru: "Район, улица, дом" },
-  "create.phArea": { uz: "Masalan, 80", ru: "Например, 80" },
-  "create.phRooms": { uz: "Masalan, 3", ru: "Например, 3" },
-  "create.phFloor": { uz: "Masalan, 4", ru: "Например, 4" },
-  "create.phTotalFloors": { uz: "Masalan, 9", ru: "Например, 9" },
-  "create.phDescription": {
-    uz: "Uy haqida qisqacha: holati, infratuzilma, nima yaqin…",
-    ru: "Коротко об объекте: состояние, инфраструктура, что рядом…",
-  },
-  "create.phPhone": { uz: "90 123 45 67", ru: "90 123 45 67" },
-  "create.hasFloors": { uz: "Qavatlari bor", ru: "Есть этажность" },
-  "create.noFloors": { uz: "Qavatlari yo'q", ru: "Без этажности" },
-  "create.floorsQuestion": { uz: "Qavatlar", ru: "Этажность" },
-  "create.yes": { uz: "Ha", ru: "Да" },
-  "create.no": { uz: "Yo'q", ru: "Нет" },
-  "create.locateMe": { uz: "Men qayerdaman", ru: "Где я" },
-  "create.titleHint": {
-    uz: "Bo'sh qoldirsangiz, turi va manzilidan tuziladi.",
-    ru: "Если оставить пустым, составим из типа и адреса.",
-  },
-  "create.cost": { uz: "Narxi", ru: "Стоимость" },
-  "create.free": { uz: "Bepul", ru: "Бесплатно" },
-  "create.firstFreeHint": {
-    uz: "Birinchi e'loningiz bepul — balansdan hech narsa yechilmaydi",
-    ru: "Первое объявление бесплатно — с баланса ничего не спишется",
-  },
-  "create.balance": { uz: "Balansingiz", ru: "Ваш баланс" },
-  // Veb'da to'ldirish yo'q (WalletPanel'ga qarang), shuning uchun bu yerda
-  // tugma emas — qayerda to'ldirish mumkinligi aytiladi.
-  "create.notEnough": {
-    uz: "Balans yetarli emas — mobil ilovada to'ldiring",
-    ru: "Недостаточно средств — пополните в мобильном приложении",
-  },
-  "create.title": { uz: "Yangi e'lon", ru: "Новое объявление" },
-  "create.lead": {
-    uz: "Asosiy ma'lumotlarni to'ldiring — keyin tahrirlashingiz mumkin.",
-    ru: "Заполните основное — потом можно отредактировать.",
-  },
-  "create.basics": { uz: "Asosiy", ru: "Основное" },
-  "create.photos": { uz: "Rasmlar", ru: "Фотографии" },
-  "create.location": { uz: "Joylashuv", ru: "Расположение" },
-  "create.details": { uz: "Qo'shimcha", ru: "Дополнительно" },
-  "create.contact": { uz: "Aloqa", ru: "Контакты" },
-  "create.pickPoint": {
-    uz: "Joyni belgilash uchun xaritaga bosing",
-    ru: "Нажмите на карту, чтобы отметить место",
-  },
-  "create.addPhotos": { uz: "Rasm qo'shish", ru: "Добавить фото" },
-  "create.photoHint": {
-    uz: "Birinchi rasm asosiy bo'ladi. 10 tagacha.",
-    ru: "Первое фото станет главным. До 10 штук.",
-  },
-  "create.remove": { uz: "O'chirish", ru: "Удалить" },
-  "create.titleField": { uz: "Sarlavha", ru: "Заголовок" },
-  "create.description": { uz: "Tavsif", ru: "Описание" },
-  "create.price": { uz: "Narx", ru: "Цена" },
-  "create.rooms": { uz: "Xonalar", ru: "Комнаты" },
-  "create.area": { uz: "Maydon, m²", ru: "Площадь, м²" },
-  "create.floor": { uz: "Qavat", ru: "Этаж" },
-  "create.totalFloors": { uz: "Jami qavat", ru: "Этажей всего" },
-  "create.address": { uz: "Manzil", ru: "Адрес" },
-  "create.phone": { uz: "Aloqa telefoni", ru: "Контактный телефон" },
-  "create.submit": { uz: "E'lonni joylash", ru: "Разместить объявление" },
-  "create.submitting": { uz: "Joylanmoqda…", ru: "Размещаем…" },
-  "create.needCategory": { uz: "Turini tanlang", ru: "Выберите тип" },
-  "create.needPrice": { uz: "Narxni kiriting", ru: "Укажите цену" },
-  "create.failed": {
-    uz: "E'lonni joylab bo'lmadi. Qayta urinib ko'ring.",
-    ru: "Не удалось разместить объявление. Попробуйте ещё раз.",
-  },
-  "create.uploadFailed": {
-    uz: "Ba'zi rasmlar yuklanmadi",
-    ru: "Некоторые фото не загрузились",
-  },
-  "create.uploading": { uz: "Rasmlar yuklanmoqda…", ru: "Загрузка фото…" },
-  "add.title": { uz: "E'lon joylash", ru: "Разместить объявление" },
-  "add.lead": {
-    uz: "E'lon joylash hozircha mobil ilovada: rasmlar, xaritada chegara chizish va narx takliflari o'sha yerda to'liq ishlaydi.",
-    ru: "Размещение объявлений пока доступно в мобильном приложении: фотографии, контур на карте и ценовые предложения работают там полностью.",
-  },
   "nav.post": { uz: "E'lon joylash", ru: "Разместить" },
 
   /* The bottom bar on a phone. Labels are taken verbatim from the app's own
@@ -682,120 +294,6 @@ const UI = {
   /* Web-only: the app pages by scrolling, a page with a footer pages by
      asking. The number is what is left, so the button says what it buys. */
   "activity.more": { uz: "Yana {{n}} ta", ru: "Ещё {{n}}" },
-  "notifications.title": { uz: "Bildirishnomalar", ru: "Уведомления" },
-  "notifications.empty": {
-    uz: "Hozircha bildirishnoma yo'q",
-    ru: "Уведомлений пока нет",
-  },
-  "notifications.emptyHint": {
-    uz: "Yangiliklar va javoblar shu yerda ko'rinadi.",
-    ru: "Новости и ответы появятся здесь.",
-  },
-  "notifications.videoReady": {
-    uz: "Videongiz joylashtirildi",
-    ru: "Ваше видео опубликовано",
-  },
-  "notifications.videoFailed": {
-    uz: "Video joylashtirilmadi",
-    ru: "Видео не опубликовано",
-  },
-  "notifications.videoAwaitingPayment": {
-    uz: "Video to'lov kutmoqda",
-    ru: "Видео ожидает оплаты",
-  },
-  "notifications.videoLike": {
-    uz: "videongizni yoqtirdi",
-    ru: "оценил ваше видео",
-  },
-  "notifications.videoComment": {
-    uz: "videongizga izoh qoldirdi",
-    ru: "прокомментировал ваше видео",
-  },
-  "notifications.commentReply": {
-    uz: "izohingizga javob berdi",
-    ru: "ответил на ваш комментарий",
-  },
-  "notifications.newFollower": {
-    uz: "sizga obuna bo'ldi",
-    ru: "подписался на вас",
-  },
-  "notifications.followedUserPosted": {
-    uz: "yangi video joyladi",
-    ru: "опубликовал новое видео",
-  },
-  "notifications.listingComment": {
-    uz: "e'loningizga izoh qoldirdi",
-    ru: "оставил комментарий к вашему объявлению",
-  },
-  "notifications.listingCommentReply": {
-    uz: "izohingizga javob berdi",
-    ru: "ответил на ваш комментарий",
-  },
-  "notifications.listingReview": {
-    uz: "e'loningizni baholadi",
-    ru: "оценил ваше объявление",
-  },
-  "notifications.priceBidReceived": {
-    uz: "e'loningizga narx taklif qildi",
-    ru: "предложил цену за ваше объявление",
-  },
-  "notifications.priceBidCountered": {
-    uz: "qarshi taklif yubordi",
-    ru: "отправил встречное предложение",
-  },
-  "notifications.priceBidAccepted": {
-    uz: "narx taklifingizni qabul qildi",
-    ru: "принял ваше предложение цены",
-  },
-  "notifications.priceBidDeclined": {
-    uz: "narx taklifingizni rad etdi",
-    ru: "отклонил ваше предложение цены",
-  },
-  "notifications.priceBidExpired": {
-    uz: "Narx taklifingiz muddati tugadi",
-    ru: "Срок вашего предложения цены истёк",
-  },
-  "notifications.chatMessage": {
-    uz: "sizga xabar yubordi",
-    ru: "отправил вам сообщение",
-  },
-  "notifications.topupSucceeded": {
-    uz: "Hisobingiz to'ldirildi",
-    ru: "Баланс пополнен",
-  },
-  "notifications.topupFailed": {
-    uz: "To'lov amalga oshmadi",
-    ru: "Платёж не прошёл",
-  },
-  "notifications.tariffPaid": {
-    uz: "Tarif uchun to'lov qabul qilindi",
-    ru: "Оплата тарифа принята",
-  },
-  "notifications.tariffExpiring": {
-    uz: "Tarifingiz tugayapti",
-    ru: "Срок тарифа заканчивается",
-  },
-  "bids.myTitle": { uz: "Narx takliflari", ru: "Предложения цены" },
-  "bids.myHint": {
-    uz: "Siz yuborgan va sizga kelgan takliflar",
-    ru: "Ваши предложения и предложения вам",
-  },
-  "bids.myEmpty": { uz: "Hali taklif yo'q", ru: "Предложений пока нет" },
-  "bids.myEmptyHint": {
-    uz: "E'londa «Narx taklif qilish» tugmasini bosib savdoni boshlang.",
-    ru: "Откройте объявление и нажмите «Предложить цену», чтобы начать торг.",
-  },
-  "bids.rowYou": { uz: "Siz taklif qildingiz", ru: "Ваше предложение" },
-  "bids.rowThem": { uz: "Sizga taklif qilindi", ru: "Предложение вам" },
-  "bids.statusPending": { uz: "Kutilmoqda", ru: "Ожидает ответа" },
-  "bids.statusAccepted": { uz: "Qabul qilindi", ru: "Принято" },
-  "bids.statusDeclined": { uz: "Rad etildi", ru: "Отклонено" },
-  "bids.statusCountered": {
-    uz: "Qarshi taklif berildi",
-    ru: "Отправлено встречное",
-  },
-  "bids.statusWithdrawn": { uz: "Qaytarib olindi", ru: "Отозвано" },
-  "bids.statusExpired": { uz: "Muddati tugadi", ru: "Срок истёк" },
   "blocks.title": {
     uz: "Bloklangan foydalanuvchilar",
     ru: "Заблокированные",
@@ -837,81 +335,6 @@ const UI = {
     uz: "Hisobingizga kirgan qurilmalar",
     ru: "Устройства, на которых выполнен вход",
   },
-  /* ── Deleting your account ───────────────────────────────────────────
-     A PAGE, not a dialog, and the app's reasoning holds here: both stores
-     require the path to exist and be reachable without support, and a
-     two-line confirm cannot say which records survive and which do not.
-     Strings are the app's own (mobile/app/delete-account.tsx). */
-  "deleteAccount.title": { uz: "Akkauntni o'chirish", ru: "Удаление аккаунта" },
-  "deleteAccount.intro": {
-    uz: "Bu amalni ortga qaytarib bo'lmaydi. O'chirilgan ma'lumotlar tiklanmaydi.",
-    ru: "Это действие необратимо. Удалённые данные восстановить невозможно.",
-  },
-  "deleteAccount.balanceWarning": {
-    uz: "Hamyoningizda {{balance}} bor. Akkaunt o'chirilgandan keyin bu mablag' qaytarilmaydi — avval sarflashni tavsiya qilamiz.",
-    ru: "На вашем кошельке {{balance}}. После удаления аккаунта эти средства не возвращаются — рекомендуем сначала их израсходовать.",
-  },
-  "deleteAccount.removedTitle": { uz: "Nima o'chiriladi", ru: "Что удаляется" },
-  "deleteAccount.goesProfile": {
-    uz: "Ismingiz, rasmingiz va profilingizdagi barcha ma'lumotlar",
-    ru: "Ваше имя, фотография и все данные профиля",
-  },
-  "deleteAccount.goesListings": {
-    uz: "Barcha e'lonlaringiz — ular xaritadan va qidiruvdan yo'qoladi",
-    ru: "Все ваши объявления — они исчезнут с карты и из поиска",
-  },
-  "deleteAccount.goesVideos": {
-    uz: "Yuklagan videolaringiz",
-    ru: "Загруженные вами видео",
-  },
-  "deleteAccount.goesContacts": {
-    uz: "Telefon raqamingiz va Telegram bog'lanishi",
-    ru: "Номер телефона и привязка к Telegram",
-  },
-  "deleteAccount.goesPush": {
-    uz: "Bildirishnomalar uchun qurilma ro'yxati",
-    ru: "Список устройств для уведомлений",
-  },
-  "deleteAccount.keptTitle": {
-    uz: "Nima saqlanib qoladi",
-    ru: "Что сохраняется",
-  },
-  "deleteAccount.staysMessages": {
-    uz: "Yozishmalaringiz suhbatdoshingizda qoladi, lekin sizning ismingiz ko'rinmaydi",
-    ru: "Переписка останется у собеседника, но ваше имя в ней отображаться не будет",
-  },
-  "deleteAccount.staysPayments": {
-    uz: "To'lov yozuvlari — qonun talabiga ko'ra, shaxsingizga bog'lanmagan holda",
-    ru: "Записи о платежах — по требованию закона, без привязки к вашей личности",
-  },
-  "deleteAccount.reasonTitle": {
-    uz: "Sabab (ixtiyoriy)",
-    ru: "Причина (необязательно)",
-  },
-  "deleteAccount.reasonPlaceholder": {
-    uz: "Nima uchun ketyapsiz? Bu bizga yordam beradi.",
-    ru: "Почему вы уходите? Это поможет нам стать лучше.",
-  },
-  "deleteAccount.action": { uz: "Akkauntni o'chirish", ru: "Удалить аккаунт" },
-  "deleteAccount.confirmTitle": {
-    uz: "Akkaunt o'chirilsinmi?",
-    ru: "Удалить аккаунт?",
-  },
-  "deleteAccount.confirmMessage": {
-    uz: "Bu amalni ortga qaytarib bo'lmaydi. Akkauntingiz va e'lonlaringiz darhol o'chiriladi.",
-    ru: "Это действие необратимо. Ваш аккаунт и объявления будут удалены немедленно.",
-  },
-  "deleteAccount.footnote": {
-    uz: "Savollar bo'lsa: +998 95 555 52 29 yoki agromind5229@gmail.com",
-    ru: "Вопросы: +998 95 555 52 29 или agromind5229@gmail.com",
-  },
-  /* The published policy, which is a different thing from the button: one
-     explains the process to anybody (a store reviewer included), the other
-     performs it for the person signed in. */
-  "deleteAccount.policy": {
-    uz: "O'chirish qoidalari",
-    ru: "Правила удаления",
-  },
   "settings.deletionHint": {
     uz: "Bu amalni ortga qaytarib bo'lmaydi. O'chirilgan ma'lumotlar tiklanmaydi.",
     ru: "Это действие необратимо. Удалённые данные восстановить невозможно.",
@@ -921,15 +344,11 @@ const UI = {
     uz: "Ko'rinish, valyuta va til shu brauzerda saqlanadi — ilovadagi sozlamalar alohida.",
     ru: "Тема, валюта и язык сохраняются в этом браузере — настройки в приложении отдельные.",
   },
-  "settings.inAppSection": { uz: "Mobil ilovada", ru: "В приложении" },
-  "settings.inApp": { uz: "Ilovada", ru: "В приложении" },
   /* NOT the same claim as "Ilovada", and the difference is the point:
      "in the app" says go and use it there, "soon" says it exists nowhere
      yet. Marking an unbuilt feature as app-only sends somebody to hunt
      through the app for a screen that is not in it. */
   "settings.soon": { uz: "Tez orada", ru: "Скоро" },
-  "settings.verification": { uz: "Tasdiqlash", ru: "Верификация" },
-  "settings.activity": { uz: "Faollik", ru: "Активность" },
   "settings.places": { uz: "Saqlangan joylar", ru: "Сохранённые места" },
   "deletion.howTitle": {
     uz: "Hisobni o'chirishning ikki yo'li",
@@ -968,8 +387,6 @@ const UI = {
     uz: "O'zbekistonda uy-joy sotib olish, sotish va ijaraga berish.",
     ru: "Покупка, продажа и аренда жилья в Узбекистане.",
   },
-  "home.download": { uz: "Ilovani yuklab olish", ru: "Скачать приложение" },
-  "home.legalTitle": { uz: "Hujjatlar", ru: "Документы" },
   "support.title": { uz: "Yordam", ru: "Поддержка" },
   "support.lead": {
     uz: "Savolingiz bo'lsa yoki muammoga duch kelsangiz, bizga yozing. Odatda bir ish kuni ichida javob beramiz.",
@@ -992,28 +409,22 @@ const UI = {
   "listing.rooms": { uz: "{{n}} xona", ru: "{{n}} комн." },
   "listing.untitled": { uz: "Nomsiz e'lon", ru: "Без названия" },
   "listing.sold": { uz: "Sotilgan", ru: "Продано" },
-  "listing.soldFor": { uz: "{{price}}ga sotilgan", ru: "Продано за {{price}}" },
   "home.searchAction": { uz: "Qidirish", ru: "Найти" },
   "home.search": { uz: "Qidirish", ru: "Поиск" },
   "home.searchPlaceholder": {
     uz: "Tuman, manzil yoki e'lon nomi",
     ru: "Район, адрес или название",
   },
-  "home.viewList": { uz: "Ro'yxat", ru: "Список" },
-  "home.viewGrid": { uz: "Katak", ru: "Плитка" },
-  "home.viewMap": { uz: "Xarita", ru: "Карта" },
   "home.purposeSale": { uz: "Sotuv", ru: "Продажа" },
   "home.purposeRent": { uz: "Ijara", ru: "Аренда" },
   "home.purposeDaily": { uz: "Kunlik", ru: "Посуточно" },
   "home.topTitle": { uz: "Tavsiya etilgan", ru: "Рекомендуемые" },
   "home.foundLabel": { uz: "e'lon topildi", ru: "объявлений найдено" },
-  "home.found": { uz: "{{n}} ta e'lon", ru: "{{n}} объявлений" },
   "home.empty": { uz: "E'lonlar topilmadi", ru: "Объявления не найдены" },
   "home.emptyHint": {
     uz: "Qidiruvni o'zgartirib ko'ring.",
     ru: "Попробуйте изменить запрос.",
   },
-  "home.mapLoading": { uz: "Xarita yuklanmoqda…", ru: "Карта загружается…" },
   "home.loadError": {
     uz: "E'lonlarni yuklab bo'lmadi",
     ru: "Не удалось загрузить объявления",
@@ -1060,93 +471,13 @@ const UI = {
     uz: "Bu foydalanuvchida hozircha faol e'lon yo'q.",
     ru: "У этого пользователя пока нет активных объявлений.",
   },
-  "reviews.title": { uz: "Sharhlar", ru: "Отзывы" },
-  "reviews.count": { uz: "{{count}} ta sharh", ru: "{{count}} отзывов" },
-  "reviews.you": { uz: "Siz", ru: "Вы" },
-  "reviews.edited": { uz: "tahrirlangan", ru: "изменён" },
-  "reviews.write": { uz: "Sharh qoldirish", ru: "Оставить отзыв" },
-  "reviews.editMine": { uz: "Sharhimni tahrirlash", ru: "Изменить мой отзыв" },
-  "reviews.writeSubtitle": {
-    uz: "Bahoyingiz boshqalarga tanlashda yordam beradi",
-    ru: "Ваша оценка поможет другим с выбором",
-  },
-  "reviews.tapToRate": {
-    uz: "Baholash uchun yulduzcha bosing",
-    ru: "Нажмите на звёзды, чтобы оценить",
-  },
-  "reviews.commentPlaceholder": {
-    uz: "Nima yoqdi yoki yoqmadi? (ixtiyoriy)",
-    ru: "Что понравилось или нет? (необязательно)",
-  },
-  "reviews.submit": { uz: "Yuborish", ru: "Отправить" },
-  "reviews.saveEdit": { uz: "Saqlash", ru: "Сохранить" },
-  "reviews.deleteTitle": { uz: "Sharh o'chirilsinmi?", ru: "Удалить отзыв?" },
-  "reviews.deleteMessage": {
-    uz: "Sharhingiz va bahoyingiz olib tashlanadi.",
-    ru: "Ваш отзыв и оценка будут удалены.",
-  },
-  "reviews.emptyTitle": { uz: "Hali sharhlar yo'q", ru: "Отзывов пока нет" },
-  "reviews.emptyHint": {
-    uz: "Birinchi bo'lib fikringizni qoldiring.",
-    ru: "Оставьте первый отзыв.",
-  },
-  "reviews.emptyOwner": {
-    uz: "E'loningiz haqida sharhlar shu yerda ko'rinadi.",
-    ru: "Отзывы о вашем объявлении появятся здесь.",
-  },
-  "reviews.barLabel": {
-    uz: "{{star}} yulduz: {{count}} ta",
-    ru: "{{star}} звёзд: {{count}}",
-  },
-  "reviews.ownListing": {
-    uz: "O'z e'loningizni baholay olmaysiz",
-    ru: "Нельзя оценивать собственное объявление",
-  },
-  "comments.title": { uz: "Izohlar", ru: "Комментарии" },
-  "comments.placeholder": {
-    uz: "Izoh yozing…",
-    ru: "Напишите комментарий…",
-  },
-  "comments.send": { uz: "Yuborish", ru: "Отправить" },
-  "comments.reply": { uz: "Javob berish", ru: "Ответить" },
-  "comments.replyingTo": {
-    uz: "{{name}} ga javob",
-    ru: "Ответ {{name}}",
-  },
-  "comments.edited": { uz: "tahrirlangan", ru: "изменён" },
-  "comments.like": { uz: "Yoqdi", ru: "Нравится" },
-  "comments.showReplies": {
-    uz: "Yana {{count}} ta javob",
-    ru: "Ещё {{count}} ответов",
-  },
-  "comments.edit": { uz: "Tahrirlash", ru: "Изменить" },
-  "comments.save": { uz: "Saqlash", ru: "Сохранить" },
-  "comments.deleteTitle": {
-    uz: "Izoh o'chirilsinmi?",
-    ru: "Удалить комментарий?",
-  },
-  "comments.deleteMessage": {
-    uz: "Izohingiz olib tashlanadi.",
-    ru: "Ваш комментарий будет удалён.",
-  },
-  "comments.deleteThreadMessage": {
-    uz: "Izoh va unga berilgan javoblar o'chiriladi.",
-    ru: "Комментарий и ответы на него будут удалены.",
-  },
-  "comments.emptyTitle": {
-    uz: "Hali izohlar yo'q",
-    ru: "Комментариев пока нет",
-  },
-  "comments.emptyHint": {
-    uz: "Birinchi bo'lib savol bering yoki fikr bildiring.",
-    ru: "Задайте первый вопрос или оставьте мнение.",
-  },
-  "comments.signInToPost": {
-    uz: "Izoh qoldirish uchun kiring",
-    ru: "Войдите, чтобы комментировать",
-  },
   "detail.share": { uz: "Ulashish", ru: "Поделиться" },
   "detail.linkCopied": { uz: "Havola nusxalandi", ru: "Ссылка скопирована" },
+  "detail.shareFailed": {
+    uz: "Havolani nusxalab bo'lmadi",
+    ru: "Не удалось скопировать ссылку",
+  },
+
   "report.action": { uz: "Shikoyat qilish", ru: "Пожаловаться" },
   "report.subtitle": {
     uz: "Nima uchun bu e'lon haqida xabar bermoqchisiz?",
@@ -1184,7 +515,6 @@ const UI = {
   "detail.showPhone": { uz: "Raqamni ko'rsatish", ru: "Показать номер" },
   "detail.phoneFailed": { uz: "Qayta urinish", ru: "Повторить" },
   "detail.seller": { uz: "Sotuvchi", ru: "Продавец" },
-  "detail.call": { uz: "Bog'lanish", ru: "Связаться" },
   "detail.verified": { uz: "Tasdiqlangan", ru: "Проверенный" },
   "detail.rooms": { uz: "Xonalar", ru: "Комнат" },
   "detail.area": { uz: "Maydon", ru: "Площадь" },
@@ -1201,37 +531,10 @@ const UI = {
     uz: "Bu e'lon arxivga olingan va qidiruvda ko'rinmaydi.",
     ru: "Это объявление в архиве и не отображается в поиске.",
   },
-  "detail.openInApp": { uz: "Ilovada ochish", ru: "Открыть в приложении" },
-  // ---- sessions
-  "sessions.title": { uz: "Faol seanslar", ru: "Активные сеансы" },
-  "sessions.lead": {
-    uz: "Hisobingizga kirilgan qurilmalar. Notanish qurilmani ko'rsangiz, uni yakunlang.",
-    ru: "Устройства, с которых выполнен вход. Если видите незнакомое — завершите сеанс.",
-  },
-  "sessions.thisDevice": { uz: "Shu qurilma", ru: "Это устройство" },
-  "sessions.otherDevice": { uz: "Boshqa qurilma", ru: "Другое устройство" },
-  "sessions.lastSeen": { uz: "Oxirgi faollik: {{when}}", ru: "Последняя активность: {{when}}" },
-  "sessions.end": { uz: "Yakunlash", ru: "Завершить" },
-  "sessions.current": { uz: "Shu qurilma", ru: "Это устройство" },
-  "sessions.started": { uz: "Kirilgan: {{when}}", ru: "Вход: {{when}}" },
-  "sessions.active": { uz: "{{n}} ta faol seans", ru: "Активных сеансов: {{n}}" },
-  "sessions.empty": { uz: "Faol seanslar yo'q", ru: "Нет активных сеансов" },
-  "sessions.endOthersTitle": {
-    uz: "Boshqa qurilmalardan chiqilsinmi?",
-    ru: "Выйти на других устройствах?",
-  },
-  "sessions.endOthersBody": {
-    uz: "Shu qurilmadan tashqari barcha seanslar yakunlanadi. Qaytadan kirish uchun SMS kod kerak bo'ladi.",
-    ru: "Все сеансы, кроме текущего, будут завершены. Для входа снова понадобится SMS-код.",
-  },
   "time.now": { uz: "hozir", ru: "только что" },
   "time.minutes": { uz: "{{n}} daqiqa oldin", ru: "{{n}} мин назад" },
   "time.hours": { uz: "{{n}} soat oldin", ru: "{{n}} ч назад" },
   "time.yesterday": { uz: "kecha", ru: "вчера" },
-  "sessions.endOthers": {
-    uz: "Boshqa barcha qurilmalardan chiqish",
-    ru: "Выйти на всех других устройствах",
-  },
   // ---- auth
   "auth.title": { uz: "Kirish", ru: "Вход" },
   "auth.lead": {
@@ -1265,7 +568,7 @@ const UI = {
   },
   "common.cancel": { uz: "Bekor qilish", ru: "Отмена" },
   "common.retry": { uz: "Qayta urinish", ru: "Повторить" },
-  "common.empty": { uz: "Hozircha bo'sh", ru: "Пока пусто" },
+  "common.loading": { uz: "Yuklanmoqda…", ru: "Загрузка…" },
   "auth.signOut": { uz: "Chiqish", ru: "Выйти" },
   "auth.signIn": { uz: "Kirish", ru: "Войти" },
   "auth.nameTitle": { uz: "Ismingiz", ru: "Ваше имя" },
@@ -1292,15 +595,6 @@ const UI = {
     uz: "Davom etish uchun shartlarga rozilik bildiring",
     ru: "Чтобы продолжить, примите условия",
   },
-  "auth.legalNote": {
-    uz: "Davom etish orqali siz quyidagilarga rozilik bildirasiz:",
-    ru: "Продолжая, вы соглашаетесь с",
-  },
-  "auth.and": { uz: "va", ru: "и" },
-  "auth.brandLead": {
-    uz: "Hisobingizga kiring yoki yangisini oching — telefon raqami yetarli.",
-    ru: "Войдите в аккаунт или создайте новый — достаточно номера телефона.",
-  },
   "auth.genericError": {
     uz: "Nimadir xato ketdi. Qaytadan urinib ko'ring.",
     ru: "Что-то пошло не так. Попробуйте ещё раз.",
@@ -1309,22 +603,18 @@ const UI = {
     uz: "Ma'lumotlaringiz haqidagi so'rovlar uchun:",
     ru: "По вопросам о ваших данных:",
   },
-} as const satisfies Record<string, Record<Lang, string>>;
+} as const satisfies Record<string, Entry>;
 
 export type UiKey = keyof typeof UI;
 
-export type TParams = Record<string, string | number>;
+export type { TParams };
 
 /**
  * `{{name}}` interpolation, same placeholder syntax the mobile app uses, so
  * a string can be copied between the two without rewriting it.
  */
 export function t(lang: Lang, key: UiKey, params?: TParams): string {
-  const template = UI[key][lang];
-  if (!params) return template;
-  return template.replace(/\{\{(\w+)\}\}/g, (match, name: string) =>
-    name in params ? String(params[name]) : match,
-  );
+  return fill(UI[key][lang], params);
 }
 
 /**

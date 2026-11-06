@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import { Field } from "@/src/components/ui/Field";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
+import { tCreate } from "@/src/i18n/strings/create";
 import { useSession } from "@/src/features/auth/session";
 import { amenityName, categoryName, type Amenity, type Category } from "./api";
 import type { Ring } from "./geo-ring";
@@ -175,16 +176,16 @@ export function CreateListingForm({
     e.preventDefault();
     setError(null);
 
-    if (!category) return setError(t(lang, "create.needCategory"));
+    if (!category) return setError(tCreate(lang, "create.needCategory"));
     const priceNum = num(price);
     if (priceNum === undefined || priceNum <= 0) {
-      return setError(t(lang, "create.needPrice"));
+      return setError(tCreate(lang, "create.needPrice"));
     }
     // A listing with no location is one nobody can find on the map, which
     // is most of how this site is browsed.
-    if (locMode === "PIN" && !point) return setError(t(lang, "create.needShape"));
+    if (locMode === "PIN" && !point) return setError(tCreate(lang, "create.needShape"));
     if (locMode === "POLYGON" && ring.length < 3) {
-      return setError(t(lang, "create.needRing"));
+      return setError(tCreate(lang, "create.needRing"));
     }
 
     try {
@@ -195,7 +196,7 @@ export function CreateListingForm({
         images = res.images;
         // A partial failure is reported but does not abort: losing one photo
         // is not a reason to throw away everything they typed.
-        if (res.failed.length) setError(t(lang, "create.uploadFailed"));
+        if (res.failed.length) setError(tCreate(lang, "create.uploadFailed"));
       }
 
       setBusy("create");
@@ -251,7 +252,7 @@ export function CreateListingForm({
       previews.forEach((u) => URL.revokeObjectURL(u));
       router.push(`/${lang}/listing/${listing.id}`);
     } catch {
-      setError(t(lang, "create.failed"));
+      setError(tCreate(lang, "create.failed"));
       setBusy(null);
     }
   };
@@ -265,7 +266,7 @@ export function CreateListingForm({
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-6">
-      <Section title={t(lang, "create.basics")}>
+      <Section title={tCreate(lang, "create.basics")}>
         <div className="grid grid-cols-3 gap-1 rounded-control bg-muted-bg p-1">
           {PURPOSES.map((p) => (
             <button
@@ -300,8 +301,8 @@ export function CreateListingForm({
         <div className="flex items-end gap-2">
           <div className="flex-1">
             <Field
-              label={t(lang, "create.price")}
-            placeholder={t(lang, "create.phPrice")}
+              label={tCreate(lang, "create.price")}
+            placeholder={tCreate(lang, "create.phPrice")}
               inputMode="numeric"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
@@ -328,15 +329,15 @@ export function CreateListingForm({
         </div>
 
         <Field
-          label={t(lang, "create.titleField")}
-            placeholder={t(lang, "create.phTitle")}
+          label={tCreate(lang, "create.titleField")}
+            placeholder={tCreate(lang, "create.phTitle")}
           value={title}
           maxLength={160}
           onChange={(e) => setTitle(e.target.value)}
         />
       </Section>
 
-      <Section title={t(lang, "create.photos")} note={t(lang, "create.photoHint")}>
+      <Section title={tCreate(lang, "create.photos")} note={tCreate(lang, "create.photoHint")}>
         <div className="flex flex-wrap gap-3">
           {previews.map((src, i) => (
             <div
@@ -350,7 +351,7 @@ export function CreateListingForm({
               <button
                 type="button"
                 onClick={() => removeFile(i)}
-                aria-label={t(lang, "create.remove")}
+                aria-label={tCreate(lang, "create.remove")}
                 className="absolute end-1 top-1 grid size-6 place-items-center rounded-full bg-black/60 text-white"
               >
                 ✕
@@ -369,7 +370,7 @@ export function CreateListingForm({
               onClick={() => fileInput.current?.click()}
               className="grid size-24 place-items-center rounded-control bg-raised text-[13px] font-semibold text-muted ring-1 ring-dashed ring-line-strong transition hover:text-ink"
             >
-              + {t(lang, "create.addPhotos")}
+              + {tCreate(lang, "create.addPhotos")}
             </button>
           ) : null}
         </div>
@@ -388,10 +389,10 @@ export function CreateListingForm({
         />
       </Section>
 
-      <Section title={t(lang, "create.location")}>
+      <Section title={tCreate(lang, "create.location")}>
         <Field
-          label={t(lang, "create.address")}
-            placeholder={t(lang, "create.phAddress")}
+          label={tCreate(lang, "create.address")}
+            placeholder={tCreate(lang, "create.phAddress")}
           value={address}
           onChange={(e) => setAddress(e.target.value)}
         />
@@ -409,7 +410,7 @@ export function CreateListingForm({
                   : "text-muted hover:text-ink"
               }`}
             >
-              {t(lang, m === "PIN" ? "create.modePin" : "create.modePolygon")}
+              {tCreate(lang, m === "PIN" ? "create.modePin" : "create.modePolygon")}
             </button>
           ))}
         </div>
@@ -424,11 +425,11 @@ export function CreateListingForm({
         />
       </Section>
 
-      <Section title={t(lang, "create.details")}>
+      <Section title={tCreate(lang, "create.details")}>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field
-            label={t(lang, "create.area")}
-            placeholder={t(lang, "create.phArea")}
+            label={tCreate(lang, "create.area")}
+            placeholder={tCreate(lang, "create.phArea")}
             inputMode="numeric"
             value={areaValue}
             onChange={(e) => setArea(e.target.value)}
@@ -437,14 +438,14 @@ export function CreateListingForm({
           <div className="flex items-end pb-3">
             {measured && !area ? (
               <p className="text-[13px] text-faint">
-                {t(lang, "create.areaHint")}
+                {tCreate(lang, "create.areaHint")}
               </p>
             ) : null}
           </div>
         </div>
 
         <EnumRow
-          label={t(lang, "create.sellerType")}
+          label={tCreate(lang, "create.sellerType")}
           options={SELLER_TYPES}
           kind="seller"
           value={sellerType}
@@ -453,7 +454,7 @@ export function CreateListingForm({
         />
         {showBuildingType ? (
           <EnumRow
-            label={t(lang, "create.buildingType")}
+            label={tCreate(lang, "create.buildingType")}
             options={BUILDING_TYPES}
             kind="building"
             value={buildingType}
@@ -463,7 +464,7 @@ export function CreateListingForm({
         ) : null}
         {showRepairType ? (
           <EnumRow
-            label={t(lang, "create.repairType")}
+            label={tCreate(lang, "create.repairType")}
             options={REPAIR_TYPES}
             kind="repair"
             value={repairType}
@@ -475,7 +476,7 @@ export function CreateListingForm({
         {amenities.length ? (
           <div className="flex flex-col gap-2">
             <span className="text-[13px] font-semibold text-muted">
-              {t(lang, "create.properties")}
+              {tCreate(lang, "create.properties")}
             </span>
             <div className="flex flex-wrap gap-2">
               {amenities.map((a) => {
@@ -505,7 +506,7 @@ export function CreateListingForm({
         {showFloors ? (
           <div className="flex flex-col gap-2">
             <span className="text-[13px] font-semibold text-muted">
-              {t(lang, "create.floorsQuestion")}
+              {tCreate(lang, "create.floorsQuestion")}
             </span>
             <div className="flex gap-2">
               {[true, false].map((yes) => (
@@ -516,7 +517,7 @@ export function CreateListingForm({
                   onClick={() => setHasFloors(yes)}
                   className={chip(hasFloors === yes)}
                 >
-                  {t(lang, yes ? "create.hasFloors" : "create.noFloors")}
+                  {tCreate(lang, yes ? "create.hasFloors" : "create.noFloors")}
                 </button>
               ))}
             </div>
@@ -527,8 +528,8 @@ export function CreateListingForm({
           className={`grid gap-3 ${sendFloors ? "sm:grid-cols-3" : "sm:grid-cols-1"}`}
         >
           <Field
-            label={t(lang, "create.rooms")}
-            placeholder={t(lang, "create.phRooms")}
+            label={tCreate(lang, "create.rooms")}
+            placeholder={tCreate(lang, "create.phRooms")}
             inputMode="numeric"
             value={rooms}
             onChange={(e) => setRooms(e.target.value)}
@@ -539,16 +540,16 @@ export function CreateListingForm({
           {sendFloors ? (
             <>
               <Field
-                label={t(lang, "create.floor")}
-                placeholder={t(lang, "create.phFloor")}
+                label={tCreate(lang, "create.floor")}
+                placeholder={tCreate(lang, "create.phFloor")}
                 inputMode="numeric"
                 value={floor}
                 onChange={(e) => setFloor(e.target.value)}
                 className="nums"
               />
               <Field
-                label={t(lang, "create.totalFloors")}
-                placeholder={t(lang, "create.phTotalFloors")}
+                label={tCreate(lang, "create.totalFloors")}
+                placeholder={tCreate(lang, "create.phTotalFloors")}
                 inputMode="numeric"
                 value={totalFloors}
                 onChange={(e) => setTotalFloors(e.target.value)}
@@ -560,10 +561,10 @@ export function CreateListingForm({
 
         <label className="flex flex-col gap-1.5">
           <span className="text-[13px] font-semibold text-muted">
-            {t(lang, "create.description")}
+            {tCreate(lang, "create.description")}
           </span>
           <textarea
-            placeholder={t(lang, "create.phDescription")}
+            placeholder={tCreate(lang, "create.phDescription")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={5}
@@ -572,13 +573,13 @@ export function CreateListingForm({
         </label>
       </Section>
 
-      <Section title={t(lang, "create.contact")}>
+      <Section title={tCreate(lang, "create.contact")}>
         <Field
-          label={t(lang, "create.phone")}
+          label={tCreate(lang, "create.phone")}
           prefix="+998"
           inputMode="tel"
           maxLength={9}
-          placeholder={t(lang, "create.phPhone")}
+          placeholder={tCreate(lang, "create.phPhone")}
           value={phone}
           onChange={(e) =>
             setPhone(e.target.value.replace(/\D/g, "").slice(0, 9))
@@ -604,10 +605,10 @@ export function CreateListingForm({
         className="h-13 rounded-control bg-brand px-5 py-4 text-[15px] font-bold text-brand-ink transition hover:bg-brand-hover disabled:opacity-60"
       >
         {busy === "upload"
-          ? t(lang, "create.uploading")
+          ? tCreate(lang, "create.uploading")
           : busy === "create"
-            ? t(lang, "create.submitting")
-            : t(lang, "create.submit")}
+            ? tCreate(lang, "create.submitting")
+            : tCreate(lang, "create.submit")}
       </button>
     </form>
   );

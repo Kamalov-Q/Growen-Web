@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Lang } from "@/src/i18n/config";
-import { t } from "@/src/i18n/dictionary";
 import { resolveMediaUrl } from "@/src/lib/media";
 import { absoluteTime, relativeTime } from "@/src/lib/time";
 import type { ActivityListing } from "./api";
+import { tLabel } from "./labels";
 
 /**
  * One row of "your activity": the listing it happened on, and what you did
@@ -61,7 +61,7 @@ export function ActivityRow({
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="flex items-center gap-1.5">
           <span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-ink">
-            {listing?.title ?? t(lang, "listing.untitled")}
+            {listing?.title ?? tLabel(lang, "listing.untitled")}
           </span>
           {badge === "like" ? <Heart /> : null}
           {badge === "reply" ? <Reply /> : null}
@@ -75,7 +75,7 @@ export function ActivityRow({
           </span>
         ) : imageThumbUrl ? (
           <span className="text-[14px] italic text-muted">
-            {t(lang, "activity.photoOnly")}
+            {tLabel(lang, "activity.photoOnly")}
           </span>
         ) : null}
 

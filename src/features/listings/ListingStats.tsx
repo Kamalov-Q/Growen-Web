@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
-import { getListingsSocket, watchListing, type ListingStats as Stats } from "@/src/lib/listings-socket";
+import type { ListingStats as Stats } from "@/src/lib/listings-socket";
 import { absoluteDate } from "@/src/lib/time";
 import { recordView } from "./social-api";
 
@@ -29,6 +29,21 @@ import { recordView } from "./social-api";
  *
  * The initial values come from the SERVER render, so the row is correct in
  * the HTML a crawler reads and never flashes zero on the way to the truth.
+ *
+ * ── The socket is imported inside the effect, not at the top ─────────────
+ *
+ * socket.io is 13 KB gzipped and this was the only static import of it on
+ * the listing page, so it sat in the first load — downloaded, parsed and
+ * executed before anything could become interactive, in aid of a number
+ * that is ALREADY CORRECT in the HTML. Nobody is waiting on it: the counts
+ * are server-rendered, and the only thing the socket adds is that they keep
+ * moving afterwards.
+ *
+ * So it is fetched after mount. `import type` above is erased at compile
+ * time and pulls nothing in; the real import is the `await` below. The
+ * `alive` flag is what makes this safe — an effect that is torn down before
+ * the chunk lands must not then go and subscribe, which is the classic way
+ * this pattern leaks a listener on every navigation.
  */
 export function ListingStats({
   lang,
@@ -52,12 +67,13 @@ export function ListingStats({
 
   useEffect(() => {
     let alive = true;
+    /** Set once the socket is up; undefined if it never got that far. */
+    let detach: (() => void) | undefined;
 
     recordView(listingId)
       .then((res) => alive && setViews(res.viewCount))
       .catch(() => {});
 
-    const socket = getListingsSocket();
     const onStats = ({ listingId: id, ...patch }: Stats) => {
       if (!alive || id !== listingId) return;
       // A broadcast says only what changed, so each field is applied only
@@ -67,13 +83,28 @@ export function ListingStats({
       if (patch.commentCount !== undefined) setComments(patch.commentCount);
     };
 
-    socket.on("listing:stats", onStats);
-    const unwatch = watchListing(listingId);
+    void import("@/src/lib/listings-socket")
+      .then(({ getListingsSocket, watchListing }) => {
+        // Left this page while the chunk was in flight. Subscribing now
+        // would attach a listener nothing will ever remove.
+        if (!alive) return;
+
+        const socket = getListingsSocket();
+        socket.on("listing:stats", onStats);
+        const unwatch = watchListing(listingId);
+
+        detach = () => {
+          socket.off("listing:stats", onStats);
+          unwatch();
+        };
+      })
+      // A listing whose counts do not tick is a listing; a page that
+      // throws because a chunk would not load is not.
+      .catch(() => {});
 
     return () => {
       alive = false;
-      socket.off("listing:stats", onStats);
-      unwatch();
+      detach?.();
     };
   }, [listingId]);
 
@@ -113,9 +144,7 @@ export function ListingStats({
       {/* Said once, for the two numbers that are not self-evident as
           icons. Visible only to a screen reader — the glyphs carry it for
           everybody else. */}
-      <span className="sr-only">
-        {t(lang, "detail.views", { n: views })}
-      </span>
+      <span className="sr-only">{t(lang, "detail.views", { n: views })}</span>
     </div>
   );
 }

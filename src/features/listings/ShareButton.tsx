@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
+import { toast } from "@/src/components/ui/Toast";
 
 /**
  * Share this listing.
@@ -45,6 +46,8 @@ export function ShareButton({
     if (navigator.share) {
       try {
         await navigator.share({ title: text, text, url });
+        // No toast here: the system sheet already showed itself, and
+        // confirming a thing the OS just confirmed is noise.
         return;
       } catch {
         // Cancelled, or the sheet refused: fall through to the clipboard
@@ -56,9 +59,16 @@ export function ShareButton({
       await navigator.clipboard.writeText(url);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      /* The toast is what a copy needs that the tick cannot give: the
+         button is 28px in a row of counters, and a glyph swapping itself
+         out is easy to press and miss. The tick stays for the moment the
+         eye IS on the button. */
+      toast(t(lang, "detail.linkCopied"));
     } catch {
-      // No clipboard either (an http:// origin, or a denied permission).
-      // Nothing to do, and nothing worth saying about it.
+      // No clipboard: an http:// origin, or a denied permission. Said out
+      // loud now, because a press that does nothing at all reads as a
+      // broken button rather than as a browser restriction.
+      toast(t(lang, "detail.shareFailed"));
     }
   }
 

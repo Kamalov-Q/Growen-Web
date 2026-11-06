@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
-import { t, type UiKey } from "@/src/i18n/dictionary";
 import { Avatar } from "@/src/components/ui/Avatar";
 import { ConfirmDialog } from "@/src/components/ui/ConfirmDialog";
 import { groupDigits } from "@/src/features/listings/format";
@@ -25,6 +24,7 @@ import {
   type BlockedPerson,
   type MyPriceBid,
 } from "./api";
+import { tLabel, type ActivityKey } from "./labels";
 
 /**
  * The six lists behind "my activity", each one thin because `ActivityList`
@@ -45,7 +45,9 @@ export function MyCommentsPanel({ lang }: { lang: Lang }) {
       keyOf={(c) => c.id}
       emptyTitle="activity.commentsEmpty"
       emptyHint="activity.commentsEmptyHint"
-      icon={<Glyph d="M20.5 11.6a7.9 7.9 0 0 1-8.5 7.9 9 9 0 0 1-2.6-.4L4.2 21l1.4-4.2a7.4 7.4 0 0 1-1.6-4.6 7.9 7.9 0 0 1 8.5-7.7 7.9 7.9 0 0 1 8 7.1Z" />}
+      icon={
+        <Glyph d="M20.5 11.6a7.9 7.9 0 0 1-8.5 7.9 9 9 0 0 1-2.6-.4L4.2 21l1.4-4.2a7.4 7.4 0 0 1-1.6-4.6 7.9 7.9 0 0 1 8.5-7.7 7.9 7.9 0 0 1 8 7.1Z" />
+      }
       render={(c) => (
         <ActivityRow
           lang={lang}
@@ -70,7 +72,9 @@ export function MyLikesPanel({ lang }: { lang: Lang }) {
       keyOf={(c) => c.id}
       emptyTitle="activity.likesEmpty"
       emptyHint="activity.likesEmptyHint"
-      icon={<Glyph d="M12 20.3 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13Z" />}
+      icon={
+        <Glyph d="M12 20.3 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13Z" />
+      }
       render={(c) => (
         <ActivityRow
           lang={lang}
@@ -93,7 +97,9 @@ export function MyReviewsPanel({ lang }: { lang: Lang }) {
       keyOf={(r) => r.id}
       emptyTitle="activity.reviewsEmpty"
       emptyHint="activity.reviewsEmptyHint"
-      icon={<Glyph d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.6 9.7l5.8-.8z" />}
+      icon={
+        <Glyph d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.6 9.7l5.8-.8z" />
+      }
       render={(r) => (
         <ActivityRow
           lang={lang}
@@ -109,7 +115,7 @@ export function MyReviewsPanel({ lang }: { lang: Lang }) {
 
 // ---- price offers ---------------------------------------------------------
 
-const BID_STATUS: Record<MyPriceBid["status"], UiKey> = {
+const BID_STATUS: Record<MyPriceBid["status"], ActivityKey> = {
   PENDING: "bids.statusPending",
   ACCEPTED: "bids.statusAccepted",
   DECLINED: "bids.statusDeclined",
@@ -155,7 +161,7 @@ function BidRow({ lang, bid }: { lang: Lang; bid: MyPriceBid }) {
     <>
       <span className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="truncate text-[15px] font-semibold text-ink">
-          {bid.listing?.title ?? t(lang, "listing.untitled")}
+          {bid.listing?.title ?? tLabel(lang, "listing.untitled")}
         </span>
         <span className="flex flex-wrap items-baseline gap-x-2">
           <span className="nums text-[17px] font-bold text-ink">{money}</span>
@@ -170,7 +176,10 @@ function BidRow({ lang, bid }: { lang: Lang; bid: MyPriceBid }) {
           className="text-[12px] text-faint"
           title={absoluteTime(new Date(bid.createdAt))}
         >
-          {t(lang, bid.direction === "BUYER" ? "bids.rowYou" : "bids.rowThem")}
+          {tLabel(
+            lang,
+            bid.direction === "BUYER" ? "bids.rowYou" : "bids.rowThem",
+          )}
           {" · "}
           {relativeTime(bid.createdAt, lang)}
         </span>
@@ -179,7 +188,7 @@ function BidRow({ lang, bid }: { lang: Lang; bid: MyPriceBid }) {
       <span
         className={`shrink-0 rounded-full px-2.5 py-1 text-[12px] font-semibold ring-1 ${tone}`}
       >
-        {t(lang, BID_STATUS[bid.status])}
+        {tLabel(lang, BID_STATUS[bid.status])}
       </span>
     </>
   );
@@ -208,7 +217,7 @@ function BidRow({ lang, bid }: { lang: Lang; bid: MyPriceBid }) {
  * predicate: "Bek · sizning videongizni yoqtirdi". The ones with no actor —
  * a payment, a video finishing — are whole sentences.
  */
-const NOTIFICATION_TEXT: Record<string, UiKey> = {
+const NOTIFICATION_TEXT: Record<string, ActivityKey> = {
   VIDEO_READY: "notifications.videoReady",
   VIDEO_FAILED: "notifications.videoFailed",
   VIDEO_AWAITING_PAYMENT: "notifications.videoAwaitingPayment",
@@ -258,7 +267,9 @@ export function NotificationsPanel({ lang }: { lang: Lang }) {
       keyOf={(n) => n.id}
       emptyTitle="notifications.empty"
       emptyHint="notifications.emptyHint"
-      icon={<Glyph d="M6 9.5a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 13.5 6 9.5ZM10 19a2 2 0 0 0 4 0" />}
+      icon={
+        <Glyph d="M6 9.5a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 13.5 6 9.5ZM10 19a2 2 0 0 0 4 0" />
+      }
       render={(n) => (
         <NotificationRow lang={lang} notification={n} readAll={marked} />
       )}
@@ -298,7 +309,7 @@ function NotificationRow({
           {actorName ? (
             <span className="font-semibold">{actorName} </span>
           ) : null}
-          {key ? t(lang, key) : n.type}
+          {key ? tLabel(lang, key) : n.type}
         </span>
         <span
           className="text-[12px] text-faint"
@@ -320,7 +331,10 @@ function NotificationRow({
       ) : null}
 
       {unread ? (
-        <span aria-hidden className="mt-1.5 size-2 shrink-0 rounded-full bg-brand" />
+        <span
+          aria-hidden
+          className="mt-1.5 size-2 shrink-0 rounded-full bg-brand"
+        />
       ) : null}
     </>
   );
@@ -376,7 +390,7 @@ export function BlockedPanel({ lang }: { lang: Lang }) {
         role="alert"
         className="rounded-card bg-surface p-6 text-[15px] text-danger ring-1 ring-line"
       >
-        {t(lang, "home.loadError")}
+        {tLabel(lang, "home.loadError")}
       </p>
     );
   }
@@ -397,10 +411,10 @@ export function BlockedPanel({ lang }: { lang: Lang }) {
           <Glyph d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm-6.4 2.6 12.8 12.8" />
         </span>
         <p className="text-[16px] font-semibold text-ink">
-          {t(lang, "blocks.emptyTitle")}
+          {tLabel(lang, "blocks.emptyTitle")}
         </p>
         <p className="max-w-prose text-[14px] leading-6 text-muted">
-          {t(lang, "blocks.emptyHint")}
+          {tLabel(lang, "blocks.emptyHint")}
         </p>
       </div>
     );
@@ -420,7 +434,7 @@ export function BlockedPanel({ lang }: { lang: Lang }) {
             <Avatar uri={person.avatarThumbUrl} name={name} size={40} />
             <span className="flex min-w-0 flex-1 flex-col">
               <span className="truncate text-[15px] font-semibold text-ink">
-                {name ?? t(lang, "profile.noName")}
+                {name ?? tLabel(lang, "profile.noName")}
               </span>
               <span
                 className="text-[12px] text-faint"
@@ -435,7 +449,7 @@ export function BlockedPanel({ lang }: { lang: Lang }) {
               onClick={() => setConfirming(person)}
               className="shrink-0 rounded-control px-3 py-2 text-[13px] font-bold text-brand ring-1 ring-brand-line transition hover:bg-brand-soft disabled:opacity-50"
             >
-              {t(lang, "blocks.unblock")}
+              {tLabel(lang, "blocks.unblock")}
             </button>
           </div>
         );
@@ -443,10 +457,10 @@ export function BlockedPanel({ lang }: { lang: Lang }) {
 
       <ConfirmDialog
         open={confirming !== null}
-        title={t(lang, "blocks.unblock")}
-        body={t(lang, "blocks.unblockConfirm")}
-        confirmLabel={t(lang, "blocks.unblock")}
-        cancelLabel={t(lang, "common.cancel")}
+        title={tLabel(lang, "blocks.unblock")}
+        body={tLabel(lang, "blocks.unblockConfirm")}
+        confirmLabel={tLabel(lang, "blocks.unblock")}
+        cancelLabel={tLabel(lang, "common.cancel")}
         onConfirm={() => confirming && void remove(confirming)}
         onCancel={() => setConfirming(null)}
       />

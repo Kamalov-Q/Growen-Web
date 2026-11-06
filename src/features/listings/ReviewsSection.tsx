@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
+import { tReviews } from "@/src/i18n/strings/reviews";
 import { Avatar } from "@/src/components/ui/Avatar";
 import { ConfirmDialog } from "@/src/components/ui/ConfirmDialog";
 import { useSession } from "@/src/features/auth/session";
@@ -89,7 +90,7 @@ export function ReviewsSection({
     <section className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 text-[1.05rem] font-semibold tracking-tight text-ink">
-          {t(lang, "reviews.title")}
+          {tReviews(lang, "reviews.title")}
           {page?.count ? (
             <span className="nums rounded-full bg-muted-bg px-2 py-0.5 text-[12px] font-semibold text-muted">
               {page.count}
@@ -105,14 +106,14 @@ export function ReviewsSection({
             onClick={() => setOpen((v) => !v)}
             className="rounded-control px-3.5 py-2 text-[13px] font-bold text-brand ring-1 ring-brand-line transition hover:bg-brand-soft"
           >
-            {t(lang, mine ? "reviews.editMine" : "reviews.write")}
+            {tReviews(lang, mine ? "reviews.editMine" : "reviews.write")}
           </button>
         ) : (
           <Link
             href={`/${lang}/login?next=${encodeURIComponent(`/${lang}/listing/${listingId}`)}`}
             className="rounded-control px-3.5 py-2 text-[13px] font-bold text-brand ring-1 ring-brand-line transition hover:bg-brand-soft"
           >
-            {t(lang, "reviews.write")}
+            {tReviews(lang, "reviews.write")}
           </Link>
         )}
       </div>
@@ -152,10 +153,10 @@ export function ReviewsSection({
           ) : (
             <div className="py-6 text-center">
               <p className="text-[15px] font-semibold text-ink">
-                {t(lang, "reviews.emptyTitle")}
+                {tReviews(lang, "reviews.emptyTitle")}
               </p>
               <p className="mt-1 text-[14px] text-muted">
-                {t(lang, own ? "reviews.emptyOwner" : "reviews.emptyHint")}
+                {tReviews(lang, own ? "reviews.emptyOwner" : "reviews.emptyHint")}
               </p>
             </div>
           )}
@@ -166,8 +167,8 @@ export function ReviewsSection({
 
       <ConfirmDialog
         open={confirming}
-        title={t(lang, "reviews.deleteTitle")}
-        body={t(lang, "reviews.deleteMessage")}
+        title={tReviews(lang, "reviews.deleteTitle")}
+        body={tReviews(lang, "reviews.deleteMessage")}
         confirmLabel={t(lang, "common.delete")}
         cancelLabel={t(lang, "common.cancel")}
         danger
@@ -189,7 +190,7 @@ function Summary({ lang, page }: { lang: Lang; page: ReviewsPage }) {
         </span>
         <Stars value={page.average} size={16} />
         <span className="nums text-[12px] text-faint">
-          {t(lang, "reviews.count", { count: page.count })}
+          {tReviews(lang, "reviews.count", { count: page.count })}
         </span>
       </div>
 
@@ -200,7 +201,7 @@ function Summary({ lang, page }: { lang: Lang; page: ReviewsPage }) {
             <div
               key={star}
               className="flex items-center gap-2"
-              aria-label={t(lang, "reviews.barLabel", { star, count: n })}
+              aria-label={tReviews(lang, "reviews.barLabel", { star, count: n })}
             >
               <span className="nums w-3 text-[12px] text-faint">{star}</span>
               <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted-bg">
@@ -252,7 +253,7 @@ function ReviewForm({
       setError(
         err instanceof ApiError
           ? err.code === "OWN_LISTING"
-            ? t(lang, "reviews.ownListing")
+            ? tReviews(lang, "reviews.ownListing")
             : err.message
           : t(lang, "auth.genericError"),
       );
@@ -264,7 +265,7 @@ function ReviewForm({
   return (
     <div className="flex flex-col gap-3 rounded-card bg-raised p-4">
       <p className="text-[14px] text-muted">
-        {t(lang, "reviews.writeSubtitle")}
+        {tReviews(lang, "reviews.writeSubtitle")}
       </p>
 
       <div className="flex items-center gap-1" role="radiogroup">
@@ -283,7 +284,7 @@ function ReviewForm({
         ))}
         {!rating ? (
           <span className="ms-2 text-[13px] text-faint">
-            {t(lang, "reviews.tapToRate")}
+            {tReviews(lang, "reviews.tapToRate")}
           </span>
         ) : null}
       </div>
@@ -292,7 +293,7 @@ function ReviewForm({
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder={t(lang, "reviews.commentPlaceholder")}
+          placeholder={tReviews(lang, "reviews.commentPlaceholder")}
           rows={3}
           maxLength={1000}
           className="w-full resize-y bg-transparent py-3 text-[15px] leading-6 text-ink outline-none placeholder:text-faint"
@@ -312,7 +313,7 @@ function ReviewForm({
           disabled={!rating || busy}
           className="rounded-control bg-brand px-4 py-2.5 text-[14px] font-bold text-brand-ink transition hover:bg-brand-hover disabled:opacity-50"
         >
-          {t(lang, mine ? "reviews.saveEdit" : "reviews.submit")}
+          {tReviews(lang, mine ? "reviews.saveEdit" : "reviews.submit")}
         </button>
         {mine ? (
           <button
@@ -347,7 +348,7 @@ function Row({
      behind it is a detour to a page you already have in the menu. */
   const title = isMine ? (
     <span className="text-[14px] font-semibold text-ink">
-      {t(lang, "reviews.you")}
+      {tReviews(lang, "reviews.you")}
     </span>
   ) : (
     <Link
@@ -379,7 +380,7 @@ function Row({
           </span>
           {review.updatedAt !== review.createdAt ? (
             <span className="rounded-full bg-muted-bg px-1.5 py-0.5 text-[11px] font-medium text-faint">
-              {t(lang, "reviews.edited")}
+              {tReviews(lang, "reviews.edited")}
             </span>
           ) : null}
         </div>

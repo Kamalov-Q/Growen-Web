@@ -1,4 +1,4 @@
-import type { UiKey } from "@/src/i18n/dictionary";
+import type { WalletKey } from "@/src/i18n/strings/wallet";
 import type { TxKind } from "@/src/features/account/api";
 
 /**
@@ -12,7 +12,7 @@ import type { TxKind } from "@/src/features/account/api";
  * just expressed where the rest of the site expresses it.
  */
 export interface TxConfig {
-  label: UiKey;
+  label: WalletKey;
   icon: React.ReactNode;
   /** Tailwind classes for the glyph: its colour and its wash. */
   tone: string;

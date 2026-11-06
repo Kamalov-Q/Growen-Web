@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
 import { t } from "@/src/i18n/dictionary";
+import { tSessions } from "@/src/i18n/strings/sessions";
 import { useSession } from "@/src/features/auth/session";
 import { ConfirmDialog } from "@/src/components/ui/ConfirmDialog";
 import { Avatar } from "@/src/components/ui/Avatar";
@@ -115,7 +116,7 @@ export function ProfileCard({ lang }: { lang: Lang }) {
     },
     {
       href: `/${lang}/account/sessions`,
-      label: t(lang, "sessions.title"),
+      label: tSessions(lang, "sessions.title"),
       icon: "sessions",
     },
     {

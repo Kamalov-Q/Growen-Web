@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { Lang } from "@/src/i18n/config";
-import { t } from "@/src/i18n/dictionary";
+import { tw } from "@/src/i18n/strings/wallet";
 import { usePrefs } from "@/src/features/settings/prefs";
 
 /**
@@ -128,7 +128,7 @@ export function VirtualCard({
       <div
         role="button"
         tabIndex={0}
-        aria-label={t(lang, "wallet.flipHint")}
+        aria-label={tw(lang, "wallet.flipHint")}
         onClick={() => setFlipped((v) => !v)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -142,10 +142,10 @@ export function VirtualCard({
         <Face
           {...face}
           className="relative"
-          label={t(lang, "wallet.currentBalance")}
+          label={tw(lang, "wallet.currentBalance")}
           amount={balance === undefined ? null : formatThousands(balance)}
           currency="UZS"
-          swapTo={t(lang, "wallet.toUsd")}
+          swapTo={tw(lang, "wallet.toUsd")}
           corner="VIRTUAL"
         />
         {/* Stacked exactly over the front and turned away from the viewer.
@@ -162,14 +162,14 @@ export function VirtualCard({
         <Face
           {...face}
           className="absolute inset-0 [transform:rotateY(180deg)]"
-          label={t(lang, "wallet.currentBalanceUsd")}
+          label={tw(lang, "wallet.currentBalanceUsd")}
           amount={
             balance === undefined
               ? null
               : formatUsd(balance, rate ?? UZS_PER_USD)
           }
           currency="USD"
-          swapTo={t(lang, "wallet.toUzs")}
+          swapTo={tw(lang, "wallet.toUzs")}
           corner="USD"
         />
       </div>
@@ -307,7 +307,7 @@ function Face({
           >
             <path d="M12 5v14M5 12h14" />
           </svg>
-          {t(lang, "wallet.topup")}
+          {tw(lang, "wallet.topup")}
         </Link>
         ) : null}
       </div>

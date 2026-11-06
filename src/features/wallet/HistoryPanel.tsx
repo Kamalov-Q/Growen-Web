@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import type { Lang } from "@/src/i18n/config";
-import { t } from "@/src/i18n/dictionary";
+import { tw } from "@/src/i18n/strings/wallet";
 import { useSession } from "@/src/features/auth/session";
 import {
   VirtualCard,
@@ -121,7 +121,7 @@ export function HistoryPanel({ lang }: { lang: Lang }) {
       ) : (
         <section className="flex flex-col gap-1 rounded-card bg-surface p-6 shadow-card ring-1 ring-line">
           <p className="text-[13px] font-semibold uppercase tracking-wide text-muted">
-            {t(lang, "wallet.balance")}
+            {tw(lang, "wallet.balance")}
           </p>
           {wallet === null ? (
             <div className="h-9 w-40 animate-pulse rounded-control bg-muted-bg" />
@@ -135,7 +135,7 @@ export function HistoryPanel({ lang }: { lang: Lang }) {
 
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="flex items-center gap-2 text-[1.05rem] font-bold tracking-tight text-ink">
-          {t(lang, "wallet.transactions")}
+          {tw(lang, "wallet.transactions")}
           {total ? (
             <span className="nums rounded-full bg-muted-bg px-2 py-0.5 text-[12px] font-semibold text-muted">
               {total}
@@ -149,7 +149,7 @@ export function HistoryPanel({ lang }: { lang: Lang }) {
           type="button"
           onClick={() => void refresh()}
           disabled={busy}
-          aria-label={t(lang, "wallet.refresh")}
+          aria-label={tw(lang, "wallet.refresh")}
           className="grid size-9 place-items-center rounded-control text-muted ring-1 ring-line transition hover:text-ink disabled:opacity-50"
         >
           <svg
@@ -185,7 +185,7 @@ export function HistoryPanel({ lang }: { lang: Lang }) {
             >
               <path d="M12 4v11m0 0 4-4m-4 4-4-4M4 19h16" />
             </svg>
-            {t(lang, exporting ? "wallet.downloading" : "wallet.download")}
+            {tw(lang, exporting ? "wallet.downloading" : "wallet.download")}
           </button>
         ) : null}
       </div>
@@ -195,7 +195,7 @@ export function HistoryPanel({ lang }: { lang: Lang }) {
           role="alert"
           className="rounded-card bg-surface p-6 text-[15px] text-danger ring-1 ring-line"
         >
-          {t(lang, "wallet.txLoadError")}
+          {tw(lang, "wallet.txLoadError")}
         </p>
       ) : null}
 
@@ -207,7 +207,7 @@ export function HistoryPanel({ lang }: { lang: Lang }) {
         </div>
       ) : !items.length ? (
         <p className="rounded-card bg-surface px-6 py-16 text-center text-[15px] text-muted shadow-card ring-1 ring-line">
-          {t(lang, "wallet.noHistory")}
+          {tw(lang, "wallet.noHistory")}
         </p>
       ) : (
         <>
@@ -226,7 +226,7 @@ export function HistoryPanel({ lang }: { lang: Lang }) {
               onClick={() => void more(items.length)}
               className="h-12 rounded-control text-[15px] font-semibold text-ink ring-1 ring-line transition hover:bg-muted-bg disabled:opacity-50"
             >
-              {t(lang, "wallet.loadMore", { n: total - items.length })}
+              {tw(lang, "wallet.loadMore", { n: total - items.length })}
             </button>
           ) : null}
         </>
@@ -254,7 +254,7 @@ function Row({ lang, tx }: { lang: Lang; tx: WalletTxn }) {
 
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="truncate text-[15px] font-semibold text-ink">
-          {t(lang, config.label)}
+          {tw(lang, config.label)}
         </span>
         <span
           className="text-[12px] text-faint"
@@ -277,7 +277,7 @@ function Row({ lang, tx }: { lang: Lang; tx: WalletTxn }) {
           {formatThousands(amount)}
         </span>
         <span className="nums text-[12px] text-faint">
-          {t(lang, "wallet.balanceAfter", {
+          {tw(lang, "wallet.balanceAfter", {
             amount: formatThousands(tx.balanceAfter),
           })}
         </span>
