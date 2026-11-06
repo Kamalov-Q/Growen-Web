@@ -20,16 +20,26 @@ import { HeaderSearch } from "@/src/features/listings/HeaderSearch";
  */
 
 /**
- * The real emblem — the same gold leaf and buildings the app ships as its
- * launcher icon (mobile/assets/icon.png), resized into public/logo.png.
+ * The real emblem — the delivered logo's own mark, cut from
+ * `mobile/brand/logo-master.png` by that folder's generator and written
+ * here as `public/logo.png`. Regenerate with `npm run icons` in mobile/;
+ * do not retouch it by hand, the next run overwrites it.
  *
- * It was a brand-coloured tile with a "G" in it, which is what you draw
- * before anyone sends you the artwork. Somebody who installed the app and
- * then found the site had no way to tell it was the same company.
+ * ── Gold on nothing, not a tile ───────────────────────────────────────────
  *
- * `unoptimized`: the file is already a 96px PNG cut for this 32px slot, so
- * Next's optimizer would spend a transform and a cache entry producing
- * something the same size.
+ * It used to be the mark on its own teal FIELD, which reads as a sticker
+ * pressed onto the bar — and once the header became glass it was a dark
+ * square sitting over the map. The mark alone takes whatever surface it is
+ * placed on, in either theme, which is also why it has no rounded corners:
+ * there is no tile to round.
+ *
+ * (The tab and home-screen icons keep the field — app/icon.png and
+ * app/apple-icon.png. Those sit on somebody else's surface, where a
+ * transparent mark would be gold on whatever happens to be behind it.)
+ *
+ * `unoptimized`: the file is a 128px PNG cut for this 32px slot — enough
+ * for a 3x screen — so the optimizer would spend a transform and a cache
+ * entry producing something the same size.
  */
 function Mark() {
   return (
@@ -40,7 +50,7 @@ function Mark() {
       height={32}
       unoptimized
       priority
-      className="size-8 shrink-0 rounded-[0.6rem]"
+      className="size-8 shrink-0"
     />
   );
 }

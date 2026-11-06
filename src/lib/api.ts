@@ -214,11 +214,22 @@ interface ApiOptions {
   /** Attach the access token and retry once on 401. Default true. */
   auth?: boolean;
   signal?: AbortSignal;
+  /**
+   * Extra headers for the one or two endpoints that take something this
+   * client does not otherwise send — `X-Device-Id`, which is how a view is
+   * counted once per guest. They are merged LAST but cannot replace
+   * `Authorization`: a caller passing one would be silently signing in as
+   * somebody else.
+   */
+  headers?: Record<string, string>;
 }
 
 async function send(path: string, opts: ApiOptions): Promise<Response> {
   const headers: Record<string, string> = { "X-Auth-Mode": "cookie" };
   if (opts.body !== undefined) headers["Content-Type"] = "application/json";
+  for (const [key, value] of Object.entries(opts.headers ?? {})) {
+    if (key.toLowerCase() !== "authorization") headers[key] = value;
+  }
   if (opts.auth !== false && accessToken) {
     headers.Authorization = `Bearer ${accessToken}`;
   }

@@ -66,7 +66,11 @@ function Block({ block }: { block: LegalBlock }) {
       return (
         // Horizontally scrollable on a phone rather than squeezed: a
         // retention table with a wrapped two-word column is unreadable.
-        <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+        // `py-0.5 -my-0.5` for the same reason the filter chips need it:
+        // a box that scrolls on one axis clips on both, and the table's
+        // `ring-1` is a box-shadow painted outside its border box, so
+        // without the padding it comes out sliced flat top and bottom.
+        <div className="-mx-4 -my-0.5 overflow-x-auto px-4 py-0.5 sm:mx-0 sm:px-0">
           <table className="w-full min-w-[22rem] overflow-hidden rounded-card text-left text-[15px] ring-1 ring-line">
             <thead>
               <tr className="bg-muted-bg">

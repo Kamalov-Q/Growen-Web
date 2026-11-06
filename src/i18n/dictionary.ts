@@ -614,7 +614,7 @@ const UI = {
   "tabs.nav": { uz: "Asosiy menyu", ru: "Основная навигация" },
   "gallery.prev": { uz: "Oldingi rasm", ru: "Предыдущее фото" },
   "gallery.next": { uz: "Keyingi rasm", ru: "Следующее фото" },
-  "map.satellite": { uz: "Sun'il yo'ldosh", ru: "Спутник" },
+  "map.satellite": { uz: "Sun'iy yo'ldosh", ru: "Спутник" },
   "map.street": { uz: "Xarita", ru: "Карта" },
   "map.recenter": { uz: "Markazga", ru: "К центру" },
   "map.openIn": { uz: "Xaritada ochish:", ru: "Открыть на карте:" },
@@ -1044,6 +1044,143 @@ const UI = {
   "detail.about": { uz: "Tavsif", ru: "Описание" },
   "detail.specs": { uz: "Xususiyatlar", ru: "Характеристики" },
   "detail.location": { uz: "Joylashuv", ru: "Расположение" },
+  /* ── What people say about a listing ─────────────────────────────────
+     Reviews, comments and the report sheet, in the app's own words
+     (mobile/src/i18n/locales). Same endpoints, so a comment written on the
+     phone is the same comment here. */
+  "userProfile.message": { uz: "Yozish", ru: "Написать" },
+  "userProfile.messageInApp": {
+    uz: "Yozishmalar mobil ilovada",
+    ru: "Переписка — в мобильном приложении",
+  },
+  "userProfile.sortNewest": { uz: "Eng yangi", ru: "Сначала новые" },
+  "userProfile.title": { uz: "Profil", ru: "Профиль" },
+  "userProfile.ads": { uz: "E'lonlari", ru: "Объявления" },
+  "userProfile.noAds": {
+    uz: "Bu foydalanuvchida hozircha faol e'lon yo'q.",
+    ru: "У этого пользователя пока нет активных объявлений.",
+  },
+  "reviews.title": { uz: "Sharhlar", ru: "Отзывы" },
+  "reviews.count": { uz: "{{count}} ta sharh", ru: "{{count}} отзывов" },
+  "reviews.you": { uz: "Siz", ru: "Вы" },
+  "reviews.edited": { uz: "tahrirlangan", ru: "изменён" },
+  "reviews.write": { uz: "Sharh qoldirish", ru: "Оставить отзыв" },
+  "reviews.editMine": { uz: "Sharhimni tahrirlash", ru: "Изменить мой отзыв" },
+  "reviews.writeSubtitle": {
+    uz: "Bahoyingiz boshqalarga tanlashda yordam beradi",
+    ru: "Ваша оценка поможет другим с выбором",
+  },
+  "reviews.tapToRate": {
+    uz: "Baholash uchun yulduzcha bosing",
+    ru: "Нажмите на звёзды, чтобы оценить",
+  },
+  "reviews.commentPlaceholder": {
+    uz: "Nima yoqdi yoki yoqmadi? (ixtiyoriy)",
+    ru: "Что понравилось или нет? (необязательно)",
+  },
+  "reviews.submit": { uz: "Yuborish", ru: "Отправить" },
+  "reviews.saveEdit": { uz: "Saqlash", ru: "Сохранить" },
+  "reviews.deleteTitle": { uz: "Sharh o'chirilsinmi?", ru: "Удалить отзыв?" },
+  "reviews.deleteMessage": {
+    uz: "Sharhingiz va bahoyingiz olib tashlanadi.",
+    ru: "Ваш отзыв и оценка будут удалены.",
+  },
+  "reviews.emptyTitle": { uz: "Hali sharhlar yo'q", ru: "Отзывов пока нет" },
+  "reviews.emptyHint": {
+    uz: "Birinchi bo'lib fikringizni qoldiring.",
+    ru: "Оставьте первый отзыв.",
+  },
+  "reviews.emptyOwner": {
+    uz: "E'loningiz haqida sharhlar shu yerda ko'rinadi.",
+    ru: "Отзывы о вашем объявлении появятся здесь.",
+  },
+  "reviews.barLabel": {
+    uz: "{{star}} yulduz: {{count}} ta",
+    ru: "{{star}} звёзд: {{count}}",
+  },
+  "reviews.ownListing": {
+    uz: "O'z e'loningizni baholay olmaysiz",
+    ru: "Нельзя оценивать собственное объявление",
+  },
+  "comments.title": { uz: "Izohlar", ru: "Комментарии" },
+  "comments.placeholder": {
+    uz: "Izoh yozing…",
+    ru: "Напишите комментарий…",
+  },
+  "comments.send": { uz: "Yuborish", ru: "Отправить" },
+  "comments.reply": { uz: "Javob berish", ru: "Ответить" },
+  "comments.replyingTo": {
+    uz: "{{name}} ga javob",
+    ru: "Ответ {{name}}",
+  },
+  "comments.edited": { uz: "tahrirlangan", ru: "изменён" },
+  "comments.like": { uz: "Yoqdi", ru: "Нравится" },
+  "comments.showReplies": {
+    uz: "Yana {{count}} ta javob",
+    ru: "Ещё {{count}} ответов",
+  },
+  "comments.edit": { uz: "Tahrirlash", ru: "Изменить" },
+  "comments.save": { uz: "Saqlash", ru: "Сохранить" },
+  "comments.deleteTitle": {
+    uz: "Izoh o'chirilsinmi?",
+    ru: "Удалить комментарий?",
+  },
+  "comments.deleteMessage": {
+    uz: "Izohingiz olib tashlanadi.",
+    ru: "Ваш комментарий будет удалён.",
+  },
+  "comments.deleteThreadMessage": {
+    uz: "Izoh va unga berilgan javoblar o'chiriladi.",
+    ru: "Комментарий и ответы на него будут удалены.",
+  },
+  "comments.emptyTitle": {
+    uz: "Hali izohlar yo'q",
+    ru: "Комментариев пока нет",
+  },
+  "comments.emptyHint": {
+    uz: "Birinchi bo'lib savol bering yoki fikr bildiring.",
+    ru: "Задайте первый вопрос или оставьте мнение.",
+  },
+  "comments.signInToPost": {
+    uz: "Izoh qoldirish uchun kiring",
+    ru: "Войдите, чтобы комментировать",
+  },
+  "detail.share": { uz: "Ulashish", ru: "Поделиться" },
+  "detail.linkCopied": { uz: "Havola nusxalandi", ru: "Ссылка скопирована" },
+  "report.action": { uz: "Shikoyat qilish", ru: "Пожаловаться" },
+  "report.subtitle": {
+    uz: "Nima uchun bu e'lon haqida xabar bermoqchisiz?",
+    ru: "Почему вы хотите пожаловаться на это объявление?",
+  },
+  "report.FRAUD": { uz: "Firibgarlik", ru: "Мошенничество" },
+  "report.WRONG_INFO": {
+    uz: "Ma'lumotlar noto'g'ri",
+    ru: "Неверная информация",
+  },
+  "report.ALREADY_SOLD": {
+    uz: "Allaqachon sotilgan yoki band",
+    ru: "Уже продано или занято",
+  },
+  "report.WRONG_PRICE": { uz: "Narx noto'g'ri", ru: "Неверная цена" },
+  "report.DUPLICATE": { uz: "Takroriy e'lon", ru: "Повторное объявление" },
+  "report.INAPPROPRIATE": {
+    uz: "Nomaqbul kontent",
+    ru: "Неприемлемый контент",
+  },
+  "report.OTHER": { uz: "Boshqa sabab", ru: "Другая причина" },
+  "report.otherPlaceholder": {
+    uz: "Sababni yozing…",
+    ru: "Опишите причину…",
+  },
+  "report.submit": { uz: "Yuborish", ru: "Отправить" },
+  "report.sent": {
+    uz: "Shikoyat yuborildi. Rahmat!",
+    ru: "Жалоба отправлена. Спасибо!",
+  },
+  "report.already": {
+    uz: "Siz bu e'lon haqida allaqachon xabar bergansiz",
+    ru: "Вы уже пожаловались на это объявление",
+  },
   "detail.showPhone": { uz: "Raqamni ko'rsatish", ru: "Показать номер" },
   "detail.phoneFailed": { uz: "Qayta urinish", ru: "Повторить" },
   "detail.seller": { uz: "Sotuvchi", ru: "Продавец" },

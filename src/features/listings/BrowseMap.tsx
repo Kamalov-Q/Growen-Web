@@ -20,6 +20,7 @@ import { ensureMapWorker } from "@/src/lib/maplibre";
 /** See the `moveend` handler — a flick settles several times. */
 const VIEWPORT_DEBOUNCE_MS = 300;
 import type { Lang } from "@/src/i18n/config";
+import { t } from "@/src/i18n/dictionary";
 import { fetchViewport, type FeedQuery } from "./api";
 import type { MapPointFeature, MapPolygonFeature } from "@/src/lib/listing-types";
 import { MapControls } from "./MapControls";
@@ -567,13 +568,10 @@ export function BrowseMap({
           className="pointer-events-auto flex h-9 items-center gap-1.5 rounded-control bg-surface/95 px-3 text-[13px] font-semibold text-ink shadow-card ring-1 ring-line backdrop-blur-sm transition hover:bg-surface"
         >
           {layer === "street" ? "🛰" : "🗺"}{" "}
-          {layer === "street"
-            ? lang === "ru"
-              ? "Спутник"
-              : "Sun'iy yo'ldosh"
-            : lang === "ru"
-              ? "Схема"
-              : "Xarita"}
+          {/* Through the dictionary like everything else: these were two
+              inline ternaries over `lang`, which is how one of the two
+              copies of this label ended up spelled "Sun'il". */}
+          {t(lang, layer === "street" ? "map.satellite" : "map.street")}
         </button>
 
         {count !== null ? (

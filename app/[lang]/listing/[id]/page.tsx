@@ -2,11 +2,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Page } from "@/src/components/Page";
 import { Avatar } from "@/src/components/ui/Avatar";
+import { VerifiedSeal } from "@/src/components/ui/Seal";
 import { ContactButton } from "@/src/features/listings/ContactButton";
 import { Gallery } from "@/src/features/listings/Gallery";
 import { ListingJsonLd } from "@/src/features/listings/ListingJsonLd";
 import { LocationMapLoader } from "@/src/features/listings/LocationMapLoader";
 import { ListingCard } from "@/src/features/listings/ListingCard";
+import { CommentsSection } from "@/src/features/listings/CommentsSection";
+import { ListingStats } from "@/src/features/listings/ListingStats";
+import { ShareButton } from "@/src/features/listings/ShareButton";
+import { ReportButton } from "@/src/features/listings/ReportButton";
+import { ReviewsSection } from "@/src/features/listings/ReviewsSection";
 import { fetchListing, fetchSimilar } from "@/src/features/listings/api";
 import {
   formatPrice,
@@ -17,6 +23,7 @@ import { isLang } from "@/src/i18n/config";
 import { enumLabel, t } from "@/src/i18n/dictionary";
 import { num } from "@/src/lib/listing-types";
 import { pageMetadata } from "@/src/lib/metadata";
+import { monthYear } from "@/src/lib/time";
 
 /**
  * Revalidated, not cached forever: a price change or a listing going SOLD
@@ -214,9 +221,22 @@ export default async function ListingPage({
                   </>
                 ) : null}
               </div>
-              <p className="nums text-[13px] text-faint">
-                {t(lang, "detail.views", { n: listing.viewCount })}
-              </p>
+              {/* Live: views, comments and age move while the page is
+                  open, and opening it is what records the view. Server
+                  values first, so the row is right in the HTML a crawler
+                  reads. See ListingStats. */}
+              {/* Share sits IN the row, not pushed to the far end of it:
+                  `justify-between` left it floating against the margin
+                  looking like it belonged to something else. */}
+              <ListingStats
+                lang={lang}
+                listingId={listing.id}
+                viewCount={listing.viewCount}
+                commentCount={listing.commentCount}
+                publishedAt={listing.publishedAt}
+              >
+                <ShareButton lang={lang} title={listing.title} />
+              </ListingStats>
             </header>
 
             {seller ? (
@@ -224,28 +244,74 @@ export default async function ListingPage({
                 <h2 className="text-[1.05rem] font-semibold tracking-tight text-ink">
                   {t(lang, "detail.seller")}
                 </h2>
-                <div className="flex items-center gap-4 rounded-card bg-surface p-4 shadow-card ring-1 ring-line">
-                  {/* The seller's actual photo, which this block had but
-                      never drew — it showed a "?" to anyone without a name
-                      and nothing at all to everyone else. */}
-                  <Avatar
-                    uri={seller.avatarThumbUrl ?? seller.avatarUrl}
-                    name={sellerName}
-                    size={48}
-                  />
-                  <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-[15px] font-semibold text-ink">
-                      {sellerName ?? "—"}
-                    </span>
-                    {seller.isVerifiedRealtor ? (
-                      <span className="flex items-center gap-1 text-[13px] font-medium text-brand">
-                        <svg aria-hidden viewBox="0 0 24 24" className="size-4" fill="currentColor">
-                          <path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Zm-1 13-3-3 1.4-1.4L11 12.2l4.6-4.6L17 9l-6 6Z" />
-                        </svg>
-                        {t(lang, "detail.verified")}
+                {/* ── The seller card ─────────────────────────────────
+                    It was an avatar and a name in an otherwise empty
+                    panel — four times the height of what it said. Now the
+                    photo leads at a size worth looking at, the name
+                    carries the seal and what kind of seller this is, and
+                    the whole block is a way INTO their profile: a chevron
+                    on a phone, where the call button is below rather than
+                    beside the name. */}
+                <div className="flex flex-col gap-3 rounded-card bg-surface p-4 shadow-card ring-1 ring-line transition hover:ring-brand-line sm:flex-row sm:items-center sm:gap-4">
+                  <Link
+                    href={`/${lang}/users/${seller.id}`}
+                    className="group flex min-w-0 flex-1 items-center gap-3"
+                  >
+                    <Avatar
+                      uri={seller.avatarThumbUrl ?? seller.avatarUrl}
+                      name={sellerName}
+                      size={56}
+                    />
+
+                    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <span className="flex items-center gap-1.5">
+                        <span className="truncate text-[16px] font-bold text-ink transition group-hover:text-brand">
+                          {sellerName ?? t(lang, "detail.seller")}
+                        </span>
+                        {seller.isVerifiedRealtor ? (
+                          <>
+                            <VerifiedSeal className="size-[18px]" />
+                            {/* The seal is `aria-hidden` — it is a picture
+                                of a claim, so the claim itself has to be
+                                said in words for anybody not seeing it. */}
+                            <span className="sr-only">
+                              {t(lang, "detail.verified")}
+                            </span>
+                          </>
+                        ) : null}
                       </span>
-                    ) : null}
-                  </div>
+
+                      <span className="flex flex-wrap items-center gap-x-2 text-[13px] text-muted">
+                        {/* Owner or agent — the buying signal this market
+                            actually cares about, and it was buried in the
+                            specification table. */}
+                        {sellerKind ? <span>{sellerKind}</span> : null}
+                        {sellerKind && seller.createdAt ? (
+                          <span aria-hidden className="text-faint">·</span>
+                        ) : null}
+                        {seller.createdAt ? (
+                          <span>
+                            {t(lang, "profile.memberSince", {
+                              date: monthYear(seller.createdAt, lang),
+                            })}
+                          </span>
+                        ) : null}
+                      </span>
+                    </span>
+
+                    <svg
+                      aria-hidden
+                      viewBox="0 0 24 24"
+                      className="size-4 shrink-0 text-faint rtl:rotate-180 sm:hidden"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="m9 6 6 6-6 6" />
+                    </svg>
+                  </Link>
 
                   {/* Only when the listing is live. Putting a phone number on a
                       sold advert invites calls the seller does not want.
@@ -317,6 +383,29 @@ export default async function ListingPage({
               />
             </section>
           ) : null}
+          </div>
+        </div>
+
+        {/* ── What people say ──────────────────────────────────────────────
+            Both read publicly, which is half of why they are here: a page
+            with questions and answers on it is worth indexing in a way a
+            specification table is not. Writing needs an account, and each
+            section says so in its own place rather than hiding behind a
+            disabled control. */}
+        <div className="mt-10 flex flex-col gap-10 border-t border-line pt-8">
+          <ReviewsSection
+            lang={lang}
+            listingId={id}
+            ownerId={seller?.id ?? null}
+          />
+          <div id="comments" className="scroll-mt-28">
+            <CommentsSection lang={lang} listingId={id} />
+          </div>
+
+          {/* Last, and quiet. Reporting is rare and accusatory — it belongs
+              at the foot of the page, not beside the phone number. */}
+          <div className="flex justify-center">
+            <ReportButton lang={lang} listingId={id} />
           </div>
         </div>
 

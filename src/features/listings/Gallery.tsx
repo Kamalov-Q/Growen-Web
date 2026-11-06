@@ -97,11 +97,44 @@ export function Gallery({
   const [index, setIndex] = useState(1);
   /** Off only for the instant of a boundary jump. */
   const [animate, setAnimate] = useState(true);
-  const [paused, setPaused] = useState(false);
+  /**
+   * Read from `document.hidden`, not started at false.
+   *
+   * `visibilitychange` only fires on a CHANGE, so a page opened in a
+   * background tab — the second result of a middle click, a restored
+   * session — had nothing to tell it the tab was hidden, and autoplay ran
+   * there. That is half of how the stage ended up blank; see the tick.
+   *
+   * It gates a timer and nothing rendered, so reading `document` in the
+   * initialiser cannot make the server and the client disagree about any
+   * markup.
+   */
+  const [paused, setPaused] = useState(
+    () => typeof document !== "undefined" && document.hidden,
+  );
   const [drag, setDrag] = useState(0);
   const [dragging, setDragging] = useState(false);
 
   const dragStart = useRef<number | null>(null);
+  /** The live index, for callbacks that must not re-subscribe to read it. */
+  const indexRef = useRef(index);
+  useEffect(() => {
+    indexRef.current = index;
+  }, [index]);
+
+  /**
+   * Put a stranded track back on a real slide, instantly.
+   *
+   * The loop normally leaves a clone through `transitionend` — and a
+   * background tab runs no transitions, so that event never arrives. The
+   * index then sits on a clone, and the next advance walks PAST the end of
+   * the track into empty space: a blank stage, with a counter still
+   * reading a plausible "4 / 4" because it is computed modulo the count.
+   */
+  const snapHome = useCallback(() => {
+    setAnimate(false);
+    setIndex(1);
+  }, []);
 
   const go = useCallback((next: number) => {
     setAnimate(true);
@@ -121,19 +154,34 @@ export function Gallery({
   useEffect(() => {
     if (count < 2 || paused || dragging || reduceMotion) return;
     const id = setInterval(() => {
+      const i = indexRef.current;
+      // Stranded on (or past) a clone: recover rather than walking further
+      // off the end. Never reached while transitions are running.
+      if (i < 1 || i > count) {
+        snapHome();
+        return;
+      }
       setAnimate(true);
-      setIndex((i) => i + 1);
+      setIndex(i + 1);
     }, AUTOPLAY_MS);
     return () => clearInterval(id);
-  }, [count, paused, dragging, reduceMotion]);
+  }, [count, paused, dragging, reduceMotion, snapHome]);
 
   // A background tab should not keep advancing. Without this you come back
   // to the page and the gallery is somewhere else entirely.
   useEffect(() => {
-    const onVisibility = () => setPaused(document.hidden);
+    const onVisibility = () => {
+      setPaused(document.hidden);
+      // Returning to the tab: if the track was left on a clone while it
+      // was hidden, put it right now rather than at the next tick.
+      if (!document.hidden) {
+        const i = indexRef.current;
+        if (i < 1 || i > count) snapHome();
+      }
+    };
     document.addEventListener("visibilitychange", onVisibility);
     return () => document.removeEventListener("visibilitychange", onVisibility);
-  }, []);
+  }, [count, snapHome]);
 
   // Re-arm the transition one frame AFTER the jump has painted. Doing it in
   // the same frame means the browser never observes the jumped position
@@ -144,7 +192,12 @@ export function Gallery({
     return () => cancelAnimationFrame(id);
   }, [animate]);
 
-  const onTransitionEnd = () => {
+  const onTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
+    // The track's OWN transform, nothing bubbling up from a slide and no
+    // other property: a stray `transitionend` from a child would jump the
+    // loop at a moment the track is not at a boundary.
+    if (e.target !== e.currentTarget || e.propertyName !== "transform") return;
+
     if (index === 0) {
       setAnimate(false);
       setIndex(count);
